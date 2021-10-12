@@ -1,0 +1,82 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Jobber</title>
+    <link rel="stylesheet" type="text/css" href="{% static "css/responsive.css" %}"/>
+    <script src="{% static "js/jquery-3.6.0.min.js" %}"></script>
+    <script src="{% static "js/scripts.js" %}"></script>
+    {% block head-extra %}{% endblock %}
+</head>
+<body>
+
+<div id="header">
+    <div id="title-box">
+        <img src="{% static "img/logo.png" %}" alt="Logo">
+        <!-- img/logo.png: https://toppng.com/free-image/suitcase-black-PNG-free-PNG-Images_30387 -->
+        <h1>Jobber</h1>
+        <h2>Own your job search</h2>
+    </div> <!-- #title-box -->
+
+    <div id="account-box">
+        <ul id="account-box-items">
+            <li>
+                <form id="search-articles" method="get"
+                      action="{% url "opportunities:opportunities_search_results" %}">
+                    <label for="search-box">Search for Advice</label>
+                    <input type="text" name="search-articles" placeholder="resume" id="search-box">
+                    <input id="search-submit" type="submit" value="Search">
+                </form>
+            </li>
+            {% if request.session.username %}
+            <li><a href="#"><img src="{% static "img/mail.png" %}" alt="Mail"></a></li>
+            <!-- img/mail.png https://www.clipartbest.com/clipart-KTjX8k7ac -->
+            <li><a href="#"><img src="{% static "img/profile.png" %}" alt="My Account"></a></li>
+            <!-- img/profile.png: https://toppng.com/free-image/black-and-white-stockportable-network-account-icon-PNG-free-PNG-Images_126251 -->
+            <li><p id="login-name">Logged in as:<br>
+                <strong>{{ request.session.username }}</strong><br>
+                120 Rep<br>
+                <a href="{% url "opportunities:logout" %}" id="logout">Sign Out</a></p></li>
+            {% endif %}
+        </ul>
+    </div> <!-- #account-box -->
+
+    <ul id="primary-nav">
+        {% block primary-nav %}
+        {% endblock %}
+    </ul>
+</div> <!-- #header -->
+
+{% block content-div %}
+    <div id="content"> {% endblock %}
+{% block my-location %} {% endblock %}
+{% block content %}
+{% endblock %}
+{% block ad-space %}
+    <div id="ad-spaces">
+        <a class="ad" href="#"><img class="ad" src="{% static "img/ad-space.png" %}" alt="ad-space"></a>
+        <!-- img/ad-space.png https://thepienews.com/milner_04/ -->
+        <a class="ad" href="#"><img class="ad" src="{% static "img/ad-space.png" %}" alt="ad-space"></a>
+        <!-- img/ad-space.png https://thepienews.com/milner_04/ -->
+    </div> <!-- #ad-spaces -->
+{% endblock %}
+</div> <!-- #content -->
+
+<div id="footer">
+    <p><a href="#">Contact Us</a> <a href="#">Careers</a> <a href="#">Privacy and Terms</a> <a
+            href="#">Accessibility</a></p>
+    <div id="language-select">
+        <label id="lang-label" for="language">Select a Language:</label>
+        <select name="lang" id="language">
+            <option value="english" class="selected">English</option>
+            <option value="spanish">Spanish</option>
+            <option value="arabic">Arabic</option>
+            <option value="korean">Korean</option>
+        </select>
+    </div> <!-- #language-select -->
+</div> <!-- #footer -->
+
+</body>
+</html>
