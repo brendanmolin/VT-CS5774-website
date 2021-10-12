@@ -1,0 +1,73 @@
+a {
+    color: blue;
+}
+
+div#header h1 {
+    display: block;
+}
+
+div#new-account {
+    border-style: solid;
+}
+
+div#login-box {
+    border-style: solid;
+}
+
+div#login-box input {
+    color: blue;
+}
+
+img#home-promo {
+    margin: 1em;
+    width: 40%;
+    object-fit: cover;
+}
+
+@media all and (min-width: 376px) {
+    div#account-options {
+        clear: left;
+        float: left;
+        width: 40%;
+        height: 80%;
+    }
+
+    div#new-account {
+        margin: 1em;
+        padding: 1em;
+        border-style: solid;
+        width: 80%;
+        clear: left;
+    }
+
+    div#login-box {
+        margin: 1em;
+        padding: 1em;
+        border-style: solid;
+        width: 80%;
+        clear: left;
+        float: left;
+    }
+
+    div#login-box input {
+        clear: left;
+        float: left;
+        color: blue;
+    }
+
+    div#login-box p {
+        clear: left;
+        float: left;
+    }
+
+    img#home-promo {
+        float: left;
+        margin: 1em;
+        width: 40%;
+        object-fit: cover;
+    }
+
+    form#login-fields > input {
+        clear: left;
+    }
+}

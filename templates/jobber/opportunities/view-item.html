@@ -1,0 +1,78 @@
+{% extends 'jobber/base.html' %}
+{% block primary-nav %}
+    <li><a href="{% url "opportunities:opportunities_index" %}">Home</a></li>
+    <li><a href="#">Profile</a></li>
+    <li><a href="{% url "opportunities:opportunities_list" %}" class="selected">Opportunities</a></li>
+    <li><a href="#">Advice</a></li>
+    <li><a href="#">About</a></li>
+{% endblock %}
+{% block my-location %}
+    <p id="my-location"><a href="{% url "opportunities:opportunities_index" %}">Home</a> > <a
+            href="{% url "opportunities:opportunities_list" %}">Opportunities</a> > View Opportunity Details
+    </p> {% endblock %}
+{% block content %}
+    <div id="your-opportunity-box" class="page-container">
+        <h2>Your Opportunity</h2>
+        <div id="your-opportunity-header">
+            <div id="stage-select">
+                <label for="stage">Current Stage:</label>
+                <select name="stage" id="stage">
+                    {% for s in stages %}
+                        <option value={{ s.value_name }} {% if s.value_name == opportunity.stage.value_name %} selected="selected" {% endif %}>{{ s.name }}</option>
+                    {% endfor %}
+                </select>
+            </div> <!-- stage-select -->
+            <div class="header-buttons">
+                <p class="button-small"><a href="{% url "opportunities:opportunities_edit_item" opportunity.id %}">Edit</a></p>
+                {% if request.session.role == "admin" %}
+                <p class="button-small"><a href="#">Delete</a></p>
+                {% endif %}
+                <p class="button"><a href="#">See Calendar</a></p>
+            </div> <!-- header-buttons -->
+        </div> <!-- your-opportunities-header -->
+        <div class="topic-box">
+            <ul class="detail-list">
+                <li class="opportunity-summary">
+                    <h3>Key Details</h3>
+                    <p>Title: {{ opportunity.title }}</p>
+                    <p>Company: {{ opportunity.company }}</p>
+                    <p>Location: {{ opportunity.location }}</p>
+                    <p>Recruiter Contact:</p>
+                    <ul class="contact-list">
+                        {% for contact in opportunity.recruiter_contacts %}
+                            <li>{{ contact.name }} <a href="#">(see details)</a></li>
+                        {% endfor %}
+                    </ul>
+                    <p>Created Date: {{ opportunity.create_date | date:"F j, Y" }}</p>
+                </li>
+                <li class="opportunity-summary">
+                    <h3>Application Details</h3>
+                    <div class="side-buttons">
+                        <p class="button"><a href="#">Download Application</a></p>
+                        <p class="button"><a href="#">Get Feedback</a></p>
+                    </div>
+                    <div class="opportunity-summary-details-wide">
+                        <p>Application Page: <a href="{{ opportunity.application_link }}"
+                                                class="explicit-link">{{ opportunity.application_link }}</a>
+                        </p>
+                        <p>Resume: {% if opportunity.application.resume is not None %}Complete <a href="#">(see)</a> {% endif %}</p>
+                        <p>Cover Letter: {% if opportunity.application.cover_letter is not None %}Complete <a href="#">(see)</a> {% endif %} </p>
+                        <p>Referrals:</p>
+                        <ul class="contact-list">
+                            {% for contact in opportunity.referral_contacts %}
+                                <li>{{ contact.name }} <a href="#">(see details)</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </li>
+                {% if opportunity.interview_date is not None or opportunity.interview_location is not None %}
+                    <li class="opportunity-summary">
+                        <h3>Interview Details</h3>
+                        <p>Location: {{ opportunity.interview_location }}</p>
+                        <p>Date: {{ opportunity.interview_date | date:"F j, Y" }}</p>
+                    </li>
+                {% endif %}
+            </ul> <!-- detail-list -->
+        </div> <!-- topic-box -->
+    </div> <!-- #your-opportunity-box -->
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'jobber/base.html' %}
+{% load static %}
+{% block head-extra %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/home-alt.css" %}"/>{% endblock %}
+{% block account-items %}
+<li>
+    <form id="search-articles" method="get" action="search-results">
+        <label for="search-box">Search for Advice</label>
+        <input type="text" name="search-articles" placeholder="resume" id="search-box">
+        <input id="search-submit" type="submit" value="Search">
+    </form>
+</li>
+{% endblock %}
+{% block primary-nav %}
+    <li><a href="#" class="selected">Home</a></li>
+    <li><a href="#">Advice</a></li>
+    <li><a href="#">About</a></li>
+{% endblock %}
+{% block content %}
+    <h2 id="welcome">Your Next Career Starts Here</h2>
+    <div id="account-options">
+        <div id="new-account">
+            <h3>Don't have an account?</h3>
+            <p><a href="#">Create one here</a></p>
+        </div> <!-- #new-account -->
+        <div id="login-box">
+            <h3>Welcome Back</h3>
+            <form action="{% url "opportunities:login" %}", name="login-fields" id="login-fields" method="POST">
+                {% csrf_token %}
+                <input type="text" name="username" placeholder="Username">
+                <input type="password" name="password" placeholder="Password">
+                <input type="submit" name="submit" value="Log In">
+                <p><a href="#">Forgot my credentials</a></p>
+            </form>
+        </div> <!-- #login-box -->
+    </div> <!-- #account-options -->
+    <img id="home-promo" src="{% static "img/promo-1.png" %}" alt="promo-space">
+    <!-- img/promo-1.png https://imgflip.com/memetemplate/288775651/Life-is-good-but-it-can-be-better -->
+{% endblock %}
+{% block ad-space %} {% endblock %}
