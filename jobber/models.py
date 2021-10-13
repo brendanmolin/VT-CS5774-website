@@ -17,13 +17,13 @@ class Opportunity(models.Model):
     stage = models.CharField(max_length=200)
     title = models.CharField(max_length=200)
     company = models.CharField(max_length=200)
-    location = models.CharField(max_length=200)
+    location = models.CharField(max_length=200, )
     recruiter_contacts = models.ManyToManyField("Contact", related_name="recruiter_contacts")
     application_link = models.CharField(max_length=200)
-    application = models.ForeignKey('Application', on_delete=models.CASCADE)
+    application = models.ForeignKey('Application', on_delete=models.CASCADE, null=True, blank=True)
     referral_contacts = models.ManyToManyField("Contact", related_name="referral_contacts")
     interview_location = models.CharField(max_length=200)
-    interview_date = models.DateTimeField()
+    interview_date = models.DateTimeField(null=True, blank=True)
     events = models.ManyToManyField("Event")
     next_step = models.CharField(max_length=200)
 
@@ -41,9 +41,9 @@ class Event(models.Model):
 
 class Resume(models.Model):
     contact = models.CharField(max_length=200)
-    experiences = models.CharField(max_length=200)
-    education = models.CharField(max_length=200)
-    skills = models.CharField(max_length=200)
+    experiences = models.TextField()
+    education = models.TextField()
+    skills = models.TextField()
 
 
 class CoverLetter(models.Model):
@@ -51,7 +51,7 @@ class CoverLetter(models.Model):
 
 
 class Application(models.Model):
-    cover_letter = models.ForeignKey('CoverLetter', on_delete=models.CASCADE)
+    cover_letter = models.ForeignKey('CoverLetter', on_delete=models.CASCADE, null=True, blank=True)
     resume = models.ForeignKey('Resume', on_delete=models.CASCADE)
 
 
@@ -67,21 +67,9 @@ class Author(models.Model):
 class Article(models.Model):
     date_posted = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=200)
-    subtitle = models.CharField(max_length=200)
-    text = models.CharField(max_length=200)
-    author = models.ForeignKey('Author', on_delete=models.CASCADE)
-
-
-# Create data
-stages = []
-contacts = []
-cover_letters = []
-resumes = []
-application = []
-events = []
-opportunities = []
-authors = []
-articles = []
+    subtitle = models.CharField(max_length=400)
+    text = models.TextField()
+    author = models.ForeignKey('Author', on_delete=models.CASCADE, null=True, blank=True)
 
 regular_user = {"username": "jay", "password": "regular"}
 admin_user = {"username": "bmo", "password": "mlogin"}
