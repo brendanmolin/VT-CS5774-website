@@ -4,7 +4,7 @@ from .models import opportunities, stages, contacts, events, regular_user, admin
 
 # Create your views here.
 def opportunities_index(request):
-    if "role" not in request.session.keys():
+    if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
     return render(request,
@@ -14,7 +14,7 @@ def opportunities_index(request):
 
 
 def opportunities_home_alt(request):
-    if "role" not in request.session.keys():
+    if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
     return render(request,
@@ -24,7 +24,7 @@ def opportunities_home_alt(request):
 
 
 def opportunities_list(request):
-    if "role" not in request.session.keys():
+    if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
     return render(request,
@@ -34,7 +34,7 @@ def opportunities_list(request):
 
 
 def opportunities_view_item(request, id):
-    if "role" not in request.session.keys():
+    if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
     my_opp = None
@@ -49,7 +49,7 @@ def opportunities_view_item(request, id):
 
 
 def opportunities_edit_item(request, id):
-    if "role" not in request.session.keys():
+    if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
     my_opp = None
@@ -65,7 +65,7 @@ def opportunities_edit_item(request, id):
 
 
 def opportunities_add_item(request):
-    if "role" not in request.session.keys():
+    if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
     return render(request,
