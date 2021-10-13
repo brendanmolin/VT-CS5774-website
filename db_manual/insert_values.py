@@ -1,15 +1,65 @@
-INSERT INTO public.jobber_stage(id, value_name, name)
-VALUES (DEFAULT, 'explore', 'Exploration'),
-       (DEFAULT, 'apply', 'Preparing Application'),
-       (DEFAULT, 'applied-waiting', 'Applied, Waiting'),
-       (DEFAULT, 'phone', 'Preparing for Phone Interview'),
-       (DEFAULT, 'phone-waiting', 'Phone Interviewed, Waiting'),
-       (DEFAULT, 'interview', 'Preparing for Interview'),
-       (DEFAULT, 'interviewed-waiting', 'Interviewed, Waiting'),
-       (DEFAULT, 'offer', 'Considering Offer'),
-       (DEFAULT, 'closed', 'Closed'),
-       (DEFAULT, 'closed-accepted', 'Closed, Accepted');
+from django.db import models
+from jobber.models import Stage, Event, Contact, Opportunity
+import datetime
+import pytz
 
+# Pre-populate data
+Stage(value_name='explore', name='Exploration').save()
+s2 = Stage(value_name='apply', name='Preparing Application')
+s2.save()
+Stage(value_name='applied-waiting', name='Applied, Waiting').save()
+Stage(value_name='phone', name='Preparing for Phone Interview').save()
+Stage(value_name='phone-waiting', name='Phone Interviewed, Waiting').save()
+s6 = Stage(value_name='interview', name='Preparing for Interview')
+s6.save()
+Stage(value_name='interviewed-waiting', name='Interviewed, Waiting').save()
+Stage(value_name='offer', name='Considering Offer').save()
+Stage(value_name='closed', name='Closed').save()
+Stage(value_name='closed-accepted', name='Closed, Accepted').save()
+
+e1 = Event(date=datetime(year=2021, month=10, day=15, tzinfo=pytz.UTC), title='Interview', type='Event')
+e1.save()
+Event(date=datetime(year=2022, month=1, day=1, tzinfo=pytz.UTC), title='Apply to 5 Jobs', type='Reminder').save()
+
+c1 = Contact(name='John Smith', title='Recruiter', company='JP Morgan', phone_number='11001001001',
+             email='john.smith@jpmorgan.com')
+c1.save()
+c2 = Contact(name='Jane Doe', title='Professor', company='University of DC', phone_number='12001001001',
+             email='jane.doe@udc.edu')
+c2.save()
+c3 = Contact(name='Jordan Williams', title='Manager', company='Intel', phone_number='14001001001',
+             email='jordan.williams@intel.com')
+c3.save()
+
+o1 = Opportunity(
+    create_date=datetime(year=2021, month=8, day=1, tzinfo=pytz.UTC),
+    modified_date=datetime(year=2021, month=9, day=2, tzinfo=pytz.UTC),
+    stage=s6,
+    title='Data Analyst',
+    company='JP Morgan',
+    location='Remote',
+    application_link='https://jpmorgan.com/careers/id_12345',
+    interview_location='170 VT Lane, Blacksburg VA 21111',
+    interview_date=datetime(year=2021, month=10, day=16, tzinfo=pytz.UTC),
+    next_step='Prepare for Interview')
+o1.save()
+o1.recruiter_contacts.add(c1)
+o1.referral_contacts.add(c2, c3)
+o1.events.add(e1)
+
+o2 = Opportunity(
+    create_date=datetime(year=2021, month=8, day=11, tzinfo=pytz.UTC),
+    modified_date=datetime(year=2021, month=10, day=13, tzinfo=pytz.UTC),
+    stage=s2,
+    title='Software Developer',
+    company='Comcast',
+    location='Philadelphia, PA',
+    application_link='https://comcast.com/careers/id_12345',
+    interview_location='',
+    next_step='Apply')
+o2.save()
+
+"""
 INSERT INTO public.jobber_contact(id, name, title, company, phone_number, email)
 VALUES (DEFAULT, 'John Smith', 'Recruiter', 'JP Morgan', '11001001001', 'john.smith@jpmorgan.com'),
        (DEFAULT, 'Jane Doe', 'Professor', 'University of DC', '12001001001', 'jane.doe@udc.edu'),
@@ -75,3 +125,4 @@ VALUES (DEFAULT,
         'When building your resume, your goal is to put as much relevant experience as possible. Sometimes though you need more than one page to do so, but conventional wisdom is that resumes should fit in one page..',
         'When building your resume, your goal is to put as much relevant experience as possible. Sometimes though you need more than one page to do so, but conventional wisdom is that resumes should fit in one page.  But in the end, your goal is to put forth your best qualifications.  One page is a minimum, not a limit.',
         1);
+"""

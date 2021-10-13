@@ -62,12 +62,12 @@
                                 <div class="contact-list">
                                     <div class="contact-list-input">
                                         <select name="recruiter-contact" id="recruiter-contact">
-                                            <option value="none" {% if opportunity.recruiter_contacts is None %}
+                                            <option value="none" {% if opportunity.recruiter_contacts.all.count == 0 %}
                                                     selected="selected" {% endif %}>None
                                             </option>
                                             {% for contact in contacts %}
                                                 <option value="{{ contact.id }}"
-                                                        {% if contact in opportunity.recruiter_contacts %}
+                                                        {% if contact in opportunity.recruiter_contacts.all %}
                                                         selected="selected" {% endif %}>{{ contact.name }}</option>
                                             {% endfor %}
                                         </select>
@@ -103,12 +103,12 @@
                                     <label for="referral-contact">Referral Contact:</label>
                                     <div class="contact-list-input">
                                         <select name="referral-contact" id="referral-contact" multiple="multiple">
-                                            <option value="none" {% if opportunity.referral_contacts is None %}
+                                            <option value="none" {% if opportunity.referral_contacts.all.count == 0 %}
                                                     selected="selected" {% endif %}>None
                                             </option>
                                             {% for contact in contacts %}
                                                 <option value="{{ contact.id }}"
-                                                        {% if contact in opportunity.referral_contacts %}
+                                                        {% if contact in opportunity.referral_contacts.all %}
                                                         selected="selected" {% endif %}>{{ contact.name }}</option>
                                             {% endfor %}
                                         </select>

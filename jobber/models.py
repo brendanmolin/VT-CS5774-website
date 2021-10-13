@@ -1,5 +1,6 @@
 from django.db import models
 from datetime import datetime
+import pytz
 
 
 # Create your models here.
@@ -14,7 +15,7 @@ class Contact(models.Model):
 class Opportunity(models.Model):
     create_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now_add=True)
-    stage = models.CharField(max_length=200)
+    stage = models.ForeignKey("Stage", on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     company = models.CharField(max_length=200)
     location = models.CharField(max_length=200, )
@@ -71,5 +72,7 @@ class Article(models.Model):
     text = models.TextField()
     author = models.ForeignKey('Author', on_delete=models.CASCADE, null=True, blank=True)
 
+
 regular_user = {"username": "jay", "password": "regular"}
 admin_user = {"username": "bmo", "password": "mlogin"}
+

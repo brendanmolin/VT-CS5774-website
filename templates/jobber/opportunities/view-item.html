@@ -39,11 +39,11 @@
                     <p>Location: {{ opportunity.location }}</p>
                     <p>Recruiter Contact:</p>
                     <ul class="contact-list">
-                        {% for contact in opportunity.recruiter_contacts %}
+                        {% for contact in opportunity.recruiter_contacts.all %}
                             <li>{{ contact.name }} <a href="#">(see details)</a></li>
                         {% endfor %}
                     </ul>
-                    <p>Created Date: {{ opportunity.create_date | date:"F j, Y" }}</p>
+                    <p>Created Date: {{ opportunity.create_date }}</p>
                 </li>
                 <li class="opportunity-summary">
                     <h3>Application Details</h3>
@@ -59,9 +59,9 @@
                         <p>Cover Letter: {% if opportunity.application.cover_letter is not None %}Complete <a href="#">(see)</a> {% endif %} </p>
                         <p>Referrals:</p>
                         <ul class="contact-list">
-                            {% for contact in opportunity.referral_contacts %}
-                                <li>{{ contact.name }} <a href="#">(see details)</a></li>
-                            {% endfor %}
+                        {% for contact in opportunity.referral_contacts.all %}
+                            <li>{{ contact.name }} <a href="#">(see details)</a></li>
+                        {% endfor %}
                         </ul>
                     </div>
                 </li>
@@ -69,7 +69,7 @@
                     <li class="opportunity-summary">
                         <h3>Interview Details</h3>
                         <p>Location: {{ opportunity.interview_location }}</p>
-                        <p>Date: {{ opportunity.interview_date | date:"F j, Y" }}</p>
+                        <p>Date: {{ opportunity.interview_date }}</p>
                     </li>
                 {% endif %}
             </ul> <!-- detail-list -->
