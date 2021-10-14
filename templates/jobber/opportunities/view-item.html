@@ -23,9 +23,21 @@
                 </select>
             </div> <!-- stage-select -->
             <div class="header-buttons">
-                <p class="button-small"><a href="{% url "opportunities:opportunities_edit_item" opportunity.id %}">Edit</a></p>
-                {% if request.session.role == "admin" %}
-                <p class="button-small"><a href="#">Delete</a></p>
+                {% if request.session.role == "admin" and opportunity.id is not None %}
+                    <form name="delete" id="delete-form" method="POST"
+                          action="{% url "opportunities:opportunities_delete_item" %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="id" value="{{ opportunity.id }}">
+                        <input type="hidden" name="title" value="{{ opportunity.title }}">
+                        <input type="hidden" name="company" value="{{ opportunity.company }} ">
+                    </form>
+                {% endif %}
+                <p class="button-small"><a
+                        href="{% url "opportunities:opportunities_edit_item" opportunity.id %}">Edit</a></p>
+                {% if request.session.role == "admin" and opportunity.id is not None %}
+                    <button id="delete-opp" type="submit" class="button-small" form="delete-form" formmethod="post">
+                        Delete
+                    </button>
                 {% endif %}
                 <p class="button"><a href="#">See Calendar</a></p>
             </div> <!-- header-buttons -->
@@ -55,8 +67,10 @@
                         <p>Application Page: <a href="{{ opportunity.application_link }}"
                                                 class="explicit-link">{{ opportunity.application_link }}</a>
                         </p>
-                        <p>Resume: {% if opportunity.application.resume is not None %}Complete <a href="#">(see)</a> {% endif %}</p>
-                        <p>Cover Letter: {% if opportunity.application.cover_letter is not None %}Complete <a href="#">(see)</a> {% endif %} </p>
+                        <p>Resume: {% if opportunity.application.resume is not None %}Complete
+                            <a href="#">(see)</a> {% endif %}</p>
+                        <p>Cover Letter: {% if opportunity.application.cover_letter is not None %}Complete
+                            <a href="#">(see)</a> {% endif %} </p>
                         <p>Referrals:</p>
                         <ul class="contact-list">
                             {% for contact in opportunity.referral_contacts %}

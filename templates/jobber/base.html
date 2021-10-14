@@ -31,14 +31,14 @@
                 </form>
             </li>
             {% if request.session.username %}
-            <li><a href="#"><img src="{% static "img/mail.png" %}" alt="Mail"></a></li>
-            <!-- img/mail.png https://www.clipartbest.com/clipart-KTjX8k7ac -->
-            <li><a href="#"><img src="{% static "img/profile.png" %}" alt="My Account"></a></li>
-            <!-- img/profile.png: https://toppng.com/free-image/black-and-white-stockportable-network-account-icon-PNG-free-PNG-Images_126251 -->
-            <li><p id="login-name">Logged in as:<br>
-                <strong>{{ request.session.username }}</strong><br>
-                120 Rep<br>
-                <a href="{% url "opportunities:logout" %}" id="logout">Sign Out</a></p></li>
+                <li><a href="#"><img src="{% static "img/mail.png" %}" alt="Mail"></a></li>
+                <!-- img/mail.png https://www.clipartbest.com/clipart-KTjX8k7ac -->
+                <li><a href="#"><img src="{% static "img/profile.png" %}" alt="My Account"></a></li>
+                <!-- img/profile.png: https://toppng.com/free-image/black-and-white-stockportable-network-account-icon-PNG-free-PNG-Images_126251 -->
+                <li><p id="login-name">Logged in as:<br>
+                    <strong>{{ request.session.username }}</strong><br>
+                    120 Rep<br>
+                    <a href="{% url "opportunities:logout" %}" id="logout">Sign Out</a></p></li>
             {% endif %}
         </ul>
     </div> <!-- #account-box -->
@@ -52,6 +52,15 @@
 {% block content-div %}
     <div id="content"> {% endblock %}
 {% block my-location %} {% endblock %}
+{% block messages %}
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}
 {% block content %}
 {% endblock %}
 {% block ad-space %}
