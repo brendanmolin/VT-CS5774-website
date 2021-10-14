@@ -101,6 +101,27 @@ def opportunities_add_item(request):
                       {"stages": stages,
                        "contacts": contacts})
 
+def opportunities_delete_item(request):
+    if not request.session.get("role", False):
+        return render(request,
+                      "jobber/opportunities/home-alt.html")
+
+    id = request.POST.get("id")
+    title = request.POST.get("title")
+    company = request.POST.get("company")
+    if request.method == 'POST':
+        for index, opp in enumerate(opportunities):
+            if str(opp.id) == id:
+                del opportunities[index]
+                break
+        messages.add_message(request, messages.SUCCESS, "Deleted Opportunity: %s, %s" % (title, company))
+        # Redirect
+        return redirect("opportunities:opportunities_list")
+    else:
+        return render(request,
+                      "jobber/opportunities/add-item.html",
+                      {"stages": stages,
+                       "contacts": contacts})
 
 def opportunities_search_results(request):
     return render(request,
