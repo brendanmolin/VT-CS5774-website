@@ -23,9 +23,10 @@
                 </select>
             </div> <!-- stage-select -->
             <div class="header-buttons">
-                <p class="button-small"><a href="{% url "opportunities:opportunities_edit_item" opportunity.id %}">Edit</a></p>
+                <p class="button-small"><a
+                        href="{% url "opportunities:opportunities_edit_item" opportunity.id %}">Edit</a></p>
                 {% if request.session.role == "admin" %}
-                <p class="button-small"><a href="#">Delete</a></p>
+                    <p class="button-small"><a href="#">Delete</a></p>
                 {% endif %}
                 <p class="button"><a href="#">See Calendar</a></p>
             </div> <!-- header-buttons -->
@@ -55,8 +56,10 @@
                         <p>Application Page: <a href="{{ opportunity.application_link }}"
                                                 class="explicit-link">{{ opportunity.application_link }}</a>
                         </p>
-                        <p>Resume: {% if opportunity.application.resume is not None %}Complete <a href="#">(see)</a> {% endif %}</p>
-                        <p>Cover Letter: {% if opportunity.application.cover_letter is not None %}Complete <a href="#">(see)</a> {% endif %} </p>
+                        <p>Resume: {% if opportunity.application.resume is not None %}Complete
+                            <a href="#">(see)</a> {% endif %}</p>
+                        <p>Cover Letter: {% if opportunity.application.cover_letter is not None %}Complete
+                            <a href="#">(see)</a> {% endif %} </p>
                         <p>Referrals:</p>
                         <ul class="contact-list">
                             {% for contact in opportunity.referral_contacts %}

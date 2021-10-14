@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.contrib import messages
 from .models import Opportunity, Contact, Stage
 from .models import opportunities, stages, contacts, events, regular_user, admin_user
 from datetime import datetime
@@ -91,6 +92,7 @@ def opportunities_add_item(request):
                         interview_location=interview_location, interview_date=interview_date, events=None,
                         next_step=None)
         opportunities.append(o)
+        messages.add_message(request, messages.SUCCESS, "Submitted Opportunity: %s, %s" % (title, company))
         # Redirect
         return redirect("opportunities:opportunities_view_item", id)
     else:

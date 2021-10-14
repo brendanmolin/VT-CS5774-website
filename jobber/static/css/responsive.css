@@ -95,6 +95,19 @@ p#my-location {
     margin-left: 1em
 }
 
+ul.messages {
+    font-weight: bold;
+    padding: 1em;
+    margin: 0;
+    list-style: None;
+}
+
+ul.messages li.success {
+    background-color: lightgreen;
+    padding: 1em;
+    margin: 0.25em;
+}
+
 div.quickview-box {
     border-style: solid;
     border-width: 0.1em;
@@ -117,7 +130,7 @@ ul.detail-list {
     padding: 0;
 }
 
-ul.detail-list>li {
+ul.detail-list > li {
     border-style: solid;
     border-width: 0.1em;
     margin: 0.2em 0.2em;
@@ -248,7 +261,6 @@ div#footer div#language-select {
     }
 
     /* content */
-
     div#content {
         clear: left;
         float: left;
@@ -297,7 +309,7 @@ div#footer div#language-select {
         margin: 0 1em;
     }
 
-    ul.detail-list>li {
+    ul.detail-list > li {
         float: left;
         clear: left;
         border-style: solid;
@@ -426,7 +438,7 @@ div#footer div#language-select {
         width: 60%;
     }
 
-    li.opportunity-summary>div.opportunity-summary-details {
+    li.opportunity-summary > div.opportunity-summary-details {
         float: left;
         margin: 0.5em;
         width: 80%;
@@ -516,7 +528,6 @@ div#footer div#language-select {
     }
 
     /* footer */
-
     div#footer {
         clear: left;
         float: left;
