@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect
+from .models import Opportunity, Contact, Stage
 from .models import opportunities, stages, contacts, events, regular_user, admin_user
+from datetime import datetime
 
 
 # Create your views here.
@@ -68,15 +70,40 @@ def opportunities_add_item(request):
     if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
-    return render(request,
-                  "jobber/opportunities/add-item.html",
-                  {"stages": stages,
-                   "contacts": contacts})
+
+    if request.method == 'POST':
+        id = max([i.id for i in opportunities]) + 1
+        stage = request.POST.get('stage')
+        application_link = request.POST.get('application-link')
+        title = request.POST.get('title')
+        company = request.POST.get('company')
+        location = request.POST.get('title')
+        recruiter_contact = request.POST.get('recruiter-contact')
+        filename_resume = request.POST.get('filename-resume')
+        filename_cover = request.POST.get('filename-cover')
+        referral_contact = request.POST.get('referral-contact')
+        interview_location = request.POST.get('interview-location')
+        interview_date = request.POST.get('interview-date')
+        o = Opportunity(id=id, create_date=datetime.now(), modified_date=datetime.now(), stage=None, title=title,
+                        company=company,
+                        location=location, recruiter_contacts=None,
+                        application_link=application_link, application=None, referral_contacts=None,
+                        interview_location=interview_location, interview_date=interview_date, events=None,
+                        next_step=None)
+        opportunities.append(o)
+        # Redirect
+        return redirect("opportunities:opportunities_view_item", id)
+    else:
+        return render(request,
+                      "jobber/opportunities/add-item.html",
+                      {"stages": stages,
+                       "contacts": contacts})
 
 
 def opportunities_search_results(request):
     return render(request,
                   "jobber/opportunities/search-results.html")
+
 
 def login(request):
     username = request.POST.get("username")
@@ -88,6 +115,7 @@ def login(request):
         request.session['username'] = username
         request.session['role'] = 'admin'
     return redirect("opportunities:opportunities_index")
+
 
 def logout(request):
     del request.session['username']

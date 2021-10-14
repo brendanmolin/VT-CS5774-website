@@ -32,110 +32,117 @@
             </div> <!-- stage-select -->
         </div> <!-- your-opportunities-header -->
         <div class="topic-box">
-            <form name="form-key-details" id="form-id-details">
-                <ul class="detail-list">
-                    <li class="opportunity-summary">
-                        <div class="opportunity-summary-header">
-                            <h3>Key Details</h3>
+            {% if not opportunity.id %}
+                <form name="form-key-details" id="form-id-details"
+                      action="{% url "opportunities:opportunities_add-item" %}" method="post">
+            {% else %}
+                <form name="form-key-details" id="form-id-details"
+                      action="{% url "opportunities:opportunities_edit_item" opportunity.id %}" method="post">
+            {% endif %}
+            {% csrf_token %}
+            <ul class="detail-list">
+                <li class="opportunity-summary">
+                    <div class="opportunity-summary-header">
+                        <h3>Key Details</h3>
+                    </div>
+                    <div class="form-boxes">
+                        <div class="form-box" id="form-fill">
+                            <p>Link to Application Page Here</p>
+                            <input type="url" name="application-link" id="form-key-details-application"
+                                   value="{{ opportunity.application_link }}">
+                            <button id="fill-in-details" type="button" name="auto-fill" value="empty">Fill in
+                                Details
+                            </button>
                         </div>
-                        <div class="form-boxes">
-                            <div class="form-box" id="form-fill">
-                                <p>Link to Application Page Here</p>
-                                <input type="url" name="application-link" id="form-key-details-application"
-                                       value="{{ opportunity.application_link }}">
-                                <button id="fill-in-details" type="button" name="auto-fill" value="empty">Fill in
-                                    Details
+                        <div class='form-box' id="key-details-enter">
+                            <p> Or Enter Details</p>
+                            <p><label for="input-title">Title:</label>
+                                <input class="required" type="text" name="title" id="input-title"
+                                       value="{{ opportunity.title }}"></p>
+                            <p><label for="input-company">Company:</label>
+                                <input class="required" type="text" name="company" id="input-company"
+                                       value="{{ opportunity.company }}"></p>
+                            <p><label for="input-location">Location:</label>
+                                <input type="text" name="location" id="input-location"
+                                       value="{{ opportunity.location }}"></p>
+                            <label for="recruiter-contact">Recruiter Contact:</label>
+                            <div class="contact-list">
+                                <div class="contact-list-input">
+                                    <select name="recruiter-contact" id="recruiter-contact">
+                                        <option value="none" {% if opportunity.recruiter_contacts is None %}
+                                                selected="selected" {% endif %}>None
+                                        </option>
+                                        {% for contact in contacts %}
+                                            <option value="{{ contact.id }}"
+                                                    {% if contact in opportunity.recruiter_contacts %}
+                                                    selected="selected" {% endif %}>{{ contact.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div> <!-- contact-list-input -->
+                                <p class="or">or</p>
+                                <button class="button-small add-contact" type="button" formmethod="post">Add
                                 </button>
-                            </div>
-                            <div class='form-box' id="key-details-enter">
-                                <p> Or Enter Details</p>
-                                <p><label for="input-title">Title:</label>
-                                    <input class="required" type="text" name="title" id="input-title"
-                                           value="{{ opportunity.title }}"></p>
-                                <p><label for="input-company">Company:</label>
-                                    <input class="required" type="text" name="company" id="input-company"
-                                           value="{{ opportunity.company }}"></p>
-                                <p><label for="input-location">Location:</label>
-                                    <input type="text" name="location" id="input-location"
-                                           value="{{ opportunity.location }}"></p>
-                                <label for="recruiter-contact">Recruiter Contact:</label>
-                                <div class="contact-list">
-                                    <div class="contact-list-input">
-                                        <select name="recruiter-contact" id="recruiter-contact">
-                                            <option value="none" {% if opportunity.recruiter_contacts is None %}
-                                                    selected="selected" {% endif %}>None
-                                            </option>
-                                            {% for contact in contacts %}
-                                                <option value="{{ contact.id }}"
-                                                        {% if contact in opportunity.recruiter_contacts %}
-                                                        selected="selected" {% endif %}>{{ contact.name }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div> <!-- contact-list-input -->
-                                    <p class="or">or</p>
-                                    <button class="button-small add-contact" type="button" formmethod="post">Add
-                                    </button>
 
-                                </div> <!-- contact-list -->
-                            </div> <!-- form-box -->
-                        </div> <!-- form-boxes -->
-                    </li> <!-- form-fields -->
-                    <li class="opportunity-summary">
-                        <div class="opportunity-summary-header">
-                            <h3>Application Details</h3>
-                            <button id="right-button" type="button">Add to Calendar</button>
+                            </div> <!-- contact-list -->
+                        </div> <!-- form-box -->
+                    </div> <!-- form-boxes -->
+                </li> <!-- form-fields -->
+                <li class="opportunity-summary">
+                    <div class="opportunity-summary-header">
+                        <h3>Application Details</h3>
+                        <button id="right-button" type="button">Add to Calendar</button>
+                    </div>
+                    <div class="form-boxes">
+                        <div class="form-box">
+                            <p><label for="myResume">Resume:</label>
+                                <input type="file" id="myResume" name="filename-resume"> or <a href="#"
+                                                                                               id="build-resume">
+                                    {% if opportunity.application.resume is not None %}Edit {% else %}
+                                        Build {% endif %}
+                                    it from your Profile</a></p>
+                            <p><label for="myCover">Cover Letter:</label>
+                                <input type="file" id="myCover" name="filename-cover"> or <a href="#"
+                                                                                             id="build-cover">
+                                    {% if opportunity.application.cover_letter is not None %}Edit {% else %}
+                                        Build {% endif %}
+                                    it from your Templates</a></p>
+                            <div class='contact-list' id="application-details-enter">
+                                <label for="referral-contact">Referral Contact:</label>
+                                <div class="contact-list-input">
+                                    <select name="referral-contact" id="referral-contact" multiple="multiple">
+                                        <option value="none" {% if opportunity.referral_contacts is None %}
+                                                selected="selected" {% endif %}>None
+                                        </option>
+                                        {% for contact in contacts %}
+                                            <option value="{{ contact.id }}"
+                                                    {% if contact in opportunity.referral_contacts %}
+                                                    selected="selected" {% endif %}>{{ contact.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div> <!-- contact-list-input -->
+                                <p class="or">or</p>
+                                <button class="button-small add-contact" type="button" formmethod="post">Add
+                                </button>
+                            </div> <!-- inner-form-box -->
+                        </div> <!-- form-box -->
+                    </div> <!-- form-boxes -->
+                </li> <!-- stage-details -->
+                <li class="opportunity-summary">
+                    <div class="opportunity-summary-header">
+                        <h3>Interview Details</h3>
+                    </div>
+                    <div class="form-boxes">
+                        <div class="form-box" id="form-fill">
+                            <p><label for="input-title">Location:</label>
+                                <input type="text" name="interview-location" id="input-title"
+                                       value="{{ opportunity.interview_location }}"></p>
+                            <p><label for="input-title">Date:</label>
+                                <input type="text" name="interview-date" id="input-title"
+                                       value="{{ opportunity.interview_date }}"></p>
                         </div>
-                        <div class="form-boxes">
-                            <div class="form-box">
-                                <p><label for="myResume">Resume:</label>
-                                    <input type="file" id="myResume" name="filename-resume"> or <a href="#"
-                                                                                                   id="build-resume">
-                                        {% if opportunity.application.resume is not None %}Edit {% else %}
-                                            Build {% endif %}
-                                        it from your Profile</a></p>
-                                <p><label for="myCover">Cover Letter:</label>
-                                    <input type="file" id="myCover" name="filename-cover"> or <a href="#"
-                                                                                                 id="build-cover">
-                                        {% if opportunity.application.cover_letter is not None %}Edit {% else %}
-                                            Build {% endif %}
-                                        it from your Templates</a></p>
-                                <div class='contact-list' id="application-details-enter">
-                                    <label for="referral-contact">Referral Contact:</label>
-                                    <div class="contact-list-input">
-                                        <select name="referral-contact" id="referral-contact" multiple="multiple">
-                                            <option value="none" {% if opportunity.referral_contacts is None %}
-                                                    selected="selected" {% endif %}>None
-                                            </option>
-                                            {% for contact in contacts %}
-                                                <option value="{{ contact.id }}"
-                                                        {% if contact in opportunity.referral_contacts %}
-                                                        selected="selected" {% endif %}>{{ contact.name }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div> <!-- contact-list-input -->
-                                    <p class="or">or</p>
-                                    <button class="button-small add-contact" type="button" formmethod="post">Add
-                                    </button>
-                                </div> <!-- inner-form-box -->
-                            </div> <!-- form-box -->
-                        </div> <!-- form-boxes -->
-                    </li> <!-- stage-details -->
-                    <li class="opportunity-summary">
-                        <div class="opportunity-summary-header">
-                            <h3>Interview Details</h3>
-                        </div>
-                        <div class="form-boxes">
-                            <div class="form-box" id="form-fill">
-                                <p><label for="input-title">Location:</label>
-                                    <input class="required" type="text" name="title" id="input-title"
-                                           value="{{ opportunity.interview_location }}"></p>
-                                <p><label for="input-title">Date:</label>
-                                    <input class="required" type="text" name="title" id="input-title"
-                                           value="{{ opportunity.interview_date }}"></p>
-                            </div>
-                        </div> <!-- form-boxes -->
-                    </li> <!-- form-fields -->
-                </ul> <!-- detail-list -->
+                    </div> <!-- form-boxes -->
+                </li> <!-- form-fields -->
+            </ul> <!-- detail-list -->
             </form>
         </div> <!-- topic-box -->
     </div> <!-- #your-opportunity-box -->
