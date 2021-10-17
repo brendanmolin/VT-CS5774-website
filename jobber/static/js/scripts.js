@@ -45,6 +45,13 @@ jQuery.searchArticles = function searchArticles(thisEl, searchPhrase) {
 }
 
 $(document).ready(function () {
+
+    $(document).on("click", 'button.delete', function(e) {
+        if(!confirm("Are you sure you want to delete this?  You cannot undo.")) {
+            e.preventDefault();
+        }
+    })
+
     $(document).on("click", 'button[type*="submit"]:not(div.popup-form button)', function (e) {
         let isError = $.validate($(this));
         if (isError) {

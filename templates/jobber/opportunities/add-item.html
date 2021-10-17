@@ -25,7 +25,7 @@
             {% endif %}
             <p class="button-small"><a href="{% url "opportunities:opportunities_list" %}">Cancel</a></p>
             {% if request.session.role == "admin" and opportunity.id is not None %}
-                <button id="delete-opp" type="submit" class="button-small" form="delete-form" formmethod="post">Delete
+                <button id="delete-opp" type="submit" class="button-small delete" form="delete-form" formmethod="post">Delete
                 </button>
             {% endif %}
             <button id="save-opp" type="submit" class="button-small" form="form-id-details" formmethod="post">Save
