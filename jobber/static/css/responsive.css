@@ -182,6 +182,7 @@ div.form-box input {
 }
 
 div.popup-form {
+    display: none;
     border-style: solid;
     border-color: black;
     background-color: darkgrey;

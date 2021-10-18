@@ -10,6 +10,7 @@ urlpatterns = [
     path('add-item', views.opportunities_add_item, name="opportunities_add-item"),
     path('search-results', views.opportunities_search_results, name="opportunities_search_results"),
     path('opportunities/delete', views.opportunities_delete_item, name="opportunities_delete_item"),
+    path('opportunities/add_contact', views.opportunities_add_contact, name="opportunities_add_contact"),
     path('login', views.login, name="login"),
     path('logout', views.logout, name="logout")
 ]

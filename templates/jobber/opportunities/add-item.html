@@ -25,7 +25,8 @@
             {% endif %}
             <p class="button-small"><a href="{% url "opportunities:opportunities_list" %}">Cancel</a></p>
             {% if request.session.role == "admin" and opportunity.id is not None %}
-                <button id="delete-opp" type="submit" class="button-small delete" form="delete-form" formmethod="post">Delete
+                <button id="delete-opp" type="submit" class="button-small delete" form="delete-form" formmethod="post">
+                    Delete
                 </button>
             {% endif %}
             <button id="save-opp" type="submit" class="button-small" form="form-id-details" formmethod="post">Save
@@ -156,4 +157,31 @@
             </form>
         </div> <!-- topic-box -->
     </div> <!-- #your-opportunity-box -->
+    {% if not opportunity.id %}
+        <form name="form-contact-details" id="form-id-details"
+              action="{% url "opportunities:opportunities_add_contact" %}" method="post">
+    {% else %}
+        <form name="form-contact-details" id="form-id-details"
+              action="{% url "opportunities:opportunities_add_contact" opportunity.id %}" method="post">
+    {% endif %}
+
+{% csrf_token %}
+<div class="form-box popup-form">
+    <h3>New Contact Information:</h3>
+    <input type="hidden" name="formname" id="formname">
+    <p><label for="contact-add-name">Name: </label>
+        <input type="text" name="contact-add-name" class="required" id="contact-add-name"></p>
+    <p><label for="contact-add-title">Title: </label>
+        <input type="text" name="contact-add-title" class="required" id="contact-add-title"></p>
+    <p><label for="contact-add-company">Company: </label>
+        <input type="text" name="contact-add-company" class="required" id="contact-add-company"></p>
+    <p><label for="contact-add-phone">Phone Number: </label>
+        <input type="tel" name="contact-add-phone" class="required" id="contact-add-phone"></p>
+    <p><label for="contact-add-email">Email: </label>
+        <input type="email" name="contact-add-email" class="required" id="contact-add-email"></p>
+    <button type="submit" id="contact-submit" class="button-small contact-list-submit-button">Save
+    </button>
+    <button type="button" id="contact-cancel" class="button-small">Cancel</button>
+</div><!-- contact-list-add -->
+</form>;
 {% endblock %}

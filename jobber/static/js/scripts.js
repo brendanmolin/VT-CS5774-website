@@ -46,7 +46,7 @@ jQuery.searchArticles = function searchArticles(thisEl, searchPhrase) {
 
 $(document).ready(function () {
 
-    $(document).on("click", 'button.delete', function(e) {
+    $(document).on("click", 'a.delete', function(e) {
         if(!confirm("Are you sure you want to delete this?  You cannot undo.")) {
             e.preventDefault();
         }
@@ -69,44 +69,48 @@ $(document).ready(function () {
     })
 
     $('button.add-contact').on('click', function () {
+        /* get which input is being added to */
+        let contactSelect = $(this).prev().prev().children('select');
+        let inputName = contactSelect.attr('name');
         /* add new contact form */
-        let contactBox = $(this).parent().parent().parent().parent().parent().parent().parent();
-        if (!(contactBox.children('form[name*="new-contact-form"]').length)) {
-            let addContactForm =
-                '<form name="new-contact-form">' +
-                '<div class="form-box popup-form">' +
-                '<h3>New Contact Information:</h3>' +
-                '<p><label for="contact-add-name">Name: </label>' +
-                '<input type="text" name="contact-add-name" class="required" id="contact-add-name"></p>' +
-                '<p><label for="contact-add-title">Title: </label>' +
-                '<input type="text" name="contact-add-title" class="required" id="contact-add-title"></p>' +
-                '<p><label for="contact-add-company">Company: </label>' +
-                '<input type="text" name="contact-add-company" class="required" id="contact-add-company"></p>' +
-                '<p><label for="contact-add-phone">Phone Number: </label>' +
-                '<input type="tel" name="contact-add-phone" class="required" id="contact-add-phone"></p>' +
-                '<p><label for="contact-add-email">Email: </label>' +
-                '<input type="email" name="contact-add-email" class="required" id="contact-add-email"></p>' +
-                '<button type="submit" id="contact-submit" class="button-small contact-list-submit-button">Save</button>' +
-                '<button type="button" id="contact-cancel" class="button-small">Cancel</button>' +
-                '</div><!-- contact-list-add -->' +
-                '</form>';
-            contactBox.append(addContactForm);
-        }
+        let popupDiv = $(document).find('div.popup-form');
+        popupDiv.css('display', 'block');
+        /* modify form input to reflect which contact type */
+        let whichForm = popupDiv.children("input[id*='formname']");
+        whichForm.attr("value", inputName);
     });
 
-    $('div.topic-box').on('click', 'button#contact-submit', function (e) {
+    $('div.popup-form').on('click', 'button#contact-submit', function (e) {
         let isError = $.validate($(this));
         if (isError) {
-            e.preventDefault();
+            console.log("error");
+            console.log(e.defaultPrevented);
+            /*e.preventDefault();*/
         } else {
+            console.log("submit");
+            console.log(e.defaultPrevented);
             /* TODO: submit form without reloading page */
-            e.preventDefault();
-            $(this).parent().parent().remove();
+            /*e.preventDefault();*/
         }
     })
 
-    $('div.topic-box').on('click', 'button#contact-cancel', function () {
-        $(this).parent().parent().remove();
+    $('div.popup-form').on('click', '#contact-cancel', function () {
+        let popupDiv = $(document).find('div.popup-form')
+        popupDiv.css('display', 'none')
+        let popupForm = $(popupDiv).parent();
+        popupForm.trigger("reset");
+        let requiredInput = $(popupForm).find('input.required');
+        requiredInput.each(function () {
+            let reqParent = $(this).parent();
+            reqParent.css('display', 'inline');
+            reqParent.css('border-style', 'none');
+        })
+
+        if (($(this).siblings('#input-error')).length) {
+            let failMsg = $(this).siblings('#input-error');
+            $(failMsg).remove();
+        }
+
     })
 
     $(function () {
