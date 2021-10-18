@@ -8,11 +8,12 @@
 {% endblock %}
 {% block my-location %}
     <p id="my-location"><a href="{% url "opportunities:opportunities_index" %}">Home</a> > <a
-            href="{% url "opportunities:opportunities_list" %}">Opportunities</a> > Create New Opportunity
+            href="{% url "opportunities:opportunities_list" %}">Opportunities</a> > {% if opportunity.id %}
+        Edit {% else %}Create New {% endif %} Opportunity
     </p> {% endblock %}
 {% block content %}
     <div id="your-opportunity-box" class="page-container">
-        <h2>Create New Opportunity</h2>
+        <h2>{% if opportunity.id %}Edit {% else %}Create New{% endif %} Opportunity</h2>
         <div class="header-buttons">
             {% if request.session.role == "admin" and opportunity.id is not None %}
                 <form name="delete" id="delete-form" method="POST"
