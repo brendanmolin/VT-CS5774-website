@@ -68,6 +68,7 @@ def opportunities_edit_item(request, id):
 
 
 def opportunities_add_item(request):
+    print("adding opp")
     if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
@@ -101,6 +102,7 @@ def opportunities_add_item(request):
                       {"stages": stages,
                        "contacts": contacts})
 
+
 def opportunities_delete_item(request):
     if not request.session.get("role", False):
         return render(request,
@@ -122,6 +124,41 @@ def opportunities_delete_item(request):
                       "jobber/opportunities/add-item.html",
                       {"stages": stages,
                        "contacts": contacts})
+
+
+def opportunities_add_contact(request, opportunity_id = None):
+    print('adding contact')
+    if not request.session.get("role", False):
+        return render(request,
+                      "jobber/opportunities/home-alt.html")
+    if request.method == 'POST':
+        id = max([i.id for i in opportunities]) + 1
+        form_name = request.POST.get("formname")
+        name = request.POST.get("contact-add-name")
+        title = request.POST.get("contact-add-title")
+        company = request.POST.get("contact-add-company")
+        phone = request.POST.get("contact-add-phone")
+        email = request.POST.get("contact-add-email")
+        c = Contact(id=id,
+                    name=name,
+                    title=title,
+                    company=company,
+                    phone_number=phone,
+                    email=email)
+        contacts.append(c)
+
+    my_opp = None
+    for opp in opportunities:
+        if opp.id == opportunity_id:
+            my_opp = opp
+            break
+
+    return render(request,
+                  "jobber/opportunities/add-item.html",
+                  {"opportunity": my_opp,
+                   'stages': stages,
+                   "contacts": contacts})
+
 
 def opportunities_search_results(request):
     return render(request,
