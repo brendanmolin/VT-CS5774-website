@@ -46,7 +46,8 @@ jQuery.searchArticles = function searchArticles(thisEl, searchPhrase) {
 
 $(document).ready(function () {
 
-    $(document).on("click", 'a.delete', function(e) {
+    $(document).on("click", 'button.delete', function(e) {
+        console.log("delete");
         if(!confirm("Are you sure you want to delete this?  You cannot undo.")) {
             e.preventDefault();
         }
