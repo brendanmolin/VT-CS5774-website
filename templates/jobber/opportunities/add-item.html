@@ -8,8 +8,10 @@
 {% endblock %}
 {% block my-location %}
     <p id="my-location"><a href="{% url "opportunities:opportunities_index" %}">Home</a> > <a
-            href="{% url "opportunities:opportunities_list" %}">Opportunities</a> > {% if opportunity.id is not None %} <a href="{% url "opportunities:opportunities_view_item" opportunity.id %}">Opportunity</a> > {% endif %} {% if opportunity.id %}
-        Edit {% else %}Create New {% endif %} Opportunity
+            href="{% url "opportunities:opportunities_list" %}">Opportunities</a> > {% if opportunity.id is not None %}
+        <a href="{% url "opportunities:opportunities_view_item" opportunity.id %}">Opportunity</a> > {% endif %}
+        {% if opportunity.id %}
+            Edit {% else %}Create New {% endif %} Opportunity
     </p> {% endblock %}
 {% block content %}
     <div id="your-opportunity-box" class="page-container">
@@ -24,7 +26,13 @@
                     <input type="hidden" name="company" value="{{ opportunity.company }} ">
                 </form>
             {% endif %}
-            <p class="button-small"><a href="{% url "opportunities:opportunities_list" %}">Cancel</a></p>
+            {% if opportunity.id is not null %}
+                <p class="button-small"><a
+                        href="{% url "opportunities:opportunities_view_item" opportunity.id %}">Close</a>
+                </p>
+            {% else %}
+                <p class="button-small"><a href="{% url "opportunities:opportunities_list" %}">Cancel</a></p>
+            {% endif %}
             {% if request.session.role == "admin" and opportunity.id is not None %}
                 <button id="delete-opp" type="submit" class="button-small delete" form="delete-form" formmethod="post">
                     Delete
