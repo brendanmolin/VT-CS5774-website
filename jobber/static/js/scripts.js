@@ -1,5 +1,5 @@
 jQuery.validate = function validate(thisEl) {
-    let requiredInput = $(thisEl).parentsUntil("form").find('input.required');
+    let requiredInput = $(thisEl).parentsUntil("form, div.page-container").find('input.required');
     let isValError = false;
     requiredInput.each(function () {
         let reqParent = $(this).parent();
@@ -83,14 +83,10 @@ $(document).ready(function () {
     $('div.popup-form').on('click', 'button#contact-submit', function (e) {
         let isError = $.validate($(this));
         if (isError) {
-            console.log("error");
-            console.log(e.defaultPrevented);
-            /*e.preventDefault();*/
+            e.preventDefault();
         } else {
-            console.log("submit");
             console.log(e.defaultPrevented);
             /* TODO: submit form without reloading page */
-            /*e.preventDefault();*/
         }
     })
 

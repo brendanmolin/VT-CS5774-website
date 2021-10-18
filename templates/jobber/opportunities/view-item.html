@@ -51,9 +51,9 @@
                     <p>Location: {{ opportunity.location }}</p>
                     <p>Recruiter Contact:</p>
                     <ul class="contact-list">
-                        {% for contact in opportunity.recruiter_contacts %}
-                            <li>{{ contact.name }} <a href="#">(see details)</a></li>
-                        {% endfor %}
+                        {% if opportunity.recruiter_contacts is not None %}
+                            <li>{{ opportunity.recruiter_contacts.name }} <a href="#">(see details)</a></li>
+                        {% endif %}
                     </ul>
                     <p>Created Date: {{ opportunity.create_date | date:"F j, Y" }}</p>
                 </li>
