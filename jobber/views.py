@@ -176,14 +176,14 @@ def opportunities_add_contact(request):
         return render(request,
                       "jobber/opportunities/home-alt.html")
     if request.method == 'POST':
-        id = max([i.id for i in opportunities]) + 1
+        opportunity_id = max([i.id for i in opportunities]) + 1
         form_name = request.POST.get("formname")
         name = request.POST.get("contact-add-name")
         title = request.POST.get("contact-add-title")
         company = request.POST.get("contact-add-company")
         phone = request.POST.get("contact-add-phone")
         email = request.POST.get("contact-add-email")
-        c = Contact(id=id,
+        c = Contact(id=opportunity_id,
                     name=name,
                     title=title,
                     company=company,
