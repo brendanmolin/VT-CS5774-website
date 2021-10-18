@@ -8,7 +8,7 @@
 {% endblock %}
 {% block my-location %}
     <p id="my-location"><a href="{% url "opportunities:opportunities_index" %}">Home</a> > <a
-            href="{% url "opportunities:opportunities_list" %}">Opportunities</a> > {% if opportunity.id %}
+            href="{% url "opportunities:opportunities_list" %}">Opportunities</a> > {% if opportunity.id is not None %} <a href="{% url "opportunities:opportunities_view_item" opportunity.id %}">Opportunity</a> > {% endif %} {% if opportunity.id %}
         Edit {% else %}Create New {% endif %} Opportunity
     </p> {% endblock %}
 {% block content %}
