@@ -36,7 +36,7 @@
         <div id="your-opportunity-header">
             <div id="stage-select">
                 <label for="stage">Current Stage:</label>
-                <select name="stage" id="stage">
+                <select name="stage" id="stage" form="form-id-details">
                     {% for s in stages %}
                         <option value={{ s.value_name }} {% if s.value_name == opportunity.stage.value_name %} selected="selected" {% endif %}>{{ s.name }}</option>
                     {% endfor %}
@@ -86,7 +86,7 @@
                                         </option>
                                         {% for contact in contacts %}
                                             <option value="{{ contact.id }}"
-                                                    {% if contact in opportunity.recruiter_contacts %}
+                                                    {% if contact == opportunity.recruiter_contacts %}
                                                     selected="selected" {% endif %}>{{ contact.name }}</option>
                                         {% endfor %}
                                     </select>
