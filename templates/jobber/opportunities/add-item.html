@@ -162,7 +162,7 @@
               action="{% url "opportunities:opportunities_add_contact" %}" method="post">
     {% else %}
         <form name="form-contact-details" id="form-id-details"
-              action="{% url "opportunities:opportunities_add_contact" opportunity.id %}" method="post">
+              action="{% url "opportunities:opportunities_add_contact" %}" method="post">
     {% endif %}
 
 {% csrf_token %}

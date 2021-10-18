@@ -56,10 +56,38 @@ def opportunities_edit_item(request, id):
         return render(request,
                       "jobber/opportunities/home-alt.html")
     my_opp = None
-    for opp in opportunities:
+    for index, opp in enumerate(opportunities):
         if opp.id == id:
             my_opp = opp
             break
+
+    if request.method == 'POST':
+        opportunity_id = my_opp.id
+        print(opportunity_id)
+        stage = request.POST.get('stage')
+        print('stage', stage)
+        application_link = request.POST.get('application-link')
+        print('appl', application_link)
+        title = request.POST.get('title')
+        company = request.POST.get('company')
+        location = request.POST.get('title')
+        recruiter_contact = request.POST.get('recruiter-contact')
+        print('a', recruiter_contact)
+        print('b', request.POST.getlist('recruiter-contact'))
+        filename_resume = request.POST.get('filename-resume')
+        filename_cover = request.POST.get('filename-cover')
+        referral_contact = request.POST.get('referral-contact')
+        print('c', request.POST.getlist('referral-contact'))
+        interview_location = request.POST.get('interview-location')
+        interview_date = request.POST.get('interview-date')
+        my_opp = Opportunity(id=opportunity_id, create_date=my_opp.create_date, modified_date=datetime.now(), stage=None, title=title,
+                        company=company,
+                        location=location, recruiter_contacts=None,
+                        application_link=application_link, application=None, referral_contacts=None,
+                        interview_location=interview_location, interview_date=interview_date, events=None,
+                        next_step=None)
+        opportunities[index] = my_opp
+        messages.add_message(request, messages.SUCCESS, "Saved Opportunity: %s, %s" % (title, company))
     return render(request,
                   "jobber/opportunities/add-item.html",
                   {"opportunity": my_opp,
@@ -81,6 +109,8 @@ def opportunities_add_item(request):
         company = request.POST.get('company')
         location = request.POST.get('title')
         recruiter_contact = request.POST.get('recruiter-contact')
+        print('a', recruiter_contact)
+        print('b', request.POST.getlist('recruiter-contact'))
         filename_resume = request.POST.get('filename-resume')
         filename_cover = request.POST.get('filename-cover')
         referral_contact = request.POST.get('referral-contact')
@@ -126,7 +156,7 @@ def opportunities_delete_item(request):
                        "contacts": contacts})
 
 
-def opportunities_add_contact(request, opportunity_id = None):
+def opportunities_add_contact(request):
     print('adding contact')
     if not request.session.get("role", False):
         return render(request,
@@ -147,17 +177,7 @@ def opportunities_add_contact(request, opportunity_id = None):
                     email=email)
         contacts.append(c)
 
-    my_opp = None
-    for opp in opportunities:
-        if opp.id == opportunity_id:
-            my_opp = opp
-            break
-
-    return render(request,
-                  "jobber/opportunities/add-item.html",
-                  {"opportunity": my_opp,
-                   'stages': stages,
-                   "contacts": contacts})
+    return redirect("opportunities:opportunities_index")
 
 
 def opportunities_search_results(request):
