@@ -140,7 +140,7 @@ def opportunities_add_item(request):
         opportunities.append(my_opp)
         messages.add_message(request, messages.SUCCESS, "Submitted Opportunity: %s, %s" % (title, company))
         # Redirect
-        return redirect("opportunities:opportunities_view_item", id)
+        return redirect("opportunities:opportunities_view_item", opportunity_id)
     else:
         return render(request,
                       "jobber/opportunities/add-item.html",
