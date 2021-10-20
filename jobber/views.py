@@ -107,7 +107,10 @@ def opportunities_add_item(request):
                       "jobber/opportunities/home-alt.html")
 
     if request.method == 'POST':
-        opportunity_id = max([i.id for i in opportunities]) + 1
+        if len(opportunities) == 0:
+            opportunity_id = 1
+        else:
+            opportunity_id = max([i.id for i in opportunities]) + 1
         stage = request.POST.get('stage')
         for s in stages:
             if s.value_name == stage:
@@ -140,7 +143,7 @@ def opportunities_add_item(request):
         opportunities.append(my_opp)
         messages.add_message(request, messages.SUCCESS, "Submitted Opportunity: %s, %s" % (title, company))
         # Redirect
-        return redirect("opportunities:opportunities_view_item", id)
+        return redirect("opportunities:opportunities_view_item", opportunity_id)
     else:
         return render(request,
                       "jobber/opportunities/add-item.html",
@@ -176,7 +179,10 @@ def opportunities_add_contact(request):
         return render(request,
                       "jobber/opportunities/home-alt.html")
     if request.method == 'POST':
-        opportunity_id = max([i.id for i in opportunities]) + 1
+        if len(opportunities) == 0:
+            opportunity_id = 1
+        else:
+            opportunity_id = max([i.id for i in opportunities]) + 1
         form_name = request.POST.get("formname")
         name = request.POST.get("contact-add-name")
         title = request.POST.get("contact-add-title")
