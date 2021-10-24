@@ -25,13 +25,13 @@ def generate_opportunity(request, opportunity_id=None) -> Opportunity:
     title = request.POST.get('title')
     company = request.POST.get('company')
     location = request.POST.get('location')
-    recruiter_contact = request.POST.get('recruiter-contact')
+    recruiter_contact = request.POST.get('REC')
     input_recruiter_contact = None
     if recruiter_contact is not '':
         input_recruiter_contact = Contact.objects.get(pk=recruiter_contact)
     filename_resume = request.POST.get('filename-resume')
     filename_cover = request.POST.get('filename-cover')
-    referral_contact = request.POST.getlist('referral-contact')
+    referral_contact = request.POST.getlist('REF')
     referral_contact_inputs = []
     for c in contacts:
         if str(c.id) in referral_contact:
@@ -62,6 +62,7 @@ def generate_opportunity(request, opportunity_id=None) -> Opportunity:
         my_opp.interview_date = interview_date
         my_opp.next_step = ''
     my_opp.save()
+    my_opp.referral_contacts.clear()
     for c in referral_contact_inputs:
         my_opp.referral_contacts.add(c)
     my_opp.save()
@@ -110,7 +111,6 @@ def opportunities_view_item(request, id):
     if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
-    opportunities = Opportunity.objects.all()
     stages = Stage.objects.all()
     my_opp = Opportunity.objects.get(pk=id)
     return render(request,
@@ -123,7 +123,6 @@ def opportunities_edit_item(request, id):
     if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
-    contacts = Contact.objects.all()
     stages = Stage.objects.all()
     my_opp = Opportunity.objects.get(pk=id)
     if request.method == 'POST':
@@ -133,7 +132,9 @@ def opportunities_edit_item(request, id):
                   "jobber/opportunities/add-item.html",
                   {"opportunity": my_opp,
                    'stages': stages,
-                   "contacts": contacts})
+                   "recruiter_contacts": Contact.objects.filter(contact_type='REC'),
+                   "referral_contacts": Contact.objects.filter(contact_type='REF')
+                   })
 
 
 def opportunities_add_item(request):
@@ -141,7 +142,6 @@ def opportunities_add_item(request):
         return render(request,
                       "jobber/opportunities/home-alt.html")
 
-    contacts = Contact.objects.all()
     stages = Stage.objects.all()
     if request.method == 'POST':
         my_opp = generate_opportunity(request, opportunity_id=None)
@@ -153,7 +153,9 @@ def opportunities_add_item(request):
         return render(request,
                       "jobber/opportunities/add-item.html",
                       {"stages": stages,
-                       "contacts": contacts})
+                       "recruiter_contacts": Contact.objects.filter(contact_type='REC'),
+                       "referral_contacts": Contact.objects.filter(contact_type='REF')
+                       })
 
 
 def opportunities_delete_item(request):
@@ -171,12 +173,13 @@ def opportunities_delete_item(request):
         # Redirect
         return redirect("opportunities:opportunities_list")
     else:
-        contacts = Contact.objects.all()
         stages = Stage.objects.all()
         return render(request,
                       "jobber/opportunities/add-item.html",
                       {"stages": stages,
-                       "contacts": contacts})
+                       "recruiter_contacts": Contact.objects.filter(contact_type='REC'),
+                       "referral_contacts": Contact.objects.filter(contact_type='REF')
+                       })
 
 
 def opportunities_add_contact(request):
@@ -194,7 +197,8 @@ def opportunities_add_contact(request):
                              title=title,
                              company=company,
                              phone_number=phone,
-                             email=email)
+                             email=email,
+                             contact_type=form_name)
         my_contact.save()
 
     return redirect("opportunities:opportunities_index")
