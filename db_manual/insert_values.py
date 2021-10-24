@@ -1,5 +1,4 @@
-from django.db import models
-from jobber.models import Stage, Event, Contact, Opportunity
+from jobber.models import Stage, Event, Contact, Opportunity, User
 import datetime
 import pytz
 
@@ -18,27 +17,32 @@ Stage(value_name='offer', name='Considering Offer').save()
 Stage(value_name='closed', name='Closed').save()
 Stage(value_name='closed-accepted', name='Closed, Accepted').save()
 
-e1 = Event(date=datetime(year=2021, month=10, day=15, tzinfo=pytz.UTC), title='Interview', type='Event')
-e1.save()
-Event(date=datetime(year=2022, month=1, day=1, tzinfo=pytz.UTC), title='Apply to 5 Jobs', type='Reminder').save()
+u1 = User(username='jay', name='Jay Pritchett', reputation=120)
+u1.save()
+User(username='bmo', name='Admin Molin', reputation=9999).save()
 
-c1 = Contact(name='John Smith', title='Recruiter', company='JP Morgan', phone_number='11001001001',
+e1 = Event(user=u1, date=datetime(year=2021, month=10, day=15, tzinfo=pytz.UTC), title='Interview', type='Event')
+e1.save()
+Event(user=u1, date=datetime(year=2022, month=1, day=1, tzinfo=pytz.UTC), title='Apply to 5 Jobs', type='Reminder').save()
+
+c1 = Contact(user=u1, name='John Smith', title='Recruiter', company='JP Morgan', phone_number='11001001001',
              email='john.smith@jpmorgan.com', contact_type=Contact.RECRUITER)
 c1.save()
-c2 = Contact(name='Jane Doe', title='Professor', company='University of DC', phone_number='12001001001',
+c2 = Contact(user=u1, name='Jane Doe', title='Professor', company='University of DC', phone_number='12001001001',
              email='jane.doe@udc.edu', contact_type=Contact.REFERENCE)
 c2.save()
-c3 = Contact(name='Jordan Williams', title='Manager', company='Intel', phone_number='14001001001',
+c3 = Contact(user=u1, name='Jordan Williams', title='Manager', company='Intel', phone_number='14001001001',
              email='jordan.williams@intel.com', contact_type=Contact.REFERENCE)
 c3.save()
-c4 = Contact(name='Kim Lee', title='Senior Analyst', company='Google', phone_number='15001001001',
+c4 = Contact(user=u1, name='Kim Lee', title='Senior Analyst', company='Google', phone_number='15001001001',
              email='kim.lee@google.com', contact_type=Contact.REFERENCE)
 c4.save()
-c5 = Contact(name='Abdullah Ahmad', title='Hiring Manager', company='Comcast', phone_number='16001001001',
+c5 = Contact(user=u1, name='Abdullah Ahmad', title='Hiring Manager', company='Comcast', phone_number='16001001001',
              email='abdullah.ahmad@google.com', contact_type=Contact.RECRUITER)
 c5.save()
 
 o1 = Opportunity(
+    user=u1,
     create_date=datetime(year=2021, month=8, day=1, tzinfo=pytz.UTC),
     modified_date=datetime(year=2021, month=9, day=2, tzinfo=pytz.UTC),
     stage=s6,
@@ -55,6 +59,7 @@ o1.referral_contacts.add(c2, c3)
 o1.events.add(e1)
 
 o2 = Opportunity(
+    user=u1,
     create_date=datetime(year=2021, month=8, day=11, tzinfo=pytz.UTC),
     modified_date=datetime(year=2021, month=10, day=13, tzinfo=pytz.UTC),
     stage=s2,

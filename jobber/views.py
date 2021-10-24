@@ -2,7 +2,7 @@ import pytz
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from datetime import datetime
-from .models import regular_user, admin_user, Opportunity, Event, Stage, Contact
+from .models import regular_user, admin_user, Opportunity, Event, Stage, Contact, User
 
 
 # Create helper functions
@@ -20,14 +20,13 @@ def generate_opportunity(request, opportunity_id=None) -> Opportunity:
     contacts = Contact.objects.all()
     stage = request.POST.get('stage')
     input_stage = Stage.objects.get(value_name=stage)
-    print(input_stage)
     application_link = request.POST.get('application-link')
     title = request.POST.get('title')
     company = request.POST.get('company')
     location = request.POST.get('location')
     recruiter_contact = request.POST.get('REC')
     input_recruiter_contact = None
-    if recruiter_contact is not '':
+    if recruiter_contact != '' and recruiter_contact is not None and recruiter_contact != 'none':
         input_recruiter_contact = Contact.objects.get(pk=recruiter_contact)
     filename_resume = request.POST.get('filename-resume')
     filename_cover = request.POST.get('filename-cover')
@@ -40,7 +39,8 @@ def generate_opportunity(request, opportunity_id=None) -> Opportunity:
     interview_date = request.POST.get('interview-date')
     interview_date = format_date(interview_date)
     if opportunity_id is None:
-        my_opp = Opportunity(create_date=utc.localize(datetime.now()), modified_date=utc.localize(datetime.now()),
+        my_opp = Opportunity(user=User.objects.get(username=request.session['username']),
+                             create_date=utc.localize(datetime.now()), modified_date=utc.localize(datetime.now()),
                              stage=input_stage, title=title,
                              company=company,
                              location=location,
@@ -50,6 +50,7 @@ def generate_opportunity(request, opportunity_id=None) -> Opportunity:
                              next_step='')
     else:
         my_opp = Opportunity.objects.get(pk=opportunity_id)
+        my_opp.user = User.objects.get(username=request.session['username'])
         my_opp.modified_date = utc.localize(datetime.now())
         my_opp.stage = input_stage
         my_opp.title = title
@@ -74,8 +75,12 @@ def opportunities_index(request):
     if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
-    opportunities = Opportunity.objects.all()
-    events = Event.objects.all()
+    if request.session['role'] == "admin":
+        opportunities = Opportunity.objects.all()
+        events = Event.objects.all()
+    else:
+        opportunities = Opportunity.objects.filter(user=User.objects.get(username=request.session['username']).id)
+        events = Event.objects.filter(user=User.objects.get(username=request.session['username']).id)
     return render(request,
                   "jobber/opportunities/index.html",
                   {"opportunities": opportunities,
@@ -86,8 +91,12 @@ def opportunities_home_alt(request):
     if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
-    opportunities = Opportunity.objects.all()
-    events = Event.objects.all()
+    if request.session['role'] == "admin":
+        opportunities = Opportunity.objects.all()
+        events = Event.objects.all()
+    else:
+        opportunities = Opportunity.objects.filter(user=User.objects.get(username=request.session['username']).id)
+        events = Event.objects.filter(user=User.objects.get(username=request.session['username']).id)
     return render(request,
                   "jobber/opportunities/index.html",
                   {"opportunities": opportunities,
@@ -98,7 +107,11 @@ def opportunities_list(request):
     if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
-    opportunities = Opportunity.objects.all()
+
+    if request.session['role'] == "admin":
+        opportunities = Opportunity.objects.all()
+    else:
+        opportunities = Opportunity.objects.filter(user=User.objects.get(username=request.session['username']).id)
     stages = Stage.objects.all()
     return render(request,
                   "jobber/opportunities/list.html",
@@ -113,6 +126,10 @@ def opportunities_view_item(request, id):
                       "jobber/opportunities/home-alt.html")
     stages = Stage.objects.all()
     my_opp = Opportunity.objects.get(pk=id)
+    if request.session['role'] != "admin" and my_opp.user.username != request.session['username']:
+        # TODO: Add message denying access
+        return redirect("opportunities:opportunities_list")
+
     return render(request,
                   "jobber/opportunities/view-item.html",
                   {"opportunity": my_opp,
@@ -125,6 +142,9 @@ def opportunities_edit_item(request, id):
                       "jobber/opportunities/home-alt.html")
     stages = Stage.objects.all()
     my_opp = Opportunity.objects.get(pk=id)
+    if request.session['role'] != "admin" and my_opp.user.username != request.session['username']:
+        # TODO: Add message denying access
+        return redirect("opportunities:opportunities_list")
     if request.method == 'POST':
         my_opp = generate_opportunity(request=request, opportunity_id=id)
         messages.add_message(request, messages.SUCCESS, "Saved Opportunity: %s, %s" % (my_opp.title, my_opp.company))
@@ -166,6 +186,9 @@ def opportunities_delete_item(request):
     if request.method == 'POST':
         opportunity_id = request.POST.get("id")
         my_opp = Opportunity.objects.get(pk=opportunity_id)
+        if request.session['role'] != "admin" and my_opp.user.username != request.session['username']:
+            # TODO: Add message denying access
+            return redirect("opportunities:opportunities_list")
         title = my_opp.title
         company = my_opp.company
         my_opp.delete()
@@ -193,12 +216,14 @@ def opportunities_add_contact(request):
         company = request.POST.get("contact-add-company")
         phone = request.POST.get("contact-add-phone")
         email = request.POST.get("contact-add-email")
-        my_contact = Contact(name=name,
-                             title=title,
-                             company=company,
-                             phone_number=phone,
-                             email=email,
-                             contact_type=form_name)
+        my_contact = Contact(
+            user=User.objects.get(username=request.session['username']),
+            name=name,
+            title=title,
+            company=company,
+            phone_number=phone,
+            email=email,
+            contact_type=form_name)
         my_contact.save()
 
     return redirect("opportunities:opportunities_index")
