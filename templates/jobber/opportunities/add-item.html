@@ -158,7 +158,8 @@
                                        value="{{ opportunity.interview_location }}"></p>
                             <p><label for="input-title">Date:</label>
                                 <input type="text" name="interview-date" id="input-title"
-                                       value="{{ opportunity.interview_date }}"></p>
+                                       value={% if opportunity.interview_date is not None %} "{{ opportunity.interview_date | date:"Y-m-d" }}" {% endif %}>
+                            </p>
                         </div>
                     </div> <!-- form-boxes -->
                 </li> <!-- form-fields -->

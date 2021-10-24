@@ -4,6 +4,71 @@ from datetime import datetime
 from .models import regular_user, admin_user, Opportunity, Event, Stage, Contact
 
 
+# Create helper functions
+def format_date(date):
+    if date != '':
+        date = datetime.strptime(date, '%Y-%m-%d')
+    else:
+        date = None
+    return date
+
+
+def generate_opportunity(request, opportunity_id=None) -> Opportunity:
+    stages = Stage.objects.all()
+    contacts = Contact.objects.all()
+    stage = request.POST.get('stage')
+    for s in stages:
+        if s.value_name == stage:
+            stage = s
+            break
+    application_link = request.POST.get('application-link')
+    title = request.POST.get('title')
+    company = request.POST.get('company')
+    location = request.POST.get('location')
+    recruiter_contact = request.POST.get('recruiter-contact')
+    input_recruiter_contact = None
+    for c in contacts:
+        if str(c.id) == recruiter_contact:
+            input_recruiter_contact = c
+            break
+    filename_resume = request.POST.get('filename-resume')
+    filename_cover = request.POST.get('filename-cover')
+    referral_contact = request.POST.getlist('referral-contact')
+    referral_contact_inputs = []
+    for c in contacts:
+        if str(c.id) in referral_contact:
+            referral_contact_inputs.append(c)
+    interview_location = request.POST.get('interview-location')
+    interview_date = request.POST.get('interview-date')
+    interview_date = format_date(interview_date)
+    if opportunity_id is None:
+        my_opp = Opportunity(create_date=datetime.now(), modified_date=datetime.now(), stage=stage, title=title,
+                             company=company,
+                             location=location,
+                             application_link=application_link, application=None,
+                             interview_location=interview_location, interview_date=interview_date,
+                             next_step='')
+    else:
+        my_opp = Opportunity.objects.get(pk=opportunity_id)
+        my_opp.modified_date = datetime.now()
+        my_opp.stage = stage
+        my_opp.title = title
+        my_opp.company = company
+        my_opp.location = location
+        my_opp.application_link = application_link
+        my_opp.application = None
+        my_opp.interview_location = interview_location
+        my_opp.interview_date = interview_date
+        my_opp.next_step = ''
+    my_opp.save()
+    if input_recruiter_contact is not None:
+        my_opp.recruiter_contacts.add(recruiter_contact)
+    for c in referral_contact_inputs:
+        my_opp.referral_contacts.add(c)
+    my_opp.save()
+    return my_opp
+
+
 # Create your views here.
 def opportunities_index(request):
     if not request.session.get("role", False):
@@ -63,48 +128,13 @@ def opportunities_edit_item(request, id):
     if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
-    opportunities = Opportunity.objects.all()
     contacts = Contact.objects.all()
     stages = Stage.objects.all()
-    my_opp = None
-    for index, opp in enumerate(opportunities):
-        if opp.id == id:
-            my_opp = opp
-            break
 
+    my_opp = Opportunity.objects.get(pk=id)
     if request.method == 'POST':
-        opportunity_id = my_opp.id
-        stage = request.POST.get('stage')
-        for s in stages:
-            if s.value_name == stage:
-                stage = s
-                break
-        application_link = request.POST.get('application-link')
-        title = request.POST.get('title')
-        company = request.POST.get('company')
-        location = request.POST.get('title')
-        recruiter_contact = request.POST.get('recruiter-contact')
-        for c in contacts:
-            if str(c.id) == recruiter_contact:
-                recruiter_contact = c
-                break
-        filename_resume = request.POST.get('filename-resume')
-        filename_cover = request.POST.get('filename-cover')
-        referral_contact = request.POST.getlist('referral-contact')
-        referral_contact_inputs = []
-        for c in contacts:
-            if str(c.id) in referral_contact:
-                referral_contact_inputs.append(c)
-        interview_location = request.POST.get('interview-location')
-        interview_date = request.POST.get('interview-date')
-        my_opp = Opportunity(id=opportunity_id, create_date=my_opp.create_date, modified_date=datetime.now(), stage=stage, title=title,
-                        company=company,
-                        location=location, recruiter_contacts=recruiter_contact,
-                        application_link=application_link, application=None, referral_contacts=referral_contact_inputs,
-                        interview_location=interview_location, interview_date=interview_date, events=None,
-                        next_step=None)
-        opportunities[index] = my_opp
-        messages.add_message(request, messages.SUCCESS, "Saved Opportunity: %s, %s" % (title, company))
+        my_opp = generate_opportunity(request=request, opportunity_id=id)
+        messages.add_message(request, messages.SUCCESS, "Saved Opportunity: %s, %s" % (my_opp.title, my_opp.company))
     return render(request,
                   "jobber/opportunities/add-item.html",
                   {"opportunity": my_opp,
@@ -117,47 +147,14 @@ def opportunities_add_item(request):
         return render(request,
                       "jobber/opportunities/home-alt.html")
 
-    opportunities = Opportunity.objects.all()
     contacts = Contact.objects.all()
     stages = Stage.objects.all()
     if request.method == 'POST':
-        if len(opportunities) == 0:
-            opportunity_id = 1
-        else:
-            opportunity_id = max([i.id for i in opportunities]) + 1
-        stage = request.POST.get('stage')
-        for s in stages:
-            if s.value_name == stage:
-                stage = s
-                break
-        application_link = request.POST.get('application-link')
-        title = request.POST.get('title')
-        company = request.POST.get('company')
-        location = request.POST.get('title')
-        recruiter_contact = request.POST.get('recruiter-contact')
-        for c in contacts:
-            if str(c.id) == recruiter_contact:
-                recruiter_contact = c
-                break
-        filename_resume = request.POST.get('filename-resume')
-        filename_cover = request.POST.get('filename-cover')
-        referral_contact = request.POST.getlist('referral-contact')
-        referral_contact_inputs = []
-        for c in contacts:
-            if str(c.id) in referral_contact:
-                referral_contact_inputs.append(c)
-        interview_location = request.POST.get('interview-location')
-        interview_date = request.POST.get('interview-date')
-        my_opp = Opportunity(id=opportunity_id, create_date=datetime.now(), modified_date=datetime.now(), stage=stage, title=title,
-                        company=company,
-                        location=location, recruiter_contacts=recruiter_contact,
-                        application_link=application_link, application=None, referral_contacts=referral_contact_inputs,
-                        interview_location=interview_location, interview_date=interview_date, events=None,
-                        next_step=None)
-        opportunities.append(my_opp)
-        messages.add_message(request, messages.SUCCESS, "Submitted Opportunity: %s, %s" % (title, company))
+        my_opp = generate_opportunity(request, opportunity_id=None)
+        messages.add_message(request, messages.SUCCESS,
+                             "Submitted Opportunity: %s, %s" % (my_opp.title, my_opp.company))
         # Redirect
-        return redirect("opportunities:opportunities_view_item", opportunity_id)
+        return redirect("opportunities:opportunities_view_item", my_opp.id)
     else:
         return render(request,
                       "jobber/opportunities/add-item.html",
@@ -171,20 +168,18 @@ def opportunities_delete_item(request):
                       "jobber/opportunities/home-alt.html")
 
     opportunities = Opportunity.objects.all()
-    contacts = Contact.objects.all()
-    stages = Stage.objects.all()
-    id = request.POST.get("id")
-    title = request.POST.get("title")
-    company = request.POST.get("company")
     if request.method == 'POST':
-        for index, opp in enumerate(opportunities):
-            if str(opp.id) == id:
-                del opportunities[index]
-                break
+        opportunity_id = request.POST.get("id")
+        my_opp = Opportunity.objects.get(pk=opportunity_id)
+        title = my_opp.title
+        company = my_opp.company
+        my_opp.delete()
         messages.add_message(request, messages.SUCCESS, "Deleted Opportunity: %s, %s" % (title, company))
         # Redirect
         return redirect("opportunities:opportunities_list")
     else:
+        contacts = Contact.objects.all()
+        stages = Stage.objects.all()
         return render(request,
                       "jobber/opportunities/add-item.html",
                       {"stages": stages,
@@ -195,26 +190,19 @@ def opportunities_add_contact(request):
     if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
-    opportunities = Opportunity.objects.all()
-    contacts = Contact.objects.all()
     if request.method == 'POST':
-        if len(opportunities) == 0:
-            opportunity_id = 1
-        else:
-            opportunity_id = max([i.id for i in opportunities]) + 1
         form_name = request.POST.get("formname")
         name = request.POST.get("contact-add-name")
         title = request.POST.get("contact-add-title")
         company = request.POST.get("contact-add-company")
         phone = request.POST.get("contact-add-phone")
         email = request.POST.get("contact-add-email")
-        c = Contact(id=opportunity_id,
-                    name=name,
-                    title=title,
-                    company=company,
-                    phone_number=phone,
-                    email=email)
-        contacts.append(c)
+        my_contact = Contact(name=name,
+                             title=title,
+                             company=company,
+                             phone_number=phone,
+                             email=email)
+        my_contact.save()
 
     return redirect("opportunities:opportunities_index")
 
