@@ -1,3 +1,4 @@
+import pytz
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from datetime import datetime
@@ -6,14 +7,16 @@ from .models import regular_user, admin_user, Opportunity, Event, Stage, Contact
 
 # Create helper functions
 def format_date(date):
+    utc = pytz.utc
     if date != '':
-        date = datetime.strptime(date, '%Y-%m-%d')
+        date = utc.localize(datetime.strptime(date, '%Y-%m-%d'))
     else:
         date = None
     return date
 
 
 def generate_opportunity(request, opportunity_id=None) -> Opportunity:
+    utc = pytz.utc
     stages = Stage.objects.all()
     contacts = Contact.objects.all()
     stage = request.POST.get('stage')
@@ -42,27 +45,27 @@ def generate_opportunity(request, opportunity_id=None) -> Opportunity:
     interview_date = request.POST.get('interview-date')
     interview_date = format_date(interview_date)
     if opportunity_id is None:
-        my_opp = Opportunity(create_date=datetime.now(), modified_date=datetime.now(), stage=stage, title=title,
+        my_opp = Opportunity(create_date=utc.localize(datetime.now()), modified_date=utc.localize(datetime.now()), stage=stage, title=title,
                              company=company,
                              location=location,
-                             application_link=application_link, application=None,
+                             application_link=application_link, recruiter_contact=input_recruiter_contact,
+                             application=None,
                              interview_location=interview_location, interview_date=interview_date,
                              next_step='')
     else:
         my_opp = Opportunity.objects.get(pk=opportunity_id)
-        my_opp.modified_date = datetime.now()
+        my_opp.modified_date = utc.localize(datetime.now())
         my_opp.stage = stage
         my_opp.title = title
         my_opp.company = company
         my_opp.location = location
         my_opp.application_link = application_link
+        my_opp.recruiter_contact = input_recruiter_contact
         my_opp.application = None
         my_opp.interview_location = interview_location
         my_opp.interview_date = interview_date
         my_opp.next_step = ''
     my_opp.save()
-    if input_recruiter_contact is not None:
-        my_opp.recruiter_contacts.add(recruiter_contact)
     for c in referral_contact_inputs:
         my_opp.referral_contacts.add(c)
     my_opp.save()

@@ -5,11 +5,22 @@ import pytz
 
 # Create your models here.
 class Contact(models.Model):
+    REFERENCE = 'REF'
+    RECRUITER = 'REC'
+    CONTACT_TYPE_CHOICES = [
+        (REFERENCE, 'Reference'),
+        (RECRUITER, 'Recruiter'),
+    ]
     name = models.CharField(max_length=200)
     title = models.CharField(max_length=200)
     company = models.CharField(max_length=200)
     phone_number = models.CharField(max_length=11)
     email = models.CharField(max_length=200)
+    contact_type = models.CharField(
+        max_length=9,
+        choices=CONTACT_TYPE_CHOICES,
+        default=REFERENCE
+    )
 
 
 class Opportunity(models.Model):
@@ -19,7 +30,8 @@ class Opportunity(models.Model):
     title = models.CharField(max_length=200)
     company = models.CharField(max_length=200)
     location = models.CharField(max_length=200, )
-    recruiter_contacts = models.ManyToManyField("Contact", related_name="recruiter_contacts")
+    recruiter_contact = models.ForeignKey("Contact", related_name="recruiter_contact", on_delete=models.CASCADE,
+                                          null=True)
     application_link = models.CharField(max_length=200)
     application = models.ForeignKey('Application', on_delete=models.CASCADE, null=True, blank=True)
     referral_contacts = models.ManyToManyField("Contact", related_name="referral_contacts")
@@ -75,4 +87,3 @@ class Article(models.Model):
 
 regular_user = {"username": "jay", "password": "regular"}
 admin_user = {"username": "bmo", "password": "mlogin"}
-

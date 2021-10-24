@@ -89,12 +89,12 @@
                             <div class="contact-list">
                                 <div class="contact-list-input">
                                     <select name="recruiter-contact" id="recruiter-contact">
-                                        <option value="none" {% if opportunity.recruiter_contacts is None %}
+                                        <option value="none" {% if opportunity.recruiter_contact is None %}
                                                 selected="selected" {% endif %}>None
                                         </option>
                                         {% for contact in contacts %}
                                             <option value="{{ contact.id }}"
-                                                    {% if contact == opportunity.recruiter_contacts %}
+                                                    {% if contact == opportunity.recruiter_contact %}
                                                     selected="selected" {% endif %}>{{ contact.name }}</option>
                                         {% endfor %}
                                     </select>
