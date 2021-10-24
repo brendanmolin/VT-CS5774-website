@@ -83,7 +83,8 @@ def opportunities_index(request):
         events = Event.objects.filter(user=User.objects.get(username=request.session['username']).id)
     return render(request,
                   "jobber/opportunities/index.html",
-                  {"opportunities": opportunities,
+                  {"user": User.objects.get(username=request.session['username']),
+                   "opportunities": opportunities,
                    "events": events})
 
 
@@ -99,7 +100,8 @@ def opportunities_home_alt(request):
         events = Event.objects.filter(user=User.objects.get(username=request.session['username']).id)
     return render(request,
                   "jobber/opportunities/index.html",
-                  {"opportunities": opportunities,
+                  {"user": User.objects.get(username=request.session['username']),
+                   "opportunities": opportunities,
                    "events": events})
 
 
@@ -115,7 +117,8 @@ def opportunities_list(request):
     stages = Stage.objects.all()
     return render(request,
                   "jobber/opportunities/list.html",
-                  {"opportunities": opportunities,
+                  {"user": User.objects.get(username=request.session['username']),
+                   "opportunities": opportunities,
                    "stages": stages}
                   )
 
@@ -132,7 +135,8 @@ def opportunities_view_item(request, id):
 
     return render(request,
                   "jobber/opportunities/view-item.html",
-                  {"opportunity": my_opp,
+                  {"user": User.objects.get(username=request.session['username']),
+                   "opportunity": my_opp,
                    'stages': stages})
 
 
@@ -150,7 +154,8 @@ def opportunities_edit_item(request, id):
         messages.add_message(request, messages.SUCCESS, "Saved Opportunity: %s, %s" % (my_opp.title, my_opp.company))
     return render(request,
                   "jobber/opportunities/add-item.html",
-                  {"opportunity": my_opp,
+                  {"user": User.objects.get(username=request.session['username']),
+                   "opportunity": my_opp,
                    'stages': stages,
                    "recruiter_contacts": Contact.objects.filter(contact_type='REC'),
                    "referral_contacts": Contact.objects.filter(contact_type='REF')
@@ -172,7 +177,8 @@ def opportunities_add_item(request):
     else:
         return render(request,
                       "jobber/opportunities/add-item.html",
-                      {"stages": stages,
+                      {"user": User.objects.get(username=request.session['username']),
+                       "stages": stages,
                        "recruiter_contacts": Contact.objects.filter(contact_type='REC'),
                        "referral_contacts": Contact.objects.filter(contact_type='REF')
                        })
@@ -199,7 +205,8 @@ def opportunities_delete_item(request):
         stages = Stage.objects.all()
         return render(request,
                       "jobber/opportunities/add-item.html",
-                      {"stages": stages,
+                      {"user": User.objects.get(username=request.session['username']),
+                       "stages": stages,
                        "recruiter_contacts": Contact.objects.filter(contact_type='REC'),
                        "referral_contacts": Contact.objects.filter(contact_type='REF')
                        })
