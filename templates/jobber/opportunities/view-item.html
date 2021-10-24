@@ -35,7 +35,8 @@
                 <p class="button-small"><a
                         href="{% url "opportunities:opportunities_edit_item" opportunity.id %}">Edit</a></p>
                 {% if request.session.role == "admin" and opportunity.id is not None %}
-                    <button id="delete-opp" type="submit" class="button-small delete" form="delete-form" formmethod="post">
+                    <button id="delete-opp" type="submit" class="button-small delete" form="delete-form"
+                            formmethod="post">
                         Delete
                     </button>
                 {% endif %}
@@ -51,8 +52,8 @@
                     <p>Location: {{ opportunity.location }}</p>
                     <p>Recruiter Contact:</p>
                     <ul class="contact-list">
-                        {% if opportunity.recruiter_contacts is not None %}
-                            <li>{{ opportunity.recruiter_contacts.name }} <a href="#">(see details)</a></li>
+                        {% if opportunity.recruiter_contact is not None %}
+                            <li>{{ opportunity.recruiter_contact.name }} <a href="#">(see details)</a></li>
                         {% endif %}
                     </ul>
                     <p>Created Date: {{ opportunity.create_date | date:"F j, Y" }}</p>
@@ -73,7 +74,7 @@
                             <a href="#">(see)</a> {% endif %} </p>
                         <p>Referrals:</p>
                         <ul class="contact-list">
-                            {% for contact in opportunity.referral_contacts %}
+                            {% for contact in opportunity.referral_contacts.all %}
                                 <li>{{ contact.name }} <a href="#">(see details)</a></li>
                             {% endfor %}
                         </ul>
@@ -83,7 +84,8 @@
                     <li class="opportunity-summary">
                         <h3>Interview Details</h3>
                         <p>Location: {{ opportunity.interview_location }}</p>
-                        <p>Date: {{ opportunity.interview_date | date:"F j, Y" }}</p>
+                        <p>Date: {% if opportunity.interview_date is not None %}
+                            {{ opportunity.interview_date | date:"F j, Y" }} {% endif %}</p>
                     </li>
                 {% endif %}
             </ul> <!-- detail-list -->
