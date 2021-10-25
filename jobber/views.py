@@ -152,7 +152,7 @@ def opportunities_edit_item(request, id):
         return redirect("opportunities:opportunities_list")
     if request.method == 'POST':
         my_opp = generate_opportunity(request=request, opportunity_id=id)
-        messages.add_message(request, messages.SUCCESS, "Saved Opportunity: %s, %s" % (my_opp.title, my_opp.company))
+        messages.add_message(request, messages.INFO, "Saved Opportunity: %s, %s" % (my_opp.title, my_opp.company))
         return redirect("opportunities:opportunities_view_item", my_opp.id)
     return render(request,
                   "jobber/opportunities/add-item.html",
@@ -200,7 +200,7 @@ def opportunities_delete_item(request):
         title = my_opp.title
         company = my_opp.company
         my_opp.delete()
-        messages.add_message(request, messages.SUCCESS, "Deleted Opportunity: %s, %s" % (title, company))
+        messages.add_message(request, messages.WARNING, "Deleted Opportunity: %s, %s" % (title, company))
         # Redirect
         return redirect("opportunities:opportunities_list")
     else:

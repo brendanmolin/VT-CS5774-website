@@ -108,6 +108,18 @@ ul.messages li.success {
     margin: 0.25em;
 }
 
+ul.messages li.info {
+    background-color: lightblue;
+    padding: 1em;
+    margin: 0.25em;
+}
+
+ul.messages li.warning {
+    background-color: indianred;
+    padding: 1em;
+    margin: 0.25em;
+}
+
 div.quickview-box {
     border-style: solid;
     border-width: 0.1em;
