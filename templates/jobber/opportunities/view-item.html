@@ -65,6 +65,7 @@
                         <p class="button"><a href="#">Get Feedback</a></p>
                     </div>
                     <div class="opportunity-summary-details-wide">
+                        <p>Applicant: {{ opportunity.user.name }}</p>
                         <p>Application Page: <a href="{{ opportunity.application_link }}"
                                                 class="explicit-link">{{ opportunity.application_link }}</a>
                         </p>

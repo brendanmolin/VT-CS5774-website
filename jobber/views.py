@@ -114,6 +114,7 @@ def opportunities_list(request):
         opportunities = Opportunity.objects.all()
     else:
         opportunities = Opportunity.objects.filter(user=User.objects.get(username=request.session['username']).id)
+    opportunities = opportunities.order_by('-modified_date')
     stages = Stage.objects.all()
     return render(request,
                   "jobber/opportunities/list.html",
@@ -152,6 +153,7 @@ def opportunities_edit_item(request, id):
     if request.method == 'POST':
         my_opp = generate_opportunity(request=request, opportunity_id=id)
         messages.add_message(request, messages.SUCCESS, "Saved Opportunity: %s, %s" % (my_opp.title, my_opp.company))
+        return redirect("opportunities:opportunities_view_item", my_opp.id)
     return render(request,
                   "jobber/opportunities/add-item.html",
                   {"user": User.objects.get(username=request.session['username']),

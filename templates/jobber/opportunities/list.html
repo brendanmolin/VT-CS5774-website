@@ -29,6 +29,9 @@
                 <p class="button"><a href={% url "opportunities:opportunities_add-item" %}>Open New Opportunity</a></p>
             </div>
         </div> <!-- your-opportunities-header -->
+    {% if opportunities.count == 0 %}
+        <p class="sorry-message"><strong>Getting Started?</strong> Try opening a new opportunity!</p>
+    {% else %}
         <div class="topic-box">
             <ul class="detail-list">
                 {% for opp in opportunities %}
@@ -45,5 +48,6 @@
                 {% endfor %}
             </ul> <!-- detail-list -->
         </div> <!-- topic-box -->
+    {% endif %}
     </div> <!-- #your-opportunities-box -->
 {% endblock %}

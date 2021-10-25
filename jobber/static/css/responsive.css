@@ -528,6 +528,10 @@ div#footer div#language-select {
         text-decoration: underline;
     }
 
+    p.sorry-message {
+        clear: left;
+    }
+
     /* footer */
     div#footer {
         clear: left;
