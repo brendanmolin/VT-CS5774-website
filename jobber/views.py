@@ -114,6 +114,7 @@ def opportunities_list(request):
         opportunities = Opportunity.objects.all()
     else:
         opportunities = Opportunity.objects.filter(user=User.objects.get(username=request.session['username']).id)
+    opportunities = opportunities.order_by('-modified_date')
     stages = Stage.objects.all()
     return render(request,
                   "jobber/opportunities/list.html",
