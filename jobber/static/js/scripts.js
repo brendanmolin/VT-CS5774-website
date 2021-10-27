@@ -164,7 +164,9 @@ $(document).ready(function () {
                 .done(function (json) {
                     if (json.success == 'success') {
                         let contacts = $(document).find('select[name*="' + json.contact_type + '"]');
-                        contacts.append('<option value="' + json.contact_id + '">' + json.contact_name + '</option>');
+                        let new_contact = $('<option value="' + json.contact_id + '">' + json.contact_name + '</option>')
+                        new_contact.css('background-color', 'lightgreen')
+                        contacts.append(new_contact);
                         let popupDiv = $(this).parent()
                         $.removePopup(popupDiv)
                         }
