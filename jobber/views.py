@@ -1,6 +1,7 @@
 import pytz
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.http import JsonResponse
 from datetime import datetime
 from .models import regular_user, admin_user, Opportunity, Event, Stage, Contact, User
 
@@ -214,7 +215,40 @@ def opportunities_delete_item(request):
                        })
 
 
+def opportunities_add_contact_ajax(request):
+    print("trigger ajax add contact")
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+    if is_ajax and request.method == "POST":
+        form_name = request.POST.get("formname")
+        name = request.POST.get("contact_add_name")
+        title = request.POST.get("contact_add_title")
+        company = request.POST.get("contact_add_company")
+        phone = request.POST.get("contact_add_phone")
+        email = request.POST.get("contact_add_email")
+        print(form_name, email, name, phone, title, company)
+        try:
+            my_contact = Contact(
+                user=User.objects.get(username=request.session['username']),
+                name=name,
+                title=title,
+                company=company,
+                phone_number=phone,
+                email=email,
+                contact_type=form_name)
+            my_contact.save()
+            new_contact_id = my_contact.id
+            return JsonResponse(
+                {'success': 'success', 'contact_type': form_name, 'contact_id': new_contact_id, 'contact_name': name},
+                status=200)
+        except:
+            return JsonResponse(
+                {'error': 'Data types entered are invalid.'}, status=200)
+        else:
+            return JsonResponse({'error': 'Invalid request.'}, status=400)
+
+
 def opportunities_add_contact(request):
+    print("trigger add contact")
     if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
