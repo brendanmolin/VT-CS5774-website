@@ -12,6 +12,7 @@ urlpatterns = [
     path('opportunities/delete', views.opportunities_delete_item, name="opportunities_delete_item"),
     path('opportunities/add_contact', views.opportunities_add_contact, name="opportunities_add_contact"),
     path('opportunities/add_contact_inplace', views.opportunities_add_contact_ajax, name="opportunities_add_contact_ajax"),
+    path('opportunities/view_contact_inplace', views.opportunities_view_contact_ajax, name="opportunities_view_contact_ajax"),
     path('login', views.login, name="login"),
     path('logout', views.logout, name="logout")
 ]

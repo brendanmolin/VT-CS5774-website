@@ -13,6 +13,7 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
 const csrftoken = getCookie('csrftoken');
 
 jQuery.validate = function validate(thisEl) {
@@ -169,7 +170,7 @@ $(document).ready(function () {
                         contacts.append(new_contact);
                         let popupDiv = $(this).parent()
                         $.removePopup(popupDiv)
-                        }
+                    }
                 })
                 // Code to run if the request fails; the raw request and
                 // status codes are passed to the function
@@ -189,6 +190,62 @@ $(document).ready(function () {
         $.removePopup(popupDiv)
 
     })
+
+
+    $('ul.contact-list li').on({
+        mouseenter: function(e) {
+            let ajax_url = $(this).attr("data-ajax-url");
+            let contact_id = $(this).attr("data-contact");
+            let popupDiv = $(document).find('div.popup-info')
+            console.log(ajax_url + ' ' + contact_id);
+            $.ajax({
+
+                // The URL for the request
+                url: ajax_url,
+
+                // The data to send (will be converted to a query string)
+                data: {
+                    contact_id: contact_id
+                },
+
+                // Whether this is a POST or GET request
+                type: "GET",
+
+                // The type of data we expect back
+                dataType: "json",
+
+                // CSRF
+                headers: {'X-CSRFToken': csrftoken},
+
+                context: this
+            })
+                // Code to run if the request succeeds (is done);
+                // The response is passed to the function
+                .done(function (json) {
+                    console.log(json.success);
+                    if (json.success == 'success') {
+                        console.log(json);
+                        console.log(json.contact_title);
+                        popupDiv.css('display', 'block');
+                        popupDiv.append('<p>Name: ' + json.contact_name + '</p>');
+                    }
+                })
+                // Code to run if the request fails; the raw request and
+                // status codes are passed to the function
+                .fail(function (xhr, status, errorThrown) {
+                    alert("Sorry, there was a problem!");
+                    console.log("Error: " + errorThrown);
+                })
+                // Code to run regardless of success or failure;
+                .always(function (xhr, status) {
+                });
+        },
+        mouseleave: function(e) {
+            let popupDiv = $(document).find('div.popup-info')
+            popupDiv.css('display', 'none');
+            popupDiv.children('p').remove();
+        }
+    });
 
     $(function () {
         if (($('div.search-results-page').length)) {

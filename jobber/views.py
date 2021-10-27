@@ -216,7 +216,6 @@ def opportunities_delete_item(request):
 
 
 def opportunities_add_contact_ajax(request):
-    print("trigger ajax add contact")
     is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
     if is_ajax and request.method == "POST":
         form_name = request.POST.get("formname")
@@ -225,7 +224,6 @@ def opportunities_add_contact_ajax(request):
         company = request.POST.get("contact_add_company")
         phone = request.POST.get("contact_add_phone")
         email = request.POST.get("contact_add_email")
-        print(form_name, email, name, phone, title, company)
         try:
             my_contact = Contact(
                 user=User.objects.get(username=request.session['username']),
@@ -247,8 +245,32 @@ def opportunities_add_contact_ajax(request):
             return JsonResponse({'error': 'Invalid request.'}, status=400)
 
 
+def opportunities_view_contact_ajax(request):
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+    if is_ajax and request.method == "GET":
+        contact_id = int(request.GET.get("contact_id"))
+        print(contact_id)
+        try:
+            my_contact = Contact.objects.get(pk=contact_id)
+            contact_name = my_contact.name
+            contact_title = my_contact.title
+            contact_company = my_contact.company
+            contact_phone = my_contact.phone_number
+            contact_email = my_contact.email
+            return JsonResponse(
+                {'success': 'success', 'contact_name': contact_name, 'contact_title': contact_title, 'contact_company': contact_company,
+                 'contact_phone': contact_phone,
+                 'contact_email': contact_email},
+                status=200)
+        except:
+            print("no dice")
+            return JsonResponse(
+                {'error': 'Contact not found.'}, status=200)
+        else:
+            return JsonResponse({'error': 'Invalid request.'}, status=400)
+
+
 def opportunities_add_contact(request):
-    print("trigger add contact")
     if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
