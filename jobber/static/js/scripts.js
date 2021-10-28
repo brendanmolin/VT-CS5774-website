@@ -192,12 +192,11 @@ $(document).ready(function () {
     })
 
 
-    $('ul.contact-list li').on({
+    $('ul.contact-list li a').on({
         mouseenter: function(e) {
-            let ajax_url = $(this).attr("data-ajax-url");
-            let contact_id = $(this).attr("data-contact");
+            let ajax_url = $(this).parent().attr("data-ajax-url");
+            let contact_id = $(this).parent().attr("data-contact");
             let popupDiv = $(document).find('div.popup-info')
-            console.log(ajax_url + ' ' + contact_id);
             $.ajax({
 
                 // The URL for the request
@@ -222,12 +221,19 @@ $(document).ready(function () {
                 // Code to run if the request succeeds (is done);
                 // The response is passed to the function
                 .done(function (json) {
-                    console.log(json.success);
                     if (json.success == 'success') {
-                        console.log(json);
-                        console.log(json.contact_title);
                         popupDiv.css('display', 'block');
-                        popupDiv.append('<p>Name: ' + json.contact_name + '</p>');
+                        let currentA = popupDiv.children('p').first();
+                        console.log($(currentA).children('span').val());
+                        $(currentA).children('span').text(json.contact_name);
+                        currentA = currentA.next();
+                        $(currentA).children('span').text(json.contact_title);
+                        currentA = currentA.next();
+                        $(currentA).children('span').text(json.contact_company);
+                        currentA = currentA.next();
+                        $(currentA).children('span').text(json.contact_phone);
+                        currentA = currentA.next();
+                        $(currentA).children('span').text(json.contact_email);
                     }
                 })
                 // Code to run if the request fails; the raw request and
@@ -243,7 +249,17 @@ $(document).ready(function () {
         mouseleave: function(e) {
             let popupDiv = $(document).find('div.popup-info')
             popupDiv.css('display', 'none');
-            popupDiv.children('p').remove();
+            let currentA = popupDiv.children('p').first();
+            console.log($(currentA).children('span').val());
+            $(currentA).children('span').text('');
+            currentA = currentA.next();
+            $(currentA).children('span').text('');
+            currentA = currentA.next();
+            $(currentA).children('span').text('');
+            currentA = currentA.next();
+            $(currentA).children('span').text('');
+            currentA = currentA.next();
+            $(currentA).children('span').text('');
         }
     });
 
