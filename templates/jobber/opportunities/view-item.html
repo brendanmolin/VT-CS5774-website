@@ -53,7 +53,7 @@
                     <p>Recruiter Contact:</p>
                     <ul class="contact-list">
                         {% if opportunity.recruiter_contact is not None %}
-                            <li>{{ opportunity.recruiter_contact.name }} <a href="#">(see details)</a></li>
+                            <li data-ajax-url="{% url "opportunities:opportunities_view_contact_ajax" %}" data-contact="{{ opportunity.recruiter_contact.id }}">{{ opportunity.recruiter_contact.name }} <a href="#">(see details)</a></li>
                         {% endif %}
                     </ul>
                     <p>Created Date: {{ opportunity.create_date | date:"F j, Y" }}</p>
@@ -76,7 +76,7 @@
                         <p>Referrals:</p>
                         <ul class="contact-list">
                             {% for contact in opportunity.referral_contacts.all %}
-                                <li>{{ contact.name }} <a href="#">(see details)</a></li>
+                                <li data-ajax-url="{% url "opportunities:opportunities_view_contact_ajax" %}" data-contact="{{ contact.id }}">{{ contact.name }} <a href="#">(see details)</a></li>
                             {% endfor %}
                         </ul>
                     </div>
@@ -92,4 +92,12 @@
             </ul> <!-- detail-list -->
         </div> <!-- topic-box -->
     </div> <!-- #your-opportunity-box -->
+<div class="popup-info">
+<h3>Contact Information:</h3>
+<p>Name: <span></span></p>
+<p>Title: <span></span></p>
+<p>Company: <span></span></p>
+<p>Phone: <span></span></p>
+<p>Email: <span></span></p>
+</div><!-- contact-list-add -->
 {% endblock %}

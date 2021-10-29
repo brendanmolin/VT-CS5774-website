@@ -189,7 +189,7 @@
         <input type="tel" name="contact-add-phone" class="required" id="contact-add-phone"></p>
     <p><label for="contact-add-email">Email: </label>
         <input type="email" name="contact-add-email" class="required" id="contact-add-email"></p>
-    <button type="submit" id="contact-submit" class="button-small contact-list-submit-button">Save
+    <button type="submit" id="contact-submit" class="button-small contact-list-submit-button" data-ajax-url="{% url "opportunities:opportunities_add_contact_ajax" %}">Save
     </button>
     <button type="button" id="contact-cancel" class="button-small">Cancel</button>
 </div><!-- contact-list-add -->

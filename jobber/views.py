@@ -1,6 +1,7 @@
 import pytz
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.http import JsonResponse
 from datetime import datetime
 from .models import regular_user, admin_user, Opportunity, Event, Stage, Contact, User
 
@@ -212,6 +213,88 @@ def opportunities_delete_item(request):
                        "recruiter_contacts": Contact.objects.filter(contact_type='REC'),
                        "referral_contacts": Contact.objects.filter(contact_type='REF')
                        })
+
+
+def opportunities_add_contact_ajax(request):
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+    if is_ajax and request.method == "POST":
+        form_name = request.POST.get("formname")
+        name = request.POST.get("contact_add_name")
+        title = request.POST.get("contact_add_title")
+        company = request.POST.get("contact_add_company")
+        phone = request.POST.get("contact_add_phone")
+        email = request.POST.get("contact_add_email")
+        try:
+            my_contact = Contact(
+                user=User.objects.get(username=request.session['username']),
+                name=name,
+                title=title,
+                company=company,
+                phone_number=phone,
+                email=email,
+                contact_type=form_name)
+            my_contact.save()
+            new_contact_id = my_contact.id
+            return JsonResponse(
+                {'success': 'success', 'contact_type': form_name, 'contact_id': new_contact_id, 'contact_name': name},
+                status=200)
+        except:
+            return JsonResponse(
+                {'error': 'Data types entered are invalid.'}, status=200)
+        else:
+            return JsonResponse({'error': 'Invalid request.'}, status=400)
+
+
+def opportunities_view_contact_ajax(request):
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+    if is_ajax and request.method == "GET":
+        contact_id = int(request.GET.get("contact_id"))
+        try:
+            my_contact = Contact.objects.get(pk=contact_id)
+            contact_name = my_contact.name
+            contact_title = my_contact.title
+            contact_company = my_contact.company
+            contact_phone = my_contact.phone_number
+            contact_email = my_contact.email
+            return JsonResponse(
+                {'success': 'success', 'contact_name': contact_name, 'contact_title': contact_title,
+                 'contact_company': contact_company,
+                 'contact_phone': contact_phone,
+                 'contact_email': contact_email},
+                status=200)
+        except:
+            return JsonResponse(
+                {'error': 'Contact not found.'}, status=200)
+        else:
+            return JsonResponse({'error': 'Invalid request.'}, status=400)
+
+
+def opportunities_list_sort_ajax(request):
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+    if is_ajax and request.method == "GET":
+        sorter = request.GET.get("sorter")
+        try:
+            opportunities = Opportunity.objects.filter(user=User.objects.get(username=request.session['username']).id)
+            if sorter == "modified-date":
+                opportunities = opportunities.order_by("-modified_date")
+            elif sorter == "created-date":
+                opportunities = opportunities.order_by("-created_date")
+            elif sorter == "stage":
+                opportunities = opportunities.order_by("stage__id")
+            elif sorter == "nearest_event":
+                pass
+
+            opp_order = {}
+            for index, opp in enumerate(opportunities):
+                opp_order[str(index)] = opp.id
+            return JsonResponse(
+                {'success': 'success', 'opportunities': opp_order},
+                status=200)
+        except:
+            return JsonResponse(
+                {'error': 'Contact not found.'}, status=200)
+        else:
+            return JsonResponse({'error': 'Invalid request.'}, status=400)
 
 
 def opportunities_add_contact(request):

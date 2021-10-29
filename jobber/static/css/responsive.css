@@ -193,6 +193,18 @@ div.form-box input {
     float: left;
 }
 
+div.popup-info {
+    display: none;
+    border-style: solid;
+    border-color: black;
+    background-color: lightblue;
+    padding: 0.25em;
+    margin: 0.5em;
+    position: fixed;
+    top: 25%;
+    left: 60%;
+}
+
 div.popup-form {
     display: none;
     border-style: solid;
