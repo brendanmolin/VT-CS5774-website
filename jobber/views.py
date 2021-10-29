@@ -249,7 +249,6 @@ def opportunities_view_contact_ajax(request):
     is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
     if is_ajax and request.method == "GET":
         contact_id = int(request.GET.get("contact_id"))
-        print(contact_id)
         try:
             my_contact = Contact.objects.get(pk=contact_id)
             contact_name = my_contact.name
@@ -258,12 +257,40 @@ def opportunities_view_contact_ajax(request):
             contact_phone = my_contact.phone_number
             contact_email = my_contact.email
             return JsonResponse(
-                {'success': 'success', 'contact_name': contact_name, 'contact_title': contact_title, 'contact_company': contact_company,
+                {'success': 'success', 'contact_name': contact_name, 'contact_title': contact_title,
+                 'contact_company': contact_company,
                  'contact_phone': contact_phone,
                  'contact_email': contact_email},
                 status=200)
         except:
-            print("no dice")
+            return JsonResponse(
+                {'error': 'Contact not found.'}, status=200)
+        else:
+            return JsonResponse({'error': 'Invalid request.'}, status=400)
+
+
+def opportunities_list_sort_ajax(request):
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+    if is_ajax and request.method == "GET":
+        sorter = request.GET.get("sorter")
+        try:
+            opportunities = Opportunity.objects.filter(user=User.objects.get(username=request.session['username']).id)
+            if sorter == "modified-date":
+                opportunities = opportunities.order_by("-modified_date")
+            elif sorter == "created-date":
+                opportunities = opportunities.order_by("-created_date")
+            elif sorter == "stage":
+                opportunities = opportunities.order_by("stage__id")
+            elif sorter == "nearest_event":
+                pass
+
+            opp_order = {}
+            for index, opp in enumerate(opportunities):
+                opp_order[str(index)] = opp.id
+            return JsonResponse(
+                {'success': 'success', 'opportunities': opp_order},
+                status=200)
+        except:
             return JsonResponse(
                 {'error': 'Contact not found.'}, status=200)
         else:

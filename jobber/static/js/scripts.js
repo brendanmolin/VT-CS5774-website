@@ -81,12 +81,14 @@ jQuery.searchArticles = function searchArticles(thisEl, searchPhrase) {
 
 $(document).ready(function () {
 
+    /* Delete item alarm */
     $(document).on("click", 'button.delete', function (e) {
         if (!confirm("Are you sure you want to delete this?  You cannot undo.")) {
             e.preventDefault();
         }
     })
 
+    /* Validation of required fields */
     $(document).on("click", 'button[type*="submit"]:not(div.popup-form button)', function (e) {
         let isError = $.validate($(this));
         if (isError) {
@@ -94,6 +96,8 @@ $(document).ready(function () {
         }
     })
 
+
+    /* Validation of required fields - remove flag when filled */
     $('div.topic-box').on('blur', 'input.required', function () {
         if (($(this).val())) {
             /* update style */
@@ -103,6 +107,7 @@ $(document).ready(function () {
         }
     })
 
+    /* Show Add Contact form */
     $('button.add-contact').on('click', function () {
         /* get which input is being added to */
         let contactSelect = $(this).prev().prev().children('select');
@@ -115,6 +120,7 @@ $(document).ready(function () {
         whichForm.attr("value", inputName);
     });
 
+    /* Submit new contact */
     $('div.popup-form').on('click', 'button#contact-submit', function (e) {
         let isError = $.validate($(this));
         if (isError) {
@@ -184,6 +190,7 @@ $(document).ready(function () {
         }
     })
 
+    /* Cancel New Contact Popup Form */
     $('div.popup-form').on('click', '#contact-cancel', function () {
 
         let popupDiv = $(document).find('div.popup-form')
@@ -192,8 +199,9 @@ $(document).ready(function () {
     })
 
 
+    /* Contact Info Popup */
     $('ul.contact-list li a').on({
-        mouseenter: function(e) {
+        mouseenter: function (e) {
             let ajax_url = $(this).parent().attr("data-ajax-url");
             let contact_id = $(this).parent().attr("data-contact");
             let popupDiv = $(document).find('div.popup-info')
@@ -224,7 +232,6 @@ $(document).ready(function () {
                     if (json.success == 'success') {
                         popupDiv.css('display', 'block');
                         let currentA = popupDiv.children('p').first();
-                        console.log($(currentA).children('span').val());
                         $(currentA).children('span').text(json.contact_name);
                         currentA = currentA.next();
                         $(currentA).children('span').text(json.contact_title);
@@ -246,11 +253,10 @@ $(document).ready(function () {
                 .always(function (xhr, status) {
                 });
         },
-        mouseleave: function(e) {
+        mouseleave: function (e) {
             let popupDiv = $(document).find('div.popup-info')
             popupDiv.css('display', 'none');
             let currentA = popupDiv.children('p').first();
-            console.log($(currentA).children('span').val());
             $(currentA).children('span').text('');
             currentA = currentA.next();
             $(currentA).children('span').text('');
@@ -263,6 +269,57 @@ $(document).ready(function () {
         }
     });
 
+    /* Opportunity List Sort */
+    $('select#sort-opportunities').on('change', function (e) {
+        let sortData = $(this).children(':selected');
+        let ajax_url = $(this).attr('data-ajax-url')
+
+        $.ajax({
+
+            // The URL for the request
+            url: ajax_url,
+
+            // The data to send (will be converted to a query string)
+            data: {
+                sorter: sortData.val()
+            },
+
+            // Whether this is a POST or GET request
+            type: "GET",
+
+            // The type of data we expect back
+            dataType: "json",
+
+            // CSRF
+            headers: {'X-CSRFToken': csrftoken},
+
+            context: this
+        })
+            // Code to run if the request succeeds (is done);
+            // The response is passed to the function
+            .done(function (json) {
+                let listUL = $('ul.detail-list');
+                $.each(json.opportunities, function (index, value) {
+                    listUL.children("li[data-id*=" + value + "]").attr('data-sort-order', index)
+                })
+                $(listUL.children()).sort(function (a, b) {
+                    let elA = parseInt($(a).attr('data-sort-order'));
+                    let elB = parseInt($(b).attr('data-sort-order'));
+                    return (elA < elB) ? -1 : (elA > elB) ? 1 : 0;
+                }).appendTo($(listUL));
+            })
+            // Code to run if the request fails; the raw request and
+            // status codes are passed to the function
+            .fail(function (xhr, status, errorThrown) {
+                alert("Sorry, there was a problem!");
+                console.log("Error: " + errorThrown);
+            })
+            // Code to run regardless of success or failure;
+            .always(function (xhr, status) {
+            });
+    })
+
+    /* Search behavior */
     $(function () {
         if (($('div.search-results-page').length)) {
             let urlParams = new URLSearchParams(window.location.search)
