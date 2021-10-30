@@ -485,6 +485,11 @@ div#footer div#language-select {
         margin-right: 5em
     }
 
+    div.popup-info {
+        top: 25%;
+        left: 50%;
+    }
+
     div#ad-box {
         border-style: none;
     }
