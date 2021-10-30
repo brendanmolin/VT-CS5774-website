@@ -265,8 +265,8 @@ def opportunities_view_contact_ajax(request):
         except:
             return JsonResponse(
                 {'error': 'Contact not found.'}, status=200)
-        else:
-            return JsonResponse({'error': 'Invalid request.'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request.'}, status=400)
 
 
 def opportunities_list_sort_ajax(request):
@@ -281,8 +281,6 @@ def opportunities_list_sort_ajax(request):
                 opportunities = opportunities.order_by("-created_date")
             elif sorter == "stage":
                 opportunities = opportunities.order_by("stage__id")
-            elif sorter == "nearest_event":
-                pass
 
             opp_order = {}
             for index, opp in enumerate(opportunities):
@@ -293,8 +291,8 @@ def opportunities_list_sort_ajax(request):
         except:
             return JsonResponse(
                 {'error': 'Contact not found.'}, status=200)
-        else:
-            return JsonResponse({'error': 'Invalid request.'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request.'}, status=400)
 
 
 def opportunities_add_contact(request):

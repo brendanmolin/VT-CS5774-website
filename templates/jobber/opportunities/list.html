@@ -19,7 +19,6 @@
                         data-ajax-url="{% url "opportunities:opportunities_list_sort_ajax" %}">
                     <option value="creation-date" class="selected">Creation Date</option>
                     <option value="modified-date">Modified Date</option>
-                    <option value="nearest-event">Nearest Event</option>
                     <option value="stage">Stage</option>
                 </select>
             </div>
@@ -44,9 +43,11 @@
                             </p>
                             <p>Stage: {{ opp.stage.name }}</p>
                             <p>Last Modified: {{ opp.modified_date | date:"F j, Y" }}</p>
-                            <p><strong>Next Step</strong>: <a
-                                    href="{% url "opportunities:opportunities_view_item" opp.id %}">
-                                {{ opp.next_step }} </a></p>
+                            {% if opp.next_step != '' %}
+                                <p><strong>Next Step</strong>: <a
+                                        href="{% url "opportunities:opportunities_view_item" opp.id %}">
+                                    {{ opp.next_step }} </a></p>
+                            {% endif %}
                         </li>
                     {% endfor %}
                 </ul> <!-- detail-list -->
