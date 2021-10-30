@@ -265,8 +265,8 @@ def opportunities_view_contact_ajax(request):
         except:
             return JsonResponse(
                 {'error': 'Contact not found.'}, status=200)
-        else:
-            return JsonResponse({'error': 'Invalid request.'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request.'}, status=400)
 
 
 def opportunities_list_sort_ajax(request):
@@ -291,8 +291,8 @@ def opportunities_list_sort_ajax(request):
         except:
             return JsonResponse(
                 {'error': 'Contact not found.'}, status=200)
-        else:
-            return JsonResponse({'error': 'Invalid request.'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request.'}, status=400)
 
 
 def opportunities_add_contact(request):
