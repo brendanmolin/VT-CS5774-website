@@ -281,8 +281,6 @@ def opportunities_list_sort_ajax(request):
                 opportunities = opportunities.order_by("-created_date")
             elif sorter == "stage":
                 opportunities = opportunities.order_by("stage__id")
-            elif sorter == "nearest_event":
-                pass
 
             opp_order = {}
             for index, opp in enumerate(opportunities):
