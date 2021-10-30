@@ -14,7 +14,7 @@
             <h2>Your Recent Activity</h2>
             <ul id="recent-activity" class="detail-list">
                 {% for opp in opportunities|slice:":3" %}
-                    <li><p>{{ opp.next_step }}: <a
+                    <li><p>{% if opp.next_step != '' %}{{ opp.next_step }}: {% endif %}<a
                             href="{% url "opportunities:opportunities_view_item" opp.id %}">{{ opp.company }}, {{ opp.title }}</a>
                     </p></li>
                 {% endfor %}
