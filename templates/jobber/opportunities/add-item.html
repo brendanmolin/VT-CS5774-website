@@ -186,7 +186,7 @@
     <p><label for="contact-add-company">Company: </label>
         <input type="text" name="contact-add-company" class="required" id="contact-add-company"></p>
     <p><label for="contact-add-phone">Phone Number: </label>
-        <input type="tel" name="contact-add-phone" class="required" id="contact-add-phone"></p>
+        <input type="tel" name="contact-add-phone" maxlength=10 minlength=10 placeholder="1234567890" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" class="required" id="contact-add-phone"></p>
     <p><label for="contact-add-email">Email: </label>
         <input type="email" name="contact-add-email" class="required" id="contact-add-email"></p>
     <button type="submit" id="contact-submit" class="button-small contact-list-submit-button" data-ajax-url="{% url "opportunities:opportunities_add_contact_ajax" %}">Save
