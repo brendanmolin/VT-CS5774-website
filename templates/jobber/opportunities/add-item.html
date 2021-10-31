@@ -156,8 +156,8 @@
                             <p><label for="input-title">Location:</label>
                                 <input type="text" name="interview-location" id="input-title"
                                        value="{{ opportunity.interview_location }}"></p>
-                            <p><label for="input-title">Date:</label>
-                                <input type="text" name="interview-date" id="input-title"
+                            <p><label for="input-date">Date:</label>
+                                <input type="date" name="interview-date" id="input-title"
                                        value={% if opportunity.interview_date is not None %} "{{ opportunity.interview_date | date:"Y-m-d" }}" {% endif %}>
                             </p>
                         </div>
