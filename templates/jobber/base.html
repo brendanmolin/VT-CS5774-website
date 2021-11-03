@@ -30,7 +30,7 @@
                 <li><p id="login-name">Logged in as:<br>
                     <strong>{{ user.username }}</strong><br>
                     {{ user.reputation }} Rep<br>
-                    <a href="{% url "opportunities:logout" %}" id="logout">Sign Out</a></p></li>
+                    <a href="{% url "users:logout_user" %}" id="logout">Sign Out</a></p></li>
             {% endif %}
         </ul>
     </div> <!-- #account-box -->

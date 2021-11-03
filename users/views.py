@@ -1,6 +1,8 @@
-from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib import messages
+
 
 # Create your views here.
 def register(request):
@@ -15,4 +17,34 @@ def register(request):
         return redirect('opportunities:opportunities_index')
 
     return render(request,
-                  "users/user/register.html",)
+                  "users/user/register.html")
+
+
+def profile(request, username):
+    user1 = get_object_or_404(User, username=username)
+    if request.method == 'POST':
+        pass
+    return render(request,
+                  "users/user/view-profile.html",
+                  {"user": user1})
+
+
+def login_user(request):
+    username = request.POST.get("username")
+    password = request.POST.get("password")
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        request.session['username'] = user.username
+        request.session['role'] = user.profile.role
+        messages.add_message(request, messages.SUCCESS,
+                             "Welcome back, %s" % user.username)
+    else:
+        messages.add_message(request, messages.ERROR,
+                             "Invalid username or password")
+    return redirect("opportunities:opportunities_index")
+
+
+def logout_user(request):
+    del request.session['username']
+    del request.session['role']
+    return redirect("opportunities:opportunities_index")

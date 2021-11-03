@@ -1,0 +1,12 @@
+{% extends 'jobber/base.html' %}
+{% load static %}
+
+{% block content %}
+    <h3 id="welcome">Profile</h3>
+    <div id="profile-box">
+                <p>Username: {{ user.username }}</p>
+                <p>Email: {{ user.email }}</p>
+            </div>
+    </div> <!-- #register-box -->
+{% endblock %}
+{% block ad-space %} {% endblock %}

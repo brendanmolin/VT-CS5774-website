@@ -322,21 +322,3 @@ def opportunities_add_contact(request):
 def opportunities_search_results(request):
     return render(request,
                   "jobber/opportunities/search-results.html")
-
-
-def login(request):
-    username = request.POST.get("username")
-    password = request.POST.get("password")
-    if (username == regular_user["username"]) & (password == regular_user["password"]):
-        request.session['username'] = username
-        request.session['role'] = 'regular'
-    elif (username == admin_user["username"]) & (password == admin_user["password"]):
-        request.session['username'] = username
-        request.session['role'] = 'admin'
-    return redirect("opportunities:opportunities_index")
-
-
-def logout(request):
-    del request.session['username']
-    del request.session['role']
-    return redirect("opportunities:opportunities_index")

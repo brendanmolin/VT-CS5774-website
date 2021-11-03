@@ -25,7 +25,7 @@
         </div> <!-- #new-account -->
         <div id="login-box">
             <h3>Welcome Back</h3>
-            <form action="{% url "opportunities:login" %}", name="login-fields" id="login-fields" method="POST">
+            <form action="{% url "users:login_user" %}", name="login-fields" id="login-fields" method="POST">
                 {% csrf_token %}
                 <input type="text" name="username" placeholder="Username">
                 <input type="password" name="password" placeholder="Password">
