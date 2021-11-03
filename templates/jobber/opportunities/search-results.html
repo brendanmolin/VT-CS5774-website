@@ -1,9 +1,9 @@
 {% extends 'jobber/base.html' %}
 {% block primary-nav %}
-    <li><a href="{% url "opportunities:opportunities_index" %}">Home</a></li>
+    <li><a href="{% url "jobber:opportunities_index" %}">Home</a></li>
     {% if request.session.username is not None %}
         <li><a href="#">Profile</a></li>
-        <li><a href="{% url "opportunities:opportunities_list" %}">Opportunities</a></li>
+        <li><a href="{% url "jobber:opportunities_list" %}">Opportunities</a></li>
     {% endif %}
     <li><a href="#">Advice</a></li>
     <li><a href="#">About</a></li>
@@ -12,7 +12,7 @@
     <div id="content" class="search-results-page">
 {% endblock %}
 {% block content %}
-    <form id="search-articles" method="get" action="{% url "opportunities:opportunities_search_results" %}">
+    <form id="search-articles" method="get" action="{% url "jobber:opportunities_search_results" %}">
         <label for="search-box">Search for Advice</label>
         <input type="text" name="search-articles" placeholder="resume" id="search-box">
         <input id="search-submit" type="submit" value="Search">

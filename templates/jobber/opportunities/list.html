@@ -1,13 +1,13 @@
 {% extends 'jobber/base.html' %}
 {% block primary-nav %}
-    <li><a href="{% url "opportunities:opportunities_index" %}">Home</a></li>
+    <li><a href="{% url "jobber:opportunities_index" %}">Home</a></li>
     <li><a href="#">Profile</a></li>
-    <li><a href="{% url "opportunities:opportunities_list" %}" class="selected">Opportunities</a></li>
+    <li><a href="{% url "jobber:opportunities_list" %}" class="selected">Opportunities</a></li>
     <li><a href="#">Advice</a></li>
     <li><a href="#">About</a></li>
 {% endblock %}
 {% block my-location %}
-    <p id="my-location"><a href="{% url "opportunities:opportunities_index" %}">Home</a> > Opportunities
+    <p id="my-location"><a href="{% url "jobber:opportunities_index" %}">Home</a> > Opportunities
     </p> {% endblock %}
 {% block content %}
     <div id="your-opportunities-box" class="page-container">
@@ -16,7 +16,7 @@
             <div class="list-sorter">
                 <label for="sort-opportunities">Sort By:</label>
                 <select name="sort-opportunities" id="sort-opportunities"
-                        data-ajax-url="{% url "opportunities:opportunities_list_sort_ajax" %}">
+                        data-ajax-url="{% url "jobber:opportunities_list_sort_ajax" %}">
                     <option value="creation-date" class="selected">Creation Date</option>
                     <option value="modified-date">Modified Date</option>
                     <option value="stage">Stage</option>
@@ -28,7 +28,7 @@
                        placeholder="Company name, title...">
             </form>
             <div class="header-buttons">
-                <p class="button"><a href={% url "opportunities:opportunities_add-item" %}>Open New Opportunity</a></p>
+                <p class="button"><a href={% url "jobber:opportunities_add-item" %}>Open New Opportunity</a></p>
             </div>
         </div> <!-- your-opportunities-header -->
         {% if opportunities.count == 0 %}
@@ -39,13 +39,13 @@
                     {% for opp in opportunities %}
                         <li class="opportunity-summary" data-sort-order="0" data-id="{{ opp.id }}">
                             <p>Opportunity: <a
-                                    href="{% url "opportunities:opportunities_view_item" opp.id %}">{{ opp.company }}, {{ opp.title }}</a>
+                                    href="{% url "jobber:opportunities_view_item" opp.id %}">{{ opp.company }}, {{ opp.title }}</a>
                             </p>
                             <p>Stage: {{ opp.stage.name }}</p>
                             <p>Last Modified: {{ opp.modified_date | date:"F j, Y" }}</p>
                             {% if opp.next_step != '' %}
                                 <p><strong>Next Step</strong>: <a
-                                        href="{% url "opportunities:opportunities_view_item" opp.id %}">
+                                        href="{% url "jobber:opportunities_view_item" opp.id %}">
                                     {{ opp.next_step }} </a></p>
                             {% endif %}
                         </li>

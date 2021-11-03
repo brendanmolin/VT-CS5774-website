@@ -1,9 +1,9 @@
 {% extends 'jobber/base.html' %}
 {% load static %}
 {% block primary-nav %}
-    <li><a href="{% url "opportunities:opportunities_index" %}" class="selected">Home</a></li>
+    <li><a href="{% url "jobber:opportunities_index" %}" class="selected">Home</a></li>
     <li><a href="#">Profile</a></li>
-    <li><a href="{% url "opportunities:opportunities_list" %}">Opportunities</a></li>
+    <li><a href="{% url "jobber:opportunities_list" %}">Opportunities</a></li>
     <li><a href="#">Advice</a></li>
     <li><a href="#">About</a></li>
 {% endblock %}
@@ -15,12 +15,12 @@
             <ul id="recent-activity" class="detail-list">
                 {% for opp in opportunities|slice:":3" %}
                     <li><p>{% if opp.next_step != '' %}{{ opp.next_step }}: {% endif %}<a
-                            href="{% url "opportunities:opportunities_view_item" opp.id %}">{{ opp.company }}, {{ opp.title }}</a>
+                            href="{% url "jobber:opportunities_view_item" opp.id %}">{{ opp.company }}, {{ opp.title }}</a>
                     </p></li>
                 {% endfor %}
             </ul>
-            <p class="button"><a href="{% url "opportunities:opportunities_add-item" %}">Open New Opportunity</a></p>
-            <p class="button"><a href="{% url "opportunities:opportunities_list" %}">See All Opportunities</a></p>
+            <p class="button"><a href="{% url "jobber:opportunities_add-item" %}">Open New Opportunity</a></p>
+            <p class="button"><a href="{% url "jobber:opportunities_list" %}">See All Opportunities</a></p>
         </div> <!-- #recent-activity-box quickview-box -->
 
         <div id="upcoming-events-box" class="quickview-box">

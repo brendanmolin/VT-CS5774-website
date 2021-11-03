@@ -1,15 +1,15 @@
 {% extends 'jobber/base.html' %}
 {% block primary-nav %}
-    <li><a href="{% url "opportunities:opportunities_index" %}">Home</a></li>
+    <li><a href="{% url "jobber:opportunities_index" %}">Home</a></li>
     <li><a href="#">Profile</a></li>
-    <li><a href="{% url "opportunities:opportunities_list" %}" class="selected">Opportunities</a></li>
+    <li><a href="{% url "jobber:opportunities_list" %}" class="selected">Opportunities</a></li>
     <li><a href="#">Advice</a></li>
     <li><a href="#">About</a></li>
 {% endblock %}
 {% block my-location %}
-    <p id="my-location"><a href="{% url "opportunities:opportunities_index" %}">Home</a> > <a
-            href="{% url "opportunities:opportunities_list" %}">Opportunities</a> > {% if opportunity.id is not None %}
-        <a href="{% url "opportunities:opportunities_view_item" opportunity.id %}">Opportunity</a> > {% endif %}
+    <p id="my-location"><a href="{% url "jobber:opportunities_index" %}">Home</a> > <a
+            href="{% url "jobber:opportunities_list" %}">Opportunities</a> > {% if opportunity.id is not None %}
+        <a href="{% url "jobber:opportunities_view_item" opportunity.id %}">Opportunity</a> > {% endif %}
         {% if opportunity.id %}
             Edit {% else %}Create New {% endif %} Opportunity
     </p> {% endblock %}
@@ -19,7 +19,7 @@
         <div class="header-buttons">
             {% if request.session.role == "admin" and opportunity.id is not None %}
                 <form name="delete" id="delete-form" method="POST"
-                      action="{% url "opportunities:opportunities_delete_item" %}">
+                      action="{% url "jobber:opportunities_delete_item" %}">
                     {% csrf_token %}
                     <input type="hidden" name="id" value="{{ opportunity.id }}">
                     <input type="hidden" name="title" value="{{ opportunity.title }}">
@@ -28,10 +28,10 @@
             {% endif %}
             {% if opportunity.id is not null %}
                 <p class="button-small"><a
-                        href="{% url "opportunities:opportunities_view_item" opportunity.id %}">Close</a>
+                        href="{% url "jobber:opportunities_view_item" opportunity.id %}">Close</a>
                 </p>
             {% else %}
-                <p class="button-small"><a href="{% url "opportunities:opportunities_list" %}">Cancel</a></p>
+                <p class="button-small"><a href="{% url "jobber:opportunities_list" %}">Cancel</a></p>
             {% endif %}
             {% if request.session.role == "admin" and opportunity.id is not None %}
                 <button id="delete-opp" type="submit" class="button-small delete" form="delete-form" formmethod="post">
@@ -54,10 +54,10 @@
         <div class="topic-box">
             {% if not opportunity.id %}
                 <form name="form-key-details" id="form-id-details"
-                      action="{% url "opportunities:opportunities_add-item" %}" method="post">
+                      action="{% url "jobber:opportunities_add-item" %}" method="post">
             {% else %}
                 <form name="form-key-details" id="form-id-details"
-                      action="{% url "opportunities:opportunities_edit_item" opportunity.id %}" method="post">
+                      action="{% url "jobber:opportunities_edit_item" opportunity.id %}" method="post">
             {% endif %}
             {% csrf_token %}
             <ul class="detail-list">
@@ -169,10 +169,10 @@
     </div> <!-- #your-opportunity-box -->
     {% if not opportunity.id %}
         <form name="form-contact-details" id="form-id-details"
-              action="{% url "opportunities:opportunities_add_contact" %}" method="post">
+              action="{% url "jobber:opportunities_add_contact" %}" method="post">
     {% else %}
         <form name="form-contact-details" id="form-id-details"
-              action="{% url "opportunities:opportunities_add_contact" %}" method="post">
+              action="{% url "jobber:opportunities_add_contact" %}" method="post">
     {% endif %}
 
 {% csrf_token %}
@@ -189,7 +189,7 @@
         <input type="tel" name="contact-add-phone" maxlength=10 minlength=10 placeholder="1234567890" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" class="required" id="contact-add-phone"></p>
     <p><label for="contact-add-email">Email: </label>
         <input type="email" name="contact-add-email" class="required" id="contact-add-email"></p>
-    <button type="submit" id="contact-submit" class="button-small contact-list-submit-button" data-ajax-url="{% url "opportunities:opportunities_add_contact_ajax" %}">Save
+    <button type="submit" id="contact-submit" class="button-small contact-list-submit-button" data-ajax-url="{% url "jobber:opportunities_add_contact_ajax" %}">Save
     </button>
     <button type="button" id="contact-cancel" class="button-small">Cancel</button>
 </div><!-- contact-list-add -->
