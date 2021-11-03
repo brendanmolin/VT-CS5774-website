@@ -8,10 +8,14 @@ html, body {
 
 div#header h1 {
     display: none;
+    margin: .5em;
+    padding: 0;
 }
 
 div#header h2 {
     display: none;
+    margin: .25em;
+    padding: 0;
 }
 
 div#title-box img {
@@ -29,6 +33,11 @@ div#title-box {
 div#account-box {
     float: right;
     margin-top: 2%;
+}
+
+div#search-articles-box {
+    clear: left;
+    margin: 1em 1em 1em 3em;
 }
 
 div#account-box ul {
@@ -89,6 +98,34 @@ h2 {
 
 a {
     color: black
+}
+
+div#register-box {
+    clear: left;
+    display: block;
+}
+
+div#register-inputs p {
+    clear: left;
+    width: 20em;
+    padding: .5em;
+}
+
+div#register-inputs p label {
+    float: left;
+}
+
+div#register-inputs p input {
+    float: right;
+}
+
+div#register-inputs {
+    clear: left;
+}
+
+div#register-box > form > input {
+    float: left;
+    clear: left;
 }
 
 p#my-location {

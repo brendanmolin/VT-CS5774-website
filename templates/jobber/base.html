@@ -14,7 +14,7 @@
 
 <div id="header">
     <div id="title-box">
-        <img src="{% static "img/logo.png" %}" alt="Logo">
+        <a href="{% url "opportunities:opportunities_index" %}"><img src="{% static "img/logo.png" %}" alt="Logo"></a>
         <!-- img/logo.png: https://toppng.com/free-image/suitcase-black-PNG-free-PNG-Images_30387 -->
         <h1>Jobber</h1>
         <h2>Own your job search</h2>
@@ -22,14 +22,6 @@
 
     <div id="account-box">
         <ul id="account-box-items">
-            <li>
-                <form id="search-articles" method="get"
-                      action="{% url "opportunities:opportunities_search_results" %}">
-                    <label for="search-box">Search for Advice</label>
-                    <input type="text" name="search-articles" placeholder="resume" id="search-box">
-                    <input id="search-submit" type="submit" value="Search">
-                </form>
-            </li>
             {% if user.username %}
                 <li><a href="#"><img src="{% static "img/mail.png" %}" alt="Mail"></a></li>
                 <!-- img/mail.png https://www.clipartbest.com/clipart-KTjX8k7ac -->
@@ -42,6 +34,17 @@
             {% endif %}
         </ul>
     </div> <!-- #account-box -->
+
+    {% block search-articles %}
+        <div id="search-articles-box">
+            <form id="search-articles" method="get"
+                  action="{% url "opportunities:opportunities_search_results" %}">
+                <label for="search-box">Search for Advice</label>
+                <input type="text" name="search-articles" placeholder="resume" id="search-box">
+                <input id="search-submit" type="submit" value="Search">
+            </form>
+        </div> <!-- #search-articles-box -->
+    {% endblock %}
 
     <ul id="primary-nav">
         {% block primary-nav %}
