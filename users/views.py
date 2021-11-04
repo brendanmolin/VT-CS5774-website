@@ -26,7 +26,7 @@ def profile(request, username):
         pass
     return render(request,
                   "users/user/view-profile.html",
-                  {"user": user1})
+                  {"user": user1.profile})
 
 
 def login_user(request):

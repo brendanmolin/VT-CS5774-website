@@ -3,18 +3,20 @@
 {% block head-extra %}
     <link rel="stylesheet" type="text/css" href="{% static "css/home-alt.css" %}"/>{% endblock %}
 {% block account-items %}
-<li>
-    <form id="search-articles" method="get" action="search-results">
-        <label for="search-box">Search for Advice</label>
-        <input type="text" name="search-articles" placeholder="resume" id="search-box">
-        <input id="search-submit" type="submit" value="Search">
-    </form>
-</li>
+    <li>
+        <form id="search-articles" method="get" action="search-results">
+            <label for="search-box">Search for Advice</label>
+            <input type="text" name="search-articles" placeholder="resume" id="search-box">
+            <input id="search-submit" type="submit" value="Search">
+        </form>
+    </li>
 {% endblock %}
 {% block primary-nav %}
-    <li><a href="#" class="selected">Home</a></li>
-    <li><a href="#">Advice</a></li>
-    <li><a href="#">About</a></li>
+    <ul id="primary-nav">
+        <li><a href="#" class="selected">Home</a></li>
+        <li><a href="#">Advice</a></li>
+        <li><a href="#">About</a></li>
+    </ul>
 {% endblock %}
 {% block content %}
     <h2 id="welcome">Your Next Career Starts Here</h2>
@@ -25,7 +27,7 @@
         </div> <!-- #new-account -->
         <div id="login-box">
             <h3>Welcome Back</h3>
-            <form action="{% url "users:login_user" %}", name="login-fields" id="login-fields" method="POST">
+            <form action="{% url "users:login_user" %}" , name="login-fields" id="login-fields" method="POST">
                 {% csrf_token %}
                 <input type="text" name="username" placeholder="Username">
                 <input type="password" name="password" placeholder="Password">

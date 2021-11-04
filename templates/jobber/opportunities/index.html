@@ -1,11 +1,13 @@
 {% extends 'jobber/base.html' %}
 {% load static %}
 {% block primary-nav %}
-    <li><a href="{% url "jobber:opportunities_index" %}" class="selected">Home</a></li>
-    <li><a href="#">Profile</a></li>
-    <li><a href="{% url "jobber:opportunities_list" %}">Opportunities</a></li>
-    <li><a href="#">Advice</a></li>
-    <li><a href="#">About</a></li>
+    <ul id="primary-nav">
+        <li><a href="{% url "jobber:opportunities_index" %}" class="selected">Home</a></li>
+        <li><a href="{% url "users:profile" user.user.username %}">Profile</a></li>
+        <li><a href="{% url "jobber:opportunities_list" %}">Opportunities</a></li>
+        <li><a href="#">Advice</a></li>
+        <li><a href="#">About</a></li>
+    </ul>
 {% endblock %}
 {% block my-location %} <p id="my-location">Home</p> {% endblock %}
 {% block content %}

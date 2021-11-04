@@ -25,7 +25,8 @@
             {% if user.user.username %}
                 <li><a href="#"><img src="{% static "img/mail.png" %}" alt="Mail"></a></li>
                 <!-- img/mail.png https://www.clipartbest.com/clipart-KTjX8k7ac -->
-                <li><a href="#"><img src="{% static "img/profile.png" %}" alt="My Account"></a></li>
+                <li><a href="{% url "users:profile" user.user.username %}"><img src="{% static "img/profile.png" %}"
+                                                                                alt="My Account"></a></li>
                 <!-- img/profile.png: https://toppng.com/free-image/black-and-white-stockportable-network-account-icon-PNG-free-PNG-Images_126251 -->
                 <li><p id="login-name">Logged in as:<br>
                     <strong>{{ user.user.username }}</strong><br>
@@ -46,10 +47,8 @@
         </div> <!-- #search-articles-box -->
     {% endblock %}
 
-    <ul id="primary-nav">
-        {% block primary-nav %}
-        {% endblock %}
-    </ul>
+    {% block primary-nav %}
+    {% endblock %}
 </div> <!-- #header -->
 
 {% block content-div %}

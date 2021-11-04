@@ -1,10 +1,12 @@
 {% extends 'jobber/base.html' %}
 {% block primary-nav %}
-    <li><a href="{% url "jobber:opportunities_index" %}">Home</a></li>
-    <li><a href="#">Profile</a></li>
-    <li><a href="{% url "jobber:opportunities_list" %}" class="selected">Opportunities</a></li>
-    <li><a href="#">Advice</a></li>
-    <li><a href="#">About</a></li>
+    <ul id="primary-nav">
+        <li><a href="{% url "jobber:opportunities_index" %}">Home</a></li>
+        <li><a href="{% url "users:profile" user.user.username %}">Profile</a></li>
+        <li><a href="{% url "jobber:opportunities_list" %}" class="selected">Opportunities</a></li>
+        <li><a href="#">Advice</a></li>
+        <li><a href="#">About</a></li>
+    </ul>
 {% endblock %}
 {% block my-location %}
     <p id="my-location"><a href="{% url "jobber:opportunities_index" %}">Home</a> > Opportunities

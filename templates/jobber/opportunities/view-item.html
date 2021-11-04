@@ -1,10 +1,12 @@
 {% extends 'jobber/base.html' %}
 {% block primary-nav %}
-    <li><a href="{% url "jobber:opportunities_index" %}">Home</a></li>
-    <li><a href="#">Profile</a></li>
-    <li><a href="{% url "jobber:opportunities_list" %}" class="selected">Opportunities</a></li>
-    <li><a href="#">Advice</a></li>
-    <li><a href="#">About</a></li>
+    <ul id="primary-nav">
+        <li><a href="{% url "jobber:opportunities_index" %}">Home</a></li>
+        <li><a href="{% url "users:profile" user.user.username %}">Profile</a></li>
+        <li><a href="{% url "jobber:opportunities_list" %}" class="selected">Opportunities</a></li>
+        <li><a href="#">Advice</a></li>
+        <li><a href="#">About</a></li>
+    </ul>
 {% endblock %}
 {% block my-location %}
     <p id="my-location"><a href="{% url "jobber:opportunities_index" %}">Home</a> > <a
@@ -53,7 +55,9 @@
                     <p>Recruiter Contact:</p>
                     <ul class="contact-list">
                         {% if opportunity.recruiter_contact is not None %}
-                            <li data-ajax-url="{% url "jobber:opportunities_view_contact_ajax" %}" data-contact="{{ opportunity.recruiter_contact.id }}">{{ opportunity.recruiter_contact.name }} <a href="#">(see details)</a></li>
+                            <li data-ajax-url="{% url "jobber:opportunities_view_contact_ajax" %}"
+                                data-contact="{{ opportunity.recruiter_contact.id }}">{{ opportunity.recruiter_contact.name }}
+                                <a href="#">(see details)</a></li>
                         {% endif %}
                     </ul>
                     <p>Created Date: {{ opportunity.create_date | date:"F j, Y" }}</p>
@@ -76,7 +80,9 @@
                         <p>Referrals:</p>
                         <ul class="contact-list">
                             {% for contact in opportunity.referral_contacts.all %}
-                                <li data-ajax-url="{% url "jobber:opportunities_view_contact_ajax" %}" data-contact="{{ contact.id }}">{{ contact.name }} <a href="#">(see details)</a></li>
+                                <li data-ajax-url="{% url "jobber:opportunities_view_contact_ajax" %}"
+                                    data-contact="{{ contact.id }}">{{ contact.name }} <a href="#">(see details)</a>
+                                </li>
                             {% endfor %}
                         </ul>
                     </div>
@@ -92,12 +98,12 @@
             </ul> <!-- detail-list -->
         </div> <!-- topic-box -->
     </div> <!-- #your-opportunity-box -->
-<div class="popup-info">
-<h3>Contact Information:</h3>
-<p>Name: <span></span></p>
-<p>Title: <span></span></p>
-<p>Company: <span></span></p>
-<p>Phone: <span></span></p>
-<p>Email: <span></span></p>
-</div><!-- contact-list-add -->
+    <div class="popup-info">
+        <h3>Contact Information:</h3>
+        <p>Name: <span></span></p>
+        <p>Title: <span></span></p>
+        <p>Company: <span></span></p>
+        <p>Phone: <span></span></p>
+        <p>Email: <span></span></p>
+    </div><!-- contact-list-add -->
 {% endblock %}
