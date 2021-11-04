@@ -17,6 +17,7 @@ function getCookie(name) {
 const csrftoken = getCookie('csrftoken');
 
 jQuery.validate = function validate(thisEl) {
+    /* Validates that required fields are filled */
     let requiredInput = $(thisEl).parentsUntil("form, div.page-container").find('input.required');
     let isValError = false;
     requiredInput.each(function () {
@@ -33,6 +34,7 @@ jQuery.validate = function validate(thisEl) {
     })
 
     if (isValError) {
+        /* Show an error box */
         if (!($(thisEl).siblings('#input-error')).length) {
             let failMsg = $('<p id="input-error">Not Yet!  Please check that required fields are filled.</p>');
             $(thisEl).parent().append(failMsg);
@@ -43,6 +45,7 @@ jQuery.validate = function validate(thisEl) {
 }
 
 jQuery.removePopup = function removePopup(thisEl) {
+    /* Clears contents of a popup form and hides it */
     thisEl.css('display', 'none')
     let popupForm = $(thisEl).parent();
     popupForm.trigger("reset");
@@ -60,6 +63,7 @@ jQuery.removePopup = function removePopup(thisEl) {
 }
 
 jQuery.searchArticles = function searchArticles(thisEl, searchPhrase) {
+    /* Hardcoded search phrase and populating articles */
     if (searchPhrase === 'resume') {
         $('div.search-results-page').append(
             '    <div class="topic-box">\n' +

@@ -8,6 +8,7 @@ from .models import regular_user, admin_user, Opportunity, Event, Stage, Contact
 
 # Create helper functions
 def format_date(date):
+    """ Formats date into yyyy-mm-dd format or None when empty"""
     utc = pytz.utc
     if date != '':
         date = utc.localize(datetime.strptime(date, '%Y-%m-%d'))
@@ -17,6 +18,7 @@ def format_date(date):
 
 
 def generate_opportunity(request, opportunity_id=None) -> Opportunity:
+    """ Creates a new or edits an existing Opportunity object given a request with opportunity form data"""
     utc = pytz.utc
     contacts = Contact.objects.all()
     stage = request.POST.get('stage')
@@ -73,6 +75,7 @@ def generate_opportunity(request, opportunity_id=None) -> Opportunity:
 
 # Create your views here.
 def opportunities_index(request):
+    """ Dashboard view, which instead redirects to promo home page when nobody is logged in """
     if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
@@ -90,6 +93,7 @@ def opportunities_index(request):
 
 
 def opportunities_home_alt(request):
+    """ The promo home page, which instead renders the dashboard when logged in"""
     if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
@@ -107,6 +111,7 @@ def opportunities_home_alt(request):
 
 
 def opportunities_list(request):
+    """ List of opportunities """
     if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
@@ -126,6 +131,7 @@ def opportunities_list(request):
 
 
 def opportunities_view_item(request, id):
+    """ Detail page of a single opportunity, given the opportunity id """
     if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
@@ -133,7 +139,7 @@ def opportunities_view_item(request, id):
     my_opp = Opportunity.objects.get(pk=id)
     if request.session['role'] != "admin" and my_opp.user.username != request.session['username']:
         # TODO: Add message denying access
-        return redirect("opportunities:opportunities_list")
+        return redirect("jobber:opportunities_list")
 
     return render(request,
                   "jobber/opportunities/view-item.html",
@@ -143,6 +149,7 @@ def opportunities_view_item(request, id):
 
 
 def opportunities_edit_item(request, id):
+    """ Renders an existing opportunity's details to an editable form, saves inputs on POST request"""
     if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
@@ -150,11 +157,11 @@ def opportunities_edit_item(request, id):
     my_opp = Opportunity.objects.get(pk=id)
     if request.session['role'] != "admin" and my_opp.user.username != request.session['username']:
         # TODO: Add message denying access
-        return redirect("opportunities:opportunities_list")
+        return redirect("jobber:opportunities_list")
     if request.method == 'POST':
         my_opp = generate_opportunity(request=request, opportunity_id=id)
         messages.add_message(request, messages.INFO, "Saved Opportunity: %s, %s" % (my_opp.title, my_opp.company))
-        return redirect("opportunities:opportunities_view_item", my_opp.id)
+        return redirect("jobber:opportunities_view_item", my_opp.id)
     return render(request,
                   "jobber/opportunities/add-item.html",
                   {"user": User.objects.get(username=request.session['username']),
@@ -166,6 +173,7 @@ def opportunities_edit_item(request, id):
 
 
 def opportunities_add_item(request):
+    """ Renders an empty opportunity form page, saves a new Opportunity on POST request"""
     if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
@@ -176,7 +184,7 @@ def opportunities_add_item(request):
         messages.add_message(request, messages.SUCCESS,
                              "Submitted Opportunity: %s, %s" % (my_opp.title, my_opp.company))
         # Redirect
-        return redirect("opportunities:opportunities_view_item", my_opp.id)
+        return redirect("jobber:opportunities_view_item", my_opp.id)
     else:
         return render(request,
                       "jobber/opportunities/add-item.html",
@@ -188,6 +196,7 @@ def opportunities_add_item(request):
 
 
 def opportunities_delete_item(request):
+    """ Deletes an Opportunity given a POST request with the opportunity id to be deleted"""
     if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
@@ -197,13 +206,13 @@ def opportunities_delete_item(request):
         my_opp = Opportunity.objects.get(pk=opportunity_id)
         if request.session['role'] != "admin" and my_opp.user.username != request.session['username']:
             # TODO: Add message denying access
-            return redirect("opportunities:opportunities_list")
+            return redirect("jobber:opportunities_list")
         title = my_opp.title
         company = my_opp.company
         my_opp.delete()
         messages.add_message(request, messages.WARNING, "Deleted Opportunity: %s, %s" % (title, company))
         # Redirect
-        return redirect("opportunities:opportunities_list")
+        return redirect("jobber:opportunities_list")
     else:
         stages = Stage.objects.all()
         return render(request,
@@ -216,6 +225,7 @@ def opportunities_delete_item(request):
 
 
 def opportunities_add_contact_ajax(request):
+    """ Adds a Contact sent from an AJAX POST request"""
     is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
     if is_ajax and request.method == "POST":
         form_name = request.POST.get("formname")
@@ -246,6 +256,7 @@ def opportunities_add_contact_ajax(request):
 
 
 def opportunities_view_contact_ajax(request):
+    """ Returns a Contact's details sent from an AJAX GET request, given a Contact id"""
     is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
     if is_ajax and request.method == "GET":
         contact_id = int(request.GET.get("contact_id"))
@@ -270,6 +281,7 @@ def opportunities_view_contact_ajax(request):
 
 
 def opportunities_list_sort_ajax(request):
+    """ Returns the sorted index of Opportunity items sent from an AJAX GET request, given a sorter name"""
     is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
     if is_ajax and request.method == "GET":
         sorter = request.GET.get("sorter")
@@ -296,6 +308,7 @@ def opportunities_list_sort_ajax(request):
 
 
 def opportunities_add_contact(request):
+    """ Creates a new contact """
     if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
@@ -316,15 +329,17 @@ def opportunities_add_contact(request):
             contact_type=form_name)
         my_contact.save()
 
-    return redirect("opportunities:opportunities_index")
+    return redirect("jobber:opportunities_index")
 
 
 def opportunities_search_results(request):
+    """ Renders the search page """
     return render(request,
                   "jobber/opportunities/search-results.html")
 
 
 def login(request):
+    """ Login """
     username = request.POST.get("username")
     password = request.POST.get("password")
     if (username == regular_user["username"]) & (password == regular_user["password"]):
@@ -333,10 +348,11 @@ def login(request):
     elif (username == admin_user["username"]) & (password == admin_user["password"]):
         request.session['username'] = username
         request.session['role'] = 'admin'
-    return redirect("opportunities:opportunities_index")
+    return redirect("jobber:opportunities_index")
 
 
 def logout(request):
+    """ Logout """
     del request.session['username']
     del request.session['role']
-    return redirect("opportunities:opportunities_index")
+    return redirect("jobber:opportunities_index")

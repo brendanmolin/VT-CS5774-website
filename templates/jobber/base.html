@@ -24,7 +24,7 @@
         <ul id="account-box-items">
             <li>
                 <form id="search-articles" method="get"
-                      action="{% url "opportunities:opportunities_search_results" %}">
+                      action="{% url "jobber:opportunities_search_results" %}">
                     <label for="search-box">Search for Advice</label>
                     <input type="text" name="search-articles" placeholder="resume" id="search-box">
                     <input id="search-submit" type="submit" value="Search">
@@ -38,7 +38,7 @@
                 <li><p id="login-name">Logged in as:<br>
                     <strong>{{ user.username }}</strong><br>
                     {{ user.reputation }} Rep<br>
-                    <a href="{% url "opportunities:logout" %}" id="logout">Sign Out</a></p></li>
+                    <a href="{% url "jobber:logout" %}" id="logout">Sign Out</a></p></li>
             {% endif %}
         </ul>
     </div> <!-- #account-box -->
