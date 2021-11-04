@@ -22,13 +22,13 @@
 
     <div id="account-box">
         <ul id="account-box-items">
-            {% if user.username %}
+            {% if user.user.username %}
                 <li><a href="#"><img src="{% static "img/mail.png" %}" alt="Mail"></a></li>
                 <!-- img/mail.png https://www.clipartbest.com/clipart-KTjX8k7ac -->
                 <li><a href="#"><img src="{% static "img/profile.png" %}" alt="My Account"></a></li>
                 <!-- img/profile.png: https://toppng.com/free-image/black-and-white-stockportable-network-account-icon-PNG-free-PNG-Images_126251 -->
                 <li><p id="login-name">Logged in as:<br>
-                    <strong>{{ user.username }}</strong><br>
+                    <strong>{{ user.user.username }}</strong><br>
                     {{ user.reputation }} Rep<br>
                     <a href="{% url "users:logout_user" %}" id="logout">Sign Out</a></p></li>
             {% endif %}
