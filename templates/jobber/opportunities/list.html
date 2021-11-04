@@ -17,8 +17,8 @@
                 <label for="sort-opportunities">Sort By:</label>
                 <select name="sort-opportunities" id="sort-opportunities"
                         data-ajax-url="{% url "jobber:opportunities_list_sort_ajax" %}">
-                    <option value="creation-date" class="selected">Creation Date</option>
-                    <option value="modified-date">Modified Date</option>
+                    <option value="modified-date" selected="selected">Modified Date</option>
+                    <option value="creation-date">Creation Date</option>
                     <option value="stage">Stage</option>
                 </select>
             </div>

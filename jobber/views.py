@@ -72,6 +72,32 @@ def generate_opportunity(request, opportunity_id=None) -> Opportunity:
     my_opp.save()
     return my_opp
 
+def get_opportunities_by_user_and_role(request):
+    """ Gets permissioned Opportunities """
+    if request.session['role'] == "admin":
+        opportunities = Opportunity.objects.all()
+    else:
+        opportunities = Opportunity.objects.filter(
+            user=User.objects.get(username=request.session['username']).id)
+    return opportunities
+
+def get_events_by_user_and_role(request):
+    """ Gets permissioned Events """
+    if request.session['role'] == "admin":
+        events = Event.objects.all()
+    else:
+        events = Event.objects.filter(
+            user=User.objects.get(username=request.session['username']).id)
+    return events
+
+def get_contacts_by_user_and_role(request):
+    """ Gets permissioned Events """
+    if request.session['role'] == "admin":
+        contacts = Contact.objects.all()
+    else:
+        contacts = Contact.objects.filter(
+            user=User.objects.get(username=request.session['username']).id)
+    return contacts
 
 # Create your views here.
 def opportunities_index(request):
@@ -79,12 +105,8 @@ def opportunities_index(request):
     if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
-    if request.session['role'] == "admin":
-        opportunities = Opportunity.objects.all()
-        events = Event.objects.all()
-    else:
-        opportunities = Opportunity.objects.filter(user=User.objects.get(username=request.session['username']).id)
-        events = Event.objects.filter(user=User.objects.get(username=request.session['username']).id)
+    opportunities = get_opportunities_by_user_and_role(request)
+    events = get_events_by_user_and_role(request)
     return render(request,
                   "jobber/opportunities/index.html",
                   {"user": User.objects.get(username=request.session['username']),
@@ -97,12 +119,8 @@ def opportunities_home_alt(request):
     if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
-    if request.session['role'] == "admin":
-        opportunities = Opportunity.objects.all()
-        events = Event.objects.all()
-    else:
-        opportunities = Opportunity.objects.filter(user=User.objects.get(username=request.session['username']).id)
-        events = Event.objects.filter(user=User.objects.get(username=request.session['username']).id)
+    opportunities = get_opportunities_by_user_and_role(request)
+    events = get_events_by_user_and_role(request)
     return render(request,
                   "jobber/opportunities/index.html",
                   {"user": User.objects.get(username=request.session['username']),
@@ -116,10 +134,7 @@ def opportunities_list(request):
         return render(request,
                       "jobber/opportunities/home-alt.html")
 
-    if request.session['role'] == "admin":
-        opportunities = Opportunity.objects.all()
-    else:
-        opportunities = Opportunity.objects.filter(user=User.objects.get(username=request.session['username']).id)
+    opportunities = get_opportunities_by_user_and_role(request)
     opportunities = opportunities.order_by('-modified_date')
     stages = Stage.objects.all()
     return render(request,
@@ -162,13 +177,14 @@ def opportunities_edit_item(request, id):
         my_opp = generate_opportunity(request=request, opportunity_id=id)
         messages.add_message(request, messages.INFO, "Saved Opportunity: %s, %s" % (my_opp.title, my_opp.company))
         return redirect("jobber:opportunities_view_item", my_opp.id)
+    contacts = get_contacts_by_user_and_role(request)
     return render(request,
                   "jobber/opportunities/add-item.html",
                   {"user": User.objects.get(username=request.session['username']),
                    "opportunity": my_opp,
                    'stages': stages,
-                   "recruiter_contacts": Contact.objects.filter(contact_type='REC'),
-                   "referral_contacts": Contact.objects.filter(contact_type='REF')
+                   "recruiter_contacts": contacts.filter(contact_type='REC'),
+                   "referral_contacts": contacts.filter(contact_type='REF')
                    })
 
 
@@ -186,12 +202,13 @@ def opportunities_add_item(request):
         # Redirect
         return redirect("jobber:opportunities_view_item", my_opp.id)
     else:
+        contacts = get_contacts_by_user_and_role(request)
         return render(request,
                       "jobber/opportunities/add-item.html",
                       {"user": User.objects.get(username=request.session['username']),
                        "stages": stages,
-                       "recruiter_contacts": Contact.objects.filter(contact_type='REC'),
-                       "referral_contacts": Contact.objects.filter(contact_type='REF')
+                       "recruiter_contacts": contacts.filter(contact_type='REC'),
+                       "referral_contacts": contacts.filter(contact_type='REF')
                        })
 
 
@@ -286,7 +303,7 @@ def opportunities_list_sort_ajax(request):
     if is_ajax and request.method == "GET":
         sorter = request.GET.get("sorter")
         try:
-            opportunities = Opportunity.objects.filter(user=User.objects.get(username=request.session['username']).id)
+            opportunities = get_opportunities_by_user_and_role(request)
             if sorter == "modified-date":
                 opportunities = opportunities.order_by("-modified_date")
             elif sorter == "created-date":
