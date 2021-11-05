@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from datetime import datetime
 from .models import Opportunity, Event, Stage, Contact
 from users.models import Profile
+from actions.models import Action
 
 
 # Create helper functions
@@ -16,6 +17,7 @@ def format_date(date):
     else:
         date = None
     return date
+
 
 def get_profile(request):
     return Profile.objects.get(user__username=request.session['username'])
@@ -76,6 +78,7 @@ def generate_opportunity(request, opportunity_id=None) -> Opportunity:
     my_opp.save()
     return my_opp
 
+
 def get_opportunities_by_user_and_role(request):
     """ Gets permissioned Opportunities """
     if request.session['role'] == "admin":
@@ -84,6 +87,7 @@ def get_opportunities_by_user_and_role(request):
         opportunities = Opportunity.objects.filter(
             profile=get_profile(request).id)
     return opportunities
+
 
 def get_events_by_user_and_role(request):
     """ Gets permissioned Events """
@@ -94,6 +98,7 @@ def get_events_by_user_and_role(request):
             profile=get_profile(request).id)
     return events
 
+
 def get_contacts_by_user_and_role(request):
     """ Gets permissioned Events """
     if request.session['role'] == "admin":
@@ -102,6 +107,7 @@ def get_contacts_by_user_and_role(request):
         contacts = Contact.objects.filter(
             profile=get_profile(request).id)
     return contacts
+
 
 # Create your views here.
 def opportunities_index(request):
@@ -200,7 +206,16 @@ def opportunities_add_item(request):
 
     stages = Stage.objects.all()
     if request.method == 'POST':
+        # Add new opportunity
         my_opp = generate_opportunity(request, opportunity_id=None)
+        # Log Action
+        action = Action(
+            user=get_profile(request),
+            verb="Created a new opportunity",
+            target=my_opp
+        )
+        action.save()
+        # Send success message
         messages.add_message(request, messages.SUCCESS,
                              "Submitted Opportunity: %s, %s" % (my_opp.title, my_opp.company))
         # Redirect
