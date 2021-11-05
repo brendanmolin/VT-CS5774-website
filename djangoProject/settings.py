@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'jobber.apps.JobberConfig',
     'users.apps.UsersConfig',
+    'actions.apps.ActionsConfig',
 ]
 
 MIDDLEWARE = [
