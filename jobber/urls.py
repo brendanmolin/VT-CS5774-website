@@ -16,7 +16,5 @@ urlpatterns = [
     path('opportunities/add_contact_inplace', views.opportunities_add_contact_ajax,
          name="opportunities_add_contact_ajax"),
     path('opportunities/view_contact_inplace', views.opportunities_view_contact_ajax,
-         name="opportunities_view_contact_ajax"),
-    path('login', views.login, name="login"),
-    path('logout', views.logout, name="logout")
+         name="opportunities_view_contact_ajax")
 ]

@@ -1,0 +1,26 @@
+{% extends 'jobber/base.html' %}
+{% load static %}
+
+{% block search-articles %}
+{% endblock %}
+
+
+{% block content %}
+    <h3 id="welcome">Register User</h3>
+    <div id="register-box">
+        <p class="hint">* = required</p>
+        <form action="{% url "users:register" %}" name="register-user" id="register-user" method="POST">
+            {% csrf_token %}
+            <div id="register-inputs">
+                <p><label for="register-username">Username*</label>
+                    <input type="text" name="register-username" placeholder="Username" required></p>
+                <p><label for="register-email">Email*</label>
+                    <input type="email" name="register-email" placeholder="Email" required></p>
+                <p><label for="register-password">Password*</label>
+                    <input type="password" name="register-password" placeholder="Password" required></p>
+            </div>
+            <input type="submit" name="submit" value="Register">
+        </form>
+    </div> <!-- #register-box -->
+{% endblock %}
+{% block ad-space %} {% endblock %}

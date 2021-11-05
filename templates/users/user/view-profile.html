@@ -1,0 +1,27 @@
+{% extends 'jobber/base.html' %}
+{% load static %}
+
+{% block primary-nav %}
+    <ul id="primary-nav">
+        <li><a href="{% url "jobber:opportunities_index" %}">Home</a></li>
+        <li><a href="{% url "users:profile" user.user.username %}" class="selected">Profile</a></li>
+        <li><a href="{% url "jobber:opportunities_list" %}">Opportunities</a></li>
+        <li><a href="#">Advice</a></li>
+        <li><a href="#">About</a></li>
+    </ul>
+{% endblock %}
+{% block my-location %}
+    <p id="my-location"> Profile
+    </p> {% endblock %}
+
+{% block content %}
+    <h3 id="welcome">{{ user.user.username }} Profile</h3>
+    <div id="profile-box">
+        <p>Username: {{ user.user.username }}</p>
+        <p>Role: {{ user.role }}</p>
+        <p>Email: {{ user.user.email }}</p>
+        <p>Reputation: {{ user.reputation }}</p>
+    </div>
+    </div> <!-- #register-box -->
+{% endblock %}
+{% block ad-space %} {% endblock %}

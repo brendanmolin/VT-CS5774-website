@@ -3,7 +3,8 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.http import JsonResponse
 from datetime import datetime
-from .models import regular_user, admin_user, Opportunity, Event, Stage, Contact, User
+from .models import Opportunity, Event, Stage, Contact
+from users.models import Profile
 
 
 # Create helper functions
@@ -15,6 +16,9 @@ def format_date(date):
     else:
         date = None
     return date
+
+def get_profile(request):
+    return Profile.objects.get(user__username=request.session['username'])
 
 
 def generate_opportunity(request, opportunity_id=None) -> Opportunity:
@@ -42,7 +46,7 @@ def generate_opportunity(request, opportunity_id=None) -> Opportunity:
     interview_date = request.POST.get('interview-date')
     interview_date = format_date(interview_date)
     if opportunity_id is None:
-        my_opp = Opportunity(user=User.objects.get(username=request.session['username']),
+        my_opp = Opportunity(profile=get_profile(request),
                              create_date=utc.localize(datetime.now()), modified_date=utc.localize(datetime.now()),
                              stage=input_stage, title=title,
                              company=company,
@@ -53,7 +57,7 @@ def generate_opportunity(request, opportunity_id=None) -> Opportunity:
                              next_step='')
     else:
         my_opp = Opportunity.objects.get(pk=opportunity_id)
-        my_opp.user = User.objects.get(username=request.session['username'])
+        my_opp.profile = get_profile(request)
         my_opp.modified_date = utc.localize(datetime.now())
         my_opp.stage = input_stage
         my_opp.title = title
@@ -78,7 +82,7 @@ def get_opportunities_by_user_and_role(request):
         opportunities = Opportunity.objects.all()
     else:
         opportunities = Opportunity.objects.filter(
-            user=User.objects.get(username=request.session['username']).id)
+            profile=get_profile(request).id)
     return opportunities
 
 def get_events_by_user_and_role(request):
@@ -87,7 +91,7 @@ def get_events_by_user_and_role(request):
         events = Event.objects.all()
     else:
         events = Event.objects.filter(
-            user=User.objects.get(username=request.session['username']).id)
+            profile=get_profile(request).id)
     return events
 
 def get_contacts_by_user_and_role(request):
@@ -96,7 +100,7 @@ def get_contacts_by_user_and_role(request):
         contacts = Contact.objects.all()
     else:
         contacts = Contact.objects.filter(
-            user=User.objects.get(username=request.session['username']).id)
+            profile=get_profile(request).id)
     return contacts
 
 # Create your views here.
@@ -109,7 +113,7 @@ def opportunities_index(request):
     events = get_events_by_user_and_role(request)
     return render(request,
                   "jobber/opportunities/index.html",
-                  {"user": User.objects.get(username=request.session['username']),
+                  {"user": get_profile(request),
                    "opportunities": opportunities,
                    "events": events})
 
@@ -123,7 +127,7 @@ def opportunities_home_alt(request):
     events = get_events_by_user_and_role(request)
     return render(request,
                   "jobber/opportunities/index.html",
-                  {"user": User.objects.get(username=request.session['username']),
+                  {"user": get_profile(request),
                    "opportunities": opportunities,
                    "events": events})
 
@@ -139,7 +143,7 @@ def opportunities_list(request):
     stages = Stage.objects.all()
     return render(request,
                   "jobber/opportunities/list.html",
-                  {"user": User.objects.get(username=request.session['username']),
+                  {"user": get_profile(request),
                    "opportunities": opportunities,
                    "stages": stages}
                   )
@@ -152,13 +156,13 @@ def opportunities_view_item(request, id):
                       "jobber/opportunities/home-alt.html")
     stages = Stage.objects.all()
     my_opp = Opportunity.objects.get(pk=id)
-    if request.session['role'] != "admin" and my_opp.user.username != request.session['username']:
+    if request.session['role'] != "admin" and my_opp.profile.user.username != request.session['username']:
         # TODO: Add message denying access
         return redirect("jobber:opportunities_list")
 
     return render(request,
                   "jobber/opportunities/view-item.html",
-                  {"user": User.objects.get(username=request.session['username']),
+                  {"user": get_profile(request),
                    "opportunity": my_opp,
                    'stages': stages})
 
@@ -170,7 +174,7 @@ def opportunities_edit_item(request, id):
                       "jobber/opportunities/home-alt.html")
     stages = Stage.objects.all()
     my_opp = Opportunity.objects.get(pk=id)
-    if request.session['role'] != "admin" and my_opp.user.username != request.session['username']:
+    if request.session['role'] != "admin" and my_opp.profile.user.username != request.session['username']:
         # TODO: Add message denying access
         return redirect("jobber:opportunities_list")
     if request.method == 'POST':
@@ -180,7 +184,7 @@ def opportunities_edit_item(request, id):
     contacts = get_contacts_by_user_and_role(request)
     return render(request,
                   "jobber/opportunities/add-item.html",
-                  {"user": User.objects.get(username=request.session['username']),
+                  {"user": get_profile(request),
                    "opportunity": my_opp,
                    'stages': stages,
                    "recruiter_contacts": contacts.filter(contact_type='REC'),
@@ -205,7 +209,7 @@ def opportunities_add_item(request):
         contacts = get_contacts_by_user_and_role(request)
         return render(request,
                       "jobber/opportunities/add-item.html",
-                      {"user": User.objects.get(username=request.session['username']),
+                      {"user": get_profile(request),
                        "stages": stages,
                        "recruiter_contacts": contacts.filter(contact_type='REC'),
                        "referral_contacts": contacts.filter(contact_type='REF')
@@ -221,7 +225,7 @@ def opportunities_delete_item(request):
     if request.method == 'POST':
         opportunity_id = request.POST.get("id")
         my_opp = Opportunity.objects.get(pk=opportunity_id)
-        if request.session['role'] != "admin" and my_opp.user.username != request.session['username']:
+        if request.session['role'] != "admin" and my_opp.profile.user.username != request.session['username']:
             # TODO: Add message denying access
             return redirect("jobber:opportunities_list")
         title = my_opp.title
@@ -234,7 +238,7 @@ def opportunities_delete_item(request):
         stages = Stage.objects.all()
         return render(request,
                       "jobber/opportunities/add-item.html",
-                      {"user": User.objects.get(username=request.session['username']),
+                      {"user": get_profile(request),
                        "stages": stages,
                        "recruiter_contacts": Contact.objects.filter(contact_type='REC'),
                        "referral_contacts": Contact.objects.filter(contact_type='REF')
@@ -253,7 +257,7 @@ def opportunities_add_contact_ajax(request):
         email = request.POST.get("contact_add_email")
         try:
             my_contact = Contact(
-                user=User.objects.get(username=request.session['username']),
+                profile=get_profile(request),
                 name=name,
                 title=title,
                 company=company,
@@ -337,7 +341,7 @@ def opportunities_add_contact(request):
         phone = request.POST.get("contact-add-phone")
         email = request.POST.get("contact-add-email")
         my_contact = Contact(
-            user=User.objects.get(username=request.session['username']),
+            profile=get_profile(request),
             name=name,
             title=title,
             company=company,
@@ -353,23 +357,3 @@ def opportunities_search_results(request):
     """ Renders the search page """
     return render(request,
                   "jobber/opportunities/search-results.html")
-
-
-def login(request):
-    """ Login """
-    username = request.POST.get("username")
-    password = request.POST.get("password")
-    if (username == regular_user["username"]) & (password == regular_user["password"]):
-        request.session['username'] = username
-        request.session['role'] = 'regular'
-    elif (username == admin_user["username"]) & (password == admin_user["password"]):
-        request.session['username'] = username
-        request.session['role'] = 'admin'
-    return redirect("jobber:opportunities_index")
-
-
-def logout(request):
-    """ Logout """
-    del request.session['username']
-    del request.session['role']
-    return redirect("jobber:opportunities_index")

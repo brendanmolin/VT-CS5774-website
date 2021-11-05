@@ -14,7 +14,7 @@
 
 <div id="header">
     <div id="title-box">
-        <img src="{% static "img/logo.png" %}" alt="Logo">
+        <a href="{% url "jobber:opportunities_index" %}"><img src="{% static "img/logo.png" %}" alt="Logo"></a>
         <!-- img/logo.png: https://toppng.com/free-image/suitcase-black-PNG-free-PNG-Images_30387 -->
         <h1>Jobber</h1>
         <h2>Own your job search</h2>
@@ -22,31 +22,33 @@
 
     <div id="account-box">
         <ul id="account-box-items">
-            <li>
-                <form id="search-articles" method="get"
-                      action="{% url "jobber:opportunities_search_results" %}">
-                    <label for="search-box">Search for Advice</label>
-                    <input type="text" name="search-articles" placeholder="resume" id="search-box">
-                    <input id="search-submit" type="submit" value="Search">
-                </form>
-            </li>
-            {% if user.username %}
+            {% if user.user.username %}
                 <li><a href="#"><img src="{% static "img/mail.png" %}" alt="Mail"></a></li>
                 <!-- img/mail.png https://www.clipartbest.com/clipart-KTjX8k7ac -->
-                <li><a href="#"><img src="{% static "img/profile.png" %}" alt="My Account"></a></li>
+                <li><a href="{% url "users:profile" user.user.username %}"><img src="{% static "img/profile.png" %}"
+                                                                                alt="My Account"></a></li>
                 <!-- img/profile.png: https://toppng.com/free-image/black-and-white-stockportable-network-account-icon-PNG-free-PNG-Images_126251 -->
                 <li><p id="login-name">Logged in as:<br>
-                    <strong>{{ user.username }}</strong><br>
+                    <strong>{{ user.user.username }}</strong><br>
                     {{ user.reputation }} Rep<br>
-                    <a href="{% url "jobber:logout" %}" id="logout">Sign Out</a></p></li>
+                    <a href="{% url "users:logout_user" %}" id="logout">Sign Out</a></p></li>
             {% endif %}
         </ul>
     </div> <!-- #account-box -->
 
-    <ul id="primary-nav">
-        {% block primary-nav %}
-        {% endblock %}
-    </ul>
+    {% block search-articles %}
+        <div id="search-articles-box">
+            <form id="search-articles" method="get"
+                  action="{% url "jobber:opportunities_search_results" %}">
+                <label for="search-box">Search for Advice</label>
+                <input type="text" name="search-articles" placeholder="resume" id="search-box">
+                <input id="search-submit" type="submit" value="Search">
+            </form>
+        </div> <!-- #search-articles-box -->
+    {% endblock %}
+
+    {% block primary-nav %}
+    {% endblock %}
 </div> <!-- #header -->
 
 {% block content-div %}
