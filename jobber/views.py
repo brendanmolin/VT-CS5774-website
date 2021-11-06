@@ -109,18 +109,28 @@ def get_contacts_by_user_and_role(request):
     return contacts
 
 
+def get_actions_by_user_and_role(request):
+    """ Gets permissioned Events """
+    if request.session['role'] == "admin":
+        actions = Action.objects.all()
+    else:
+        actions = Action.objects.filter(
+            user=get_profile(request).id)
+    return actions
+
+
 # Create your views here.
 def opportunities_index(request):
     """ Dashboard view, which instead redirects to promo home page when nobody is logged in """
     if not request.session.get("role", False):
         return render(request,
                       "jobber/opportunities/home-alt.html")
-    opportunities = get_opportunities_by_user_and_role(request)
+    actions = get_actions_by_user_and_role(request)
     events = get_events_by_user_and_role(request)
     return render(request,
                   "jobber/opportunities/index.html",
                   {"user": get_profile(request),
-                   "opportunities": opportunities,
+                   "actions": actions,
                    "events": events})
 
 
@@ -185,6 +195,14 @@ def opportunities_edit_item(request, id):
         return redirect("jobber:opportunities_list")
     if request.method == 'POST':
         my_opp = generate_opportunity(request=request, opportunity_id=id)
+        # Log Action
+        action = Action(
+            user=get_profile(request),
+            verb="updated an opportunity",
+            target=my_opp
+        )
+        action.save()
+
         messages.add_message(request, messages.INFO, "Saved Opportunity: %s, %s" % (my_opp.title, my_opp.company))
         return redirect("jobber:opportunities_view_item", my_opp.id)
     contacts = get_contacts_by_user_and_role(request)
@@ -211,7 +229,7 @@ def opportunities_add_item(request):
         # Log Action
         action = Action(
             user=get_profile(request),
-            verb="Created a new opportunity",
+            verb="created a new opportunity",
             target=my_opp
         )
         action.save()
@@ -246,6 +264,13 @@ def opportunities_delete_item(request):
         title = my_opp.title
         company = my_opp.company
         my_opp.delete()
+        # Log Action
+        action = Action(
+            user=get_profile(request),
+            verb="Deleted the opportunity %s, %s" % (my_opp.title, my_opp.company),
+            target=my_opp
+        )
+        action.save()
         messages.add_message(request, messages.WARNING, "Deleted Opportunity: %s, %s" % (title, company))
         # Redirect
         return redirect("jobber:opportunities_list")
@@ -280,6 +305,13 @@ def opportunities_add_contact_ajax(request):
                 email=email,
                 contact_type=form_name)
             my_contact.save()
+            # Log Action
+            action = Action(
+                user=get_profile(request),
+                verb="created a new contact",
+                target=my_contact
+            )
+            action.save()
             new_contact_id = my_contact.id
             return JsonResponse(
                 {'success': 'success', 'contact_type': form_name, 'contact_id': new_contact_id, 'contact_name': name},
@@ -364,6 +396,13 @@ def opportunities_add_contact(request):
             email=email,
             contact_type=form_name)
         my_contact.save()
+        # Log Action
+        action = Action(
+            user=get_profile(request),
+            verb="created a new contact",
+            target=my_contact
+        )
+        action.save()
 
     return redirect("jobber:opportunities_index")
 

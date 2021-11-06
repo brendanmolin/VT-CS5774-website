@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'jobber.apps.JobberConfig',
     'users.apps.UsersConfig',
     'actions.apps.ActionsConfig',
+    'django.contrib.humanize',
 ]
 
 MIDDLEWARE = [
