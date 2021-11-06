@@ -2,6 +2,13 @@ from django.contrib.auth import authenticate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib import messages
+from .models import Profile
+from actions.models import Action
+
+
+# Helper functions
+def get_profile(request):
+    return Profile.objects.get(user__username=request.session['username'])
 
 
 # Create your views here.
@@ -22,11 +29,14 @@ def register(request):
 
 def profile(request, username):
     user1 = get_object_or_404(User, username=username)
+    actions = Action.objects.filter(
+        user=Profile.objects.get(user__username=username))
     if request.method == 'POST':
         pass
     return render(request,
                   "users/user/view-profile.html",
-                  {"user": user1.profile})
+                  {"user": user1.profile,
+                   "actions": actions})
 
 
 def login_user(request):

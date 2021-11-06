@@ -13,14 +13,7 @@
 {% block content %}
     <div class="view-list">
         <div id="recent-activity-box" class="quickview-box">
-            <h2>Your Recent Activity</h2>
-            <ul id="recent-activity" class="detail-list">
-                {% for opp in opportunities|slice:":3" %}
-                    <li><p>{% if opp.next_step != '' %}{{ opp.next_step }}: {% endif %}<a
-                            href="{% url "jobber:opportunities_view_item" opp.id %}">{{ opp.company }}, {{ opp.title }}</a>
-                    </p></li>
-                {% endfor %}
-            </ul>
+            {% include 'actions/action/feed.html' %}
             <p class="button"><a href="{% url "jobber:opportunities_add-item" %}">Open New Opportunity</a></p>
             <p class="button"><a href="{% url "jobber:opportunities_list" %}">See All Opportunities</a></p>
         </div> <!-- #recent-activity-box quickview-box -->
