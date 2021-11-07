@@ -108,11 +108,11 @@ def opportunities_index(request):
     """ Dashboard view, which instead redirects to promo home page when nobody is logged in """
     if not request.session.get("role", False):
         return render(request,
-                      "jobber/opportunities/home-alt.html")
+                      "jobber/home-alt.html")
     opportunities = get_opportunities_by_user_and_role(request)
     events = get_events_by_user_and_role(request)
     return render(request,
-                  "jobber/opportunities/index.html",
+                  "jobber/index.html",
                   {"user": get_profile(request),
                    "opportunities": opportunities,
                    "events": events})
@@ -122,11 +122,11 @@ def opportunities_home_alt(request):
     """ The promo home page, which instead renders the dashboard when logged in"""
     if not request.session.get("role", False):
         return render(request,
-                      "jobber/opportunities/home-alt.html")
+                      "jobber/home-alt.html")
     opportunities = get_opportunities_by_user_and_role(request)
     events = get_events_by_user_and_role(request)
     return render(request,
-                  "jobber/opportunities/index.html",
+                  "jobber/index.html",
                   {"user": get_profile(request),
                    "opportunities": opportunities,
                    "events": events})
@@ -136,7 +136,7 @@ def opportunities_list(request):
     """ List of opportunities """
     if not request.session.get("role", False):
         return render(request,
-                      "jobber/opportunities/home-alt.html")
+                      "jobber/home-alt.html")
 
     opportunities = get_opportunities_by_user_and_role(request)
     opportunities = opportunities.order_by('-modified_date')
@@ -153,7 +153,7 @@ def opportunities_view_item(request, id):
     """ Detail page of a single opportunity, given the opportunity id """
     if not request.session.get("role", False):
         return render(request,
-                      "jobber/opportunities/home-alt.html")
+                      "jobber/home-alt.html")
     stages = Stage.objects.all()
     my_opp = Opportunity.objects.get(pk=id)
     if request.session['role'] != "admin" and my_opp.profile.user.username != request.session['username']:
@@ -171,7 +171,7 @@ def opportunities_edit_item(request, id):
     """ Renders an existing opportunity's details to an editable form, saves inputs on POST request"""
     if not request.session.get("role", False):
         return render(request,
-                      "jobber/opportunities/home-alt.html")
+                      "jobber/home-alt.html")
     stages = Stage.objects.all()
     my_opp = Opportunity.objects.get(pk=id)
     if request.session['role'] != "admin" and my_opp.profile.user.username != request.session['username']:
@@ -196,7 +196,7 @@ def opportunities_add_item(request):
     """ Renders an empty opportunity form page, saves a new Opportunity on POST request"""
     if not request.session.get("role", False):
         return render(request,
-                      "jobber/opportunities/home-alt.html")
+                      "jobber/home-alt.html")
 
     stages = Stage.objects.all()
     if request.method == 'POST':
@@ -220,7 +220,7 @@ def opportunities_delete_item(request):
     """ Deletes an Opportunity given a POST request with the opportunity id to be deleted"""
     if not request.session.get("role", False):
         return render(request,
-                      "jobber/opportunities/home-alt.html")
+                      "jobber/home-alt.html")
 
     if request.method == 'POST':
         opportunity_id = request.POST.get("id")
@@ -332,7 +332,7 @@ def opportunities_add_contact(request):
     """ Creates a new contact """
     if not request.session.get("role", False):
         return render(request,
-                      "jobber/opportunities/home-alt.html")
+                      "jobber/home-alt.html")
     if request.method == 'POST':
         form_name = request.POST.get("formname")
         name = request.POST.get("contact-add-name")
@@ -356,4 +356,4 @@ def opportunities_add_contact(request):
 def opportunities_search_results(request):
     """ Renders the search page """
     return render(request,
-                  "jobber/opportunities/search-results.html")
+                  "jobber/search-results.html")
