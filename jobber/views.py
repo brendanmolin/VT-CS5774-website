@@ -112,6 +112,7 @@ def generate_contact(request, contact_id=None) -> Opportunity:
     my_contact.save()
     return my_contact
 
+
 def get_opportunities_by_user_and_role(request):
     """ Gets permissioned Opportunities """
     if request.session['role'] == "admin":
@@ -160,7 +161,7 @@ def opportunities_index(request):
     if not request.session.get("role", False):
         return render(request,
                       "jobber/home-alt.html")
-    actions = get_actions_by_user_and_role(request)
+    actions = get_actions_by_user_and_role(request).order_by("-created")[:3]
     events = get_events_by_user_and_role(request)
     return render(request,
                   "jobber/index.html",
@@ -268,7 +269,7 @@ def opportunities_edit_item(request, id):
         # Log Action
         action = Action(
             user=get_profile(request),
-            verb="updated an opportunity",
+            verb="updated opportunity",
             target=my_opp
         )
         action.save()
@@ -337,7 +338,7 @@ def opportunities_delete_item(request):
         # Log Action
         action = Action(
             user=get_profile(request),
-            verb="Deleted the opportunity %s, %s" % (my_opp.title, my_opp.company),
+            verb="deleted the opportunity %s, %s" % (my_opp.title, my_opp.company),
             target=my_opp
         )
         action.save()
@@ -458,6 +459,7 @@ def contacts_list_sort_ajax(request):
     else:
         return JsonResponse({'error': 'Invalid request.'}, status=400)
 
+
 def contacts_view_item(request, id):
     """ Detail page of a single contact, given the contact id """
     if not request.session.get("role", False):
@@ -487,7 +489,7 @@ def contacts_edit_item(request, id):
         my_contact = generate_contact(request=request, contact_id=id)
         action = Action(
             user=get_profile(request),
-            verb="created a new contact",
+            verb="updated contact",
             target=my_contact
         )
         action.save()
@@ -508,8 +510,15 @@ def contacts_add_item(request):
 
     if request.method == 'POST':
         my_contact = generate_contact(request, contact_id=None)
+        # Log Action
+        action = Action(
+            user=get_profile(request),
+            verb="created a new contact",
+            target=my_contact
+        )
+        action.save()
         messages.add_message(request, messages.SUCCESS,
-                             "Submitted Contact: %s, %s" % (my_contact.name, my_contact.company))
+                             "Submitted Contact: %s, %s" % (my_contact.name, my_contact.title))
         # Redirect
         return redirect("jobber:contacts_view_item", my_contact.id)
     else:
@@ -531,9 +540,16 @@ def contacts_delete_item(request):
             # TODO: Add message denying access
             return redirect("jobber:contacts_list")
         name = my_contact.name
-        company = my_contact.company
+        title = my_contact.title
         my_contact.delete()
-        messages.add_message(request, messages.WARNING, "Deleted Contact: %s, %s" % (name, company))
+        # Log Action
+        action = Action(
+            user=get_profile(request),
+            verb="Deleted the contact %s, %s" % (name, title),
+            target=my_contact
+        )
+        action.save()
+        messages.add_message(request, messages.WARNING, "Deleted contact: %s, %s" % (name, title))
         # Redirect
         return redirect("jobber:contacts_list")
     else:

@@ -25,6 +25,12 @@ class Contact(models.Model):
         default=REFERENCE
     )
 
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse("jobber:contacts_view_item", args=[self.id])
+
 
 class Opportunity(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
