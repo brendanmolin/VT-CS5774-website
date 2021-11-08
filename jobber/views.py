@@ -17,6 +17,7 @@ def format_date(date):
         date = None
     return date
 
+
 def get_profile(request):
     return Profile.objects.get(user__username=request.session['username'])
 
@@ -76,6 +77,39 @@ def generate_opportunity(request, opportunity_id=None) -> Opportunity:
     my_opp.save()
     return my_opp
 
+
+def generate_contact(request, contact_id=None) -> Opportunity:
+    """ Creates a new or edits an existing Contact object given a request with contact form data"""
+    utc = pytz.utc
+
+    contact_type = request.POST.get("contact_type")
+    name = request.POST.get("contact_add_name")
+    title = request.POST.get("contact_add_title")
+    company = request.POST.get("contact_add_company")
+    phone = request.POST.get("contact_add_phone")
+    email = request.POST.get("contact_add_email")
+    if contact_id is None:
+        my_contact = Contact(
+            profile=get_profile(request),
+            name=name,
+            title=title,
+            company=company,
+            phone_number=phone,
+            email=email,
+            contact_type=contact_type)
+    else:
+        my_contact = Contact.objects.get(pk=contact_id)
+        my_contact.profile = get_profile(request)
+        my_contact.modified_date = utc.localize(datetime.now())
+        my_contact.name = name
+        my_contact.title = title
+        my_contact.company = company
+        my_contact.phone_number = phone
+        my_contact.email = email
+        my_contact.contact_type = contact_type
+    my_contact.save()
+    return my_contact
+
 def get_opportunities_by_user_and_role(request):
     """ Gets permissioned Opportunities """
     if request.session['role'] == "admin":
@@ -84,6 +118,7 @@ def get_opportunities_by_user_and_role(request):
         opportunities = Opportunity.objects.filter(
             profile=get_profile(request).id)
     return opportunities
+
 
 def get_events_by_user_and_role(request):
     """ Gets permissioned Events """
@@ -94,6 +129,7 @@ def get_events_by_user_and_role(request):
             profile=get_profile(request).id)
     return events
 
+
 def get_contacts_by_user_and_role(request):
     """ Gets permissioned Events """
     if request.session['role'] == "admin":
@@ -103,7 +139,10 @@ def get_contacts_by_user_and_role(request):
             profile=get_profile(request).id)
     return contacts
 
+
 # Create your views here.
+
+# Main pages
 def opportunities_index(request):
     """ Dashboard view, which instead redirects to promo home page when nobody is logged in """
     if not request.session.get("role", False):
@@ -132,6 +171,14 @@ def opportunities_home_alt(request):
                    "events": events})
 
 
+def opportunities_search_results(request):
+    """ Renders the search page """
+    return render(request,
+                  "jobber/search-results.html")
+
+
+# Opportunities Views
+
 def opportunities_list(request):
     """ List of opportunities """
     if not request.session.get("role", False):
@@ -147,6 +194,33 @@ def opportunities_list(request):
                    "opportunities": opportunities,
                    "stages": stages}
                   )
+
+
+def opportunities_list_sort_ajax(request):
+    """ Returns the sorted index of Opportunity items sent from an AJAX GET request, given a sorter name"""
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+    if is_ajax and request.method == "GET":
+        sorter = request.GET.get("sorter")
+        try:
+            opportunities = get_opportunities_by_user_and_role(request)
+            if sorter == "modified-date":
+                opportunities = opportunities.order_by("-modified_date")
+            elif sorter == "created-date":
+                opportunities = opportunities.order_by("-created_date")
+            elif sorter == "stage":
+                opportunities = opportunities.order_by("stage__id")
+
+            opp_order = {}
+            for index, opp in enumerate(opportunities):
+                opp_order[str(index)] = opp.id
+            return JsonResponse(
+                {'success': 'success', 'opportunities': opp_order},
+                status=200)
+        except:
+            return JsonResponse(
+                {'error': 'Contact not found.'}, status=200)
+    else:
+        return JsonResponse({'error': 'Invalid request.'}, status=400)
 
 
 def opportunities_view_item(request, id):
@@ -301,25 +375,39 @@ def opportunities_view_contact_ajax(request):
         return JsonResponse({'error': 'Invalid request.'}, status=400)
 
 
-def opportunities_list_sort_ajax(request):
-    """ Returns the sorted index of Opportunity items sent from an AJAX GET request, given a sorter name"""
+# Contacts views
+
+def contacts_list(request):
+    """ List of contacts """
+    if not request.session.get("role", False):
+        return render(request,
+                      "jobber/home-alt.html")
+
+    contacts = get_contacts_by_user_and_role(request)
+    contacts = contacts.order_by('name')
+    return render(request,
+                  "jobber/contacts/list.html",
+                  {"user": get_profile(request),
+                   "contacts": contacts}
+                  )
+
+
+def contacts_list_sort_ajax(request):
+    """ Returns the sorted index of Contact items sent from an AJAX GET request, given a sorter name"""
     is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
     if is_ajax and request.method == "GET":
         sorter = request.GET.get("sorter")
         try:
-            opportunities = get_opportunities_by_user_and_role(request)
-            if sorter == "modified-date":
-                opportunities = opportunities.order_by("-modified_date")
-            elif sorter == "created-date":
-                opportunities = opportunities.order_by("-created_date")
-            elif sorter == "stage":
-                opportunities = opportunities.order_by("stage__id")
-
-            opp_order = {}
-            for index, opp in enumerate(opportunities):
-                opp_order[str(index)] = opp.id
+            contacts = get_contacts_by_user_and_role(request)
+            if sorter == "name":
+                contacts = contacts.order_by("name")
+            elif sorter == "company":
+                contacts = contacts.order_by("company")
+            contact_order = {}
+            for index, opp in enumerate(contacts):
+                contact_order[str(index)] = opp.id
             return JsonResponse(
-                {'success': 'success', 'opportunities': opp_order},
+                {'success': 'success', 'opportunities': contact_order},
                 status=200)
         except:
             return JsonResponse(
@@ -327,33 +415,79 @@ def opportunities_list_sort_ajax(request):
     else:
         return JsonResponse({'error': 'Invalid request.'}, status=400)
 
-
-def opportunities_add_contact(request):
-    """ Creates a new contact """
+def contacts_view_item(request, id):
+    """ Detail page of a single contact, given the contact id """
     if not request.session.get("role", False):
         return render(request,
                       "jobber/home-alt.html")
-    if request.method == 'POST':
-        form_name = request.POST.get("formname")
-        name = request.POST.get("contact-add-name")
-        title = request.POST.get("contact-add-title")
-        company = request.POST.get("contact-add-company")
-        phone = request.POST.get("contact-add-phone")
-        email = request.POST.get("contact-add-email")
-        my_contact = Contact(
-            profile=get_profile(request),
-            name=name,
-            title=title,
-            company=company,
-            phone_number=phone,
-            email=email,
-            contact_type=form_name)
-        my_contact.save()
+    my_contact = Contact.objects.get(pk=id)
+    if request.session['role'] != "admin" and my_contact.profile.user.username != request.session['username']:
+        # TODO: Add message denying access
+        return redirect("jobber:contacts_list")
 
-    return redirect("jobber:opportunities_index")
-
-
-def opportunities_search_results(request):
-    """ Renders the search page """
     return render(request,
-                  "jobber/search-results.html")
+                  "jobber/contacts/view-item.html",
+                  {"user": get_profile(request),
+                   "opportunity": my_contact})
+
+
+def contacts_edit_item(request, id):
+    """ Renders an existing contact's details to an editable form, saves inputs on POST request"""
+    if not request.session.get("role", False):
+        return render(request,
+                      "jobber/home-alt.html")
+    my_contact = Contact.objects.get(pk=id)
+    if request.session['role'] != "admin" and my_contact.profile.user.username != request.session['username']:
+        # TODO: Add message denying access
+        return redirect("jobber:opportunities_list")
+    if request.method == 'POST':
+        my_contact = generate_contact(request=request, contact_id=id)
+        messages.add_message(request, messages.INFO, "Saved Contact: %s, %s" % (my_contact.name, my_contact.company))
+        return redirect("jobber:my_contacts_view_item", my_contact.id)
+    return render(request,
+                  "jobber/contacts/add-item.html",
+                  {"user": get_profile(request),
+                   "contacts": my_contact
+                   })
+
+
+def contacts_add_item(request):
+    """ Renders an empty contacts form page, saves a new Contact on POST request"""
+    if not request.session.get("role", False):
+        return render(request,
+                      "jobber/home-alt.html")
+
+    if request.method == 'POST':
+        my_contact = generate_contact(request, contact_id=None)
+        messages.add_message(request, messages.SUCCESS,
+                             "Submitted Contact: %s, %s" % (my_contact.name, my_contact.company))
+        # Redirect
+        return redirect("jobber:contacts_view_item", my_contact.id)
+    else:
+        return render(request,
+                      "jobber/contacts/add-item.html",
+                      {"user": get_profile(request)})
+
+
+def contacts_delete_item(request):
+    """ Deletes a Contact given a POST request with the contact id to be deleted"""
+    if not request.session.get("role", False):
+        return render(request,
+                      "jobber/home-alt.html")
+
+    if request.method == 'POST':
+        contact_id = request.POST.get("id")
+        my_contact = Contact.objects.get(pk=contact_id)
+        if request.session['role'] != "admin" and my_contact.profile.user.username != request.session['username']:
+            # TODO: Add message denying access
+            return redirect("jobber:contacts_list")
+        name = my_contact.name
+        company = my_contact.company
+        my_contact.delete()
+        messages.add_message(request, messages.WARNING, "Deleted Contact: %s, %s" % (name, company))
+        # Redirect
+        return redirect("jobber:contacts_list")
+    else:
+        return render(request,
+                      "jobber/contacts/add-item.html",
+                      {"user": get_profile(request)})

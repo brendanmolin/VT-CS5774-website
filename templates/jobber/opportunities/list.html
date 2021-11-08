@@ -1,53 +1,60 @@
-{% extends 'jobber/base.html' %}
+{% extends 'jobber/list_BASE.html' %}
 {% block primary-nav %}
     {% include 'jobber/opportunities/nav-bar.html' %}
 {% endblock %}
 {% block my-location %}
-    <p id="my-location"><a href="{% url "jobber:opportunities_index" %}">Home</a> > Opportunities
-    </p> {% endblock %}
-{% block content %}
-    <div id="your-opportunities-box" class="page-container">
-        <h2>Your Opportunities</h2>
-        <div id="your-opportunities-header">
-            <div class="list-sorter">
-                <label for="sort-opportunities">Sort By:</label>
-                <select name="sort-opportunities" id="sort-opportunities"
-                        data-ajax-url="{% url "jobber:opportunities_list_sort_ajax" %}">
-                    <option value="modified-date" selected="selected">Modified Date</option>
-                    <option value="creation-date">Creation Date</option>
-                    <option value="stage">Stage</option>
-                </select>
-            </div>
-            <form id="search-opportunities">
-                <label for="search-opportunities-box">Search: </label>
-                <input id="search-opportunities-box" type="text" name="search-list"
-                       placeholder="Company name, title...">
-            </form>
-            <div class="header-buttons">
-                <p class="button"><a href={% url "jobber:opportunities_add-item" %}>Open New Opportunity</a></p>
-            </div>
-        </div> <!-- your-opportunities-header -->
-        {% if opportunities.count == 0 %}
-            <p class="sorry-message"><strong>Getting Started?</strong> Try opening a new opportunity!</p>
-        {% else %}
-            <div class="topic-box">
-                <ul class="detail-list">
-                    {% for opp in opportunities %}
-                        <li class="opportunity-summary" data-sort-order="0" data-id="{{ opp.id }}">
-                            <p>Opportunity: <a
-                                    href="{% url "jobber:opportunities_view_item" opp.id %}">{{ opp.company }}, {{ opp.title }}</a>
-                            </p>
-                            <p>Stage: {{ opp.stage.name }}</p>
-                            <p>Last Modified: {{ opp.modified_date | date:"F j, Y" }}</p>
-                            {% if opp.next_step != '' %}
-                                <p><strong>Next Step</strong>: <a
-                                        href="{% url "jobber:opportunities_view_item" opp.id %}">
-                                    {{ opp.next_step }} </a></p>
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul> <!-- detail-list -->
-            </div> <!-- topic-box -->
-        {% endif %}
-    </div> <!-- #your-opportunities-box -->
+    <p id="my-location"><a href="{% url "jobber:opportunities_index" %}">Home</a> > Opportunities</p>
+{% endblock %}
+{% block header-2 %} Your Opportunities {% endblock %}
+{% block sorter %}
+    <div class="list-sorter">
+        <label for="sort-opportunities">Sort By:</label>
+        <select name="sort-opportunities" id="sort-opportunities"
+                data-ajax-url="{% url "jobber:opportunities_list_sort_ajax" %}">
+            <option value="modified-date" selected="selected">Modified Date</option>
+            <option value="creation-date">Creation Date</option>
+            <option value="stage">Stage</option>
+        </select>
+    </div>
+{% endblock %}
+
+{% block search-list %}
+
+    <form id="search-opportunities">
+        <label for="search-opportunities-box">Search: </label>
+        <input id="search-opportunities-box" type="text" name="search-list"
+               placeholder="Company name, title...">
+    </form>
+{% endblock %}
+
+{% block add-item %}
+    <div class="header-buttons">
+        <p class="button"><a href={% url "jobber:opportunities_add-item" %}>Open New Opportunity</a></p>
+    </div>
+{% endblock %}
+
+
+{% block item-list %}
+    {% if opportunities.count == 0 %}
+        <p class="sorry-message"><strong>Getting Started?</strong> Try opening a new opportunity!</p>
+    {% else %}
+        <div class="topic-box">
+            <ul class="detail-list">
+                {% for opp in opportunities %}
+                    <li class="opportunity-summary" data-sort-order="0" data-id="{{ opp.id }}">
+                        <p>Opportunity: <a
+                                href="{% url "jobber:opportunities_view_item" opp.id %}">{{ opp.company }}, {{ opp.title }}</a>
+                        </p>
+                        <p>Stage: {{ opp.stage.name }}</p>
+                        <p>Last Modified: {{ opp.modified_date | date:"F j, Y" }}</p>
+                        {% if opp.next_step != '' %}
+                            <p><strong>Next Step</strong>: <a
+                                    href="{% url "jobber:opportunities_view_item" opp.id %}">
+                                {{ opp.next_step }} </a></p>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul> <!-- detail-list -->
+        </div> <!-- topic-box -->
+    {% endif %}
 {% endblock %}
