@@ -70,6 +70,7 @@ div#content {
     width: 95%
 }
 
+/* Primary navigation bar */
 ul#primary-nav {
     clear: left;
     float: left;
@@ -78,17 +79,50 @@ ul#primary-nav {
     padding-left: 0;
     border-style: solid;
     list-style-type: none;
+    background-color: darkslategrey;
 }
 
+/* Primary navigation bar items */
 ul#primary-nav li {
     float: left
 }
 
+/* Primary navigation bar item text */
 ul#primary-nav li a {
     display: block;
     padding: 10px 7px;
     background-color: darkslategrey;
     color: white
+}
+
+/* Primary navigation bar item text on hover */
+ul#primary-nav li a:hover {
+    background-color: greenyellow;
+    color: darkslategrey;
+}
+
+/* Primary navigation bar item when selected */
+ul#primary-nav li a.selected {
+    background-color: lightgrey;
+    color: darkslategrey;
+}
+
+/* Primary navigation bar dropdown header and list container  */
+ul#primary-nav li div.dropdown {
+    float: left;
+    overflow: hidden;
+}
+
+/* Primary navigation bar dropdown content, hidden  */
+ul#primary-nav li div.dropdown div.dropdown-content {
+    display: none;
+    position: absolute;
+    min-width: 160px;
+}
+
+/* Primary navigation bar dropdown content, show on hover */
+ul#primary-nav li div.dropdown:hover div.dropdown-content {
+    display: block;
 }
 
 h2 {
@@ -330,16 +364,6 @@ div#footer div#language-select {
         margin: 0 1em 1em 1em;
         padding: 1em;
         width: 95%
-    }
-
-    ul#primary-nav li a:hover {
-        background-color: greenyellow;
-        color: darkslategrey;
-    }
-
-    ul#primary-nav li a.selected {
-        background-color: lightgrey;
-        color: darkslategrey;
     }
 
     h2 {

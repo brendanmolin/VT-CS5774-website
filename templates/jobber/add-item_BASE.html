@@ -1,0 +1,27 @@
+{% extends 'jobber/base.html' %}
+{% block content %}
+    <div id="your-opportunity-box" class="page-container">
+        <h2>{% block header-2 %}{% endblock %}</h2>
+        <div class="header-buttons">
+            {% block header-buttons %}
+            {% endblock %}
+        </div>
+        <div id="your-opportunity-header">
+            {% block content-header %}
+            {% endblock %}
+        </div> <!-- your-opportunities-header -->
+        <div class="topic-box">
+            {% block save-edit %}
+            {% endblock %}
+            <ul class="detail-list">
+                {% block details-1 %}
+                {% endblock %}
+            </ul> <!-- detail-list -->
+            </form>
+        </div> <!-- topic-box -->
+    </div> <!-- #your-opportunity-box -->
+
+    {% block content-other %}
+    {% endblock %}
+
+{% endblock %}

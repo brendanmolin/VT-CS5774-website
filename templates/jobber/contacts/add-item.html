@@ -1,0 +1,93 @@
+{% extends 'jobber/add-item_BASE.html' %}
+{% block primary-nav %}
+    {% include 'jobber/contacts/nav-bar.html' %}
+{% endblock %}
+{% block my-location %}
+    <p id="my-location"><a href="{% url "jobber:opportunities_index" %}">Home</a> > <a
+            href="{% url "jobber:contacts_list" %}">Contacts</a> > {% if contact.id is not None %}
+        <a href="{% url "jobber:contacts_view_item" contact.id %}">Contact</a> > {% endif %}
+        {% if contact.id %}
+            Edit {% else %}Create New {% endif %} Contact
+    </p>
+{% endblock %}
+
+{% block header-2 %}{% if contact.id %}Edit {% else %}Create New{% endif %} Contact {% endblock %}
+
+{% block header-buttons %}
+    {% if request.session.role == "admin" and contact.id is not None %}
+        <form name="delete" id="delete-form" method="POST"
+              action="{% url "jobber:contacts_delete_item" %}">
+            {% csrf_token %}
+            <input type="hidden" name="id" value="{{ contact.id }}">
+            <input type="hidden" name="name" value="{{ contact.name }}">
+            <input type="hidden" name="company" value="{{ contact.company }} ">
+        </form>
+    {% endif %}
+    {% if opportunity.id is not null %}
+        <p class="button-small"><a
+                href="{% url "jobber:contacts_view_item" contact.id %}">Close</a>
+        </p>
+    {% else %}
+        <p class="button-small"><a href="{% url "jobber:contacts_list" %}">Cancel</a></p>
+    {% endif %}
+    {% if request.session.role == "admin" and contact.id is not None %}
+        <button id="delete-opp" type="submit" class="button-small delete" form="delete-form" formmethod="post">
+            Delete
+        </button>
+    {% endif %}
+    <button id="save-opp" type="submit" class="button-small" form="form-id-details" formmethod="post">Save
+    </button>
+{% endblock %}
+
+{% block save-edit %}
+    {% if not contact.id %}
+        <form name="form-key-details" id="form-id-details"
+              action="{% url "jobber:contacts_add-item" %}" method="post">
+    {% else %}
+        <form name="form-key-details" id="form-id-details"
+              action="{% url "jobber:contacts_edit_item" contact.id %}" method="post">
+    {% endif %}
+    {% csrf_token %}
+{% endblock %}
+
+{% block details-1 %}
+    <li class="opportunity-summary">
+        <div class="opportunity-summary-header">
+            <h3>Contact Details</h3>
+        </div>
+        <div class="form-boxes">
+            <div class="form-box" id="form-fill">
+                <p><label for="input-name">Name:</label>
+                    <input type="text" name="contact-name" id="input-name" class="required" required
+                           value="{{ contact.name }}"></p>
+                <p><label for="input-title">Title:</label>
+                    <input type="text" name="contact-title" id="input-title" class="required" required
+                           value="{{ contact.title }}"></p>
+                <p><label for="input-company">Company:</label>
+                    <input type="text" name="contact-company" id="input-company" class="required" required
+                           value="{{ contact.company }}"></p>
+                <p><label for="input-phone">Phone:</label>
+                    <input type="tel" name="contact-phone" id="input-phone" maxlength=12 minlength=12
+                           placeholder="123-456-7890" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" class="required" required
+                           value="{{ contact.phone_number }}"></p>
+                <p><label for="input-email">Email:</label>
+                    <input type="email" name="contact-email" id="input-email" class="required" required
+                           value="{{ contact.email }}"></p>
+                <p><label for="input-contact-type">Contact Type:</label>
+                    <select name="contact-type" id="input-contact-type" class="required" required>
+                        <option value="REF" {% if contact.contact_type == "REF" %} selected="selected" {% endif %}>
+                            Reference
+                        </option>
+                        <option value="REC" {% if contact.contact_type == "REC" %} selected="selected" {% endif %}>
+                            Recruiter
+                        </option>
+                    </select>
+                </p>
+            </div>
+        </div> <!-- form-boxes -->
+    </li> <!-- form-fields -->
+{% endblock %}
+
+{% block form-end %}
+    </form>;
+{% endblock %}

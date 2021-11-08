@@ -30,7 +30,7 @@ def register(request):
 def profile(request, username):
     user1 = get_object_or_404(User, username=username)
     actions = Action.objects.filter(
-        user=Profile.objects.get(user__username=username))
+        user=Profile.objects.get(user__username=username)).order_by("-created")[:10]
     if request.method == 'POST':
         pass
     return render(request,

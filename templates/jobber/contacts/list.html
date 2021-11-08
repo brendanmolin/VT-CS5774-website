@@ -1,0 +1,51 @@
+{% extends 'jobber/list_BASE.html' %}
+{% block primary-nav %}
+    {% include 'jobber/contacts/nav-bar.html' %}
+{% endblock %}
+{% block my-location %}
+    <p id="my-location"><a href="{% url "jobber:opportunities_index" %}">Home</a> > Contacts</p>
+{% endblock %}
+{% block header-2 %} Your Contacts {% endblock %}
+{% block sorter %}
+    <div class="list-sorter">
+        <label for="sort-opportunities">Sort By:</label>
+        <select name="sort-opportunities" id="sort-opportunities"
+                data-ajax-url="{% url "jobber:contacts_list_sort_ajax" %}">
+            <option value="name" selected="selected">Name</option>
+            <option value="company">Company</option>
+        </select>
+    </div>
+{% endblock %}
+
+{% block search-list %}
+    <form id="search-opportunities">
+        <label for="search-opportunities-box">Search: </label>
+        <input id="search-opportunities-box" type="text" name="search-list"
+               placeholder="Company name, title...">
+    </form>
+{% endblock %}
+
+{% block add-item %}
+    <div class="header-buttons">
+        <p class="button"><a href={% url "jobber:contacts_add-item" %}>Add New Contact</a></p>
+    </div>
+{% endblock %}
+
+{% block item-list %}
+    {% if contacts.count == 0 %}
+        <p class="sorry-message"><strong>Getting Started?</strong> Try adding a contact!</p>
+    {% else %}
+        <div class="topic-box">
+            <ul class="detail-list">
+                {% for contact in contacts %}
+                    <li class="opportunity-summary" data-sort-order="0" data-id="{{ contact.id }}">
+                        <p>Contacts: <a
+                                href="{% url "jobber:contacts_view_item" contact.id %}">{{ contact.name }}, {{ contact.company }}</a>
+                        </p>
+                        <p>Type: {{ contact.get_contact_type_display }}</p>
+                    </li>
+                {% endfor %}
+            </ul> <!-- detail-list -->
+        </div> <!-- topic-box -->
+    {% endif %}
+{% endblock %}

@@ -18,15 +18,23 @@ const csrftoken = getCookie('csrftoken');
 
 jQuery.validate = function validate(thisEl) {
     /* Validates that required fields are filled */
-    let requiredInput = $(thisEl).parentsUntil("form, div.page-container").find('input.required');
+    let requiredInput = $(thisEl).parentsUntil("form, div.page-container").parent().find('input.required');
     let isValError = false;
     requiredInput.each(function () {
         let reqParent = $(this).parent();
+        console.log((/[a-zA-Z]/.test($(this).val())));
+        console.log($(this).attr('type') == 'tel' & ($(this).val().length != 12 | !(/[a-zA-Z]/.test($(this).val()))));
         if (!($(this).val())) {
             isValError = true;
             reqParent.css('display', 'inline-block');
             reqParent.css('border-style', 'solid');
             reqParent.css('border-color', 'indianred');
+        } else if ($(this).attr('type') == 'tel' & ($(this).val().length != 12 | /[a-zA-Z]/.test($(this).val()))) {
+            isValError = true;
+            $(this).val('')
+            reqParent.css('display', 'inline-block');
+            reqParent.css('border-style', 'solid');
+            reqParent.css('border-color', 'blue');
         } else {
             reqParent.css('display', 'inline');
             reqParent.css('border-style', 'none');
@@ -56,8 +64,8 @@ jQuery.removePopup = function removePopup(thisEl) {
         reqParent.css('border-style', 'none');
     })
 
-    if (($(this).siblings('#input-error')).length) {
-        let failMsg = $(this).siblings('#input-error');
+    if (($(thisEl).children('#input-error')).length) {
+        let failMsg = $(thisEl).children('#input-error');
         $(failMsg).remove();
     }
 }
