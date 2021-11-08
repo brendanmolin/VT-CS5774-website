@@ -429,7 +429,7 @@ def contacts_view_item(request, id):
     return render(request,
                   "jobber/contacts/view-item.html",
                   {"user": get_profile(request),
-                   "opportunity": my_contact})
+                   "contact": my_contact})
 
 
 def contacts_edit_item(request, id):
@@ -444,7 +444,7 @@ def contacts_edit_item(request, id):
     if request.method == 'POST':
         my_contact = generate_contact(request=request, contact_id=id)
         messages.add_message(request, messages.INFO, "Saved Contact: %s, %s" % (my_contact.name, my_contact.company))
-        return redirect("jobber:my_contacts_view_item", my_contact.id)
+        return redirect("jobber:contacts_view_item", my_contact.id)
     return render(request,
                   "jobber/contacts/add-item.html",
                   {"user": get_profile(request),
