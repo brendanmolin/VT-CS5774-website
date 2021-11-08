@@ -42,7 +42,7 @@
                         <p>Contacts: <a
                                 href="{% url "jobber:contacts_view_item" contact.id %}">{{ contact.name }}, {{ contact.company }}</a>
                         </p>
-                        <p>Type: {{ contact.contact_type }}</p>
+                        <p>Type: {{ contact.get_contact_type_display }}</p>
                     </li>
                 {% endfor %}
             </ul> <!-- detail-list -->

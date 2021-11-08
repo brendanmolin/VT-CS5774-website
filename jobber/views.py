@@ -82,12 +82,13 @@ def generate_contact(request, contact_id=None) -> Opportunity:
     """ Creates a new or edits an existing Contact object given a request with contact form data"""
     utc = pytz.utc
 
-    contact_type = request.POST.get("contact_type")
-    name = request.POST.get("contact_add_name")
-    title = request.POST.get("contact_add_title")
-    company = request.POST.get("contact_add_company")
-    phone = request.POST.get("contact_add_phone")
-    email = request.POST.get("contact_add_email")
+    print(request.POST)
+    contact_type = request.POST.get("contact-type")
+    name = request.POST.get("contact-name")
+    title = request.POST.get("contact-title")
+    company = request.POST.get("contact-company")
+    phone = request.POST.get("contact-phone")
+    email = request.POST.get("contact-email")
     if contact_id is None:
         my_contact = Contact(
             profile=get_profile(request),
@@ -447,15 +448,17 @@ def contacts_edit_item(request, id):
     return render(request,
                   "jobber/contacts/add-item.html",
                   {"user": get_profile(request),
-                   "contacts": my_contact
+                   "contact": my_contact
                    })
 
 
 def contacts_add_item(request):
     """ Renders an empty contacts form page, saves a new Contact on POST request"""
+    print("a")
     if not request.session.get("role", False):
         return render(request,
                       "jobber/home-alt.html")
+    print("b")
 
     if request.method == 'POST':
         my_contact = generate_contact(request, contact_id=None)
@@ -464,6 +467,7 @@ def contacts_add_item(request):
         # Redirect
         return redirect("jobber:contacts_view_item", my_contact.id)
     else:
+        print("c")
         return render(request,
                       "jobber/contacts/add-item.html",
                       {"user": get_profile(request)})
