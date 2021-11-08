@@ -1,5 +1,6 @@
 from django.db import models
 from users.models import Profile
+from django.urls import reverse
 from datetime import datetime
 import pytz
 
@@ -42,6 +43,12 @@ class Opportunity(models.Model):
     interview_date = models.DateTimeField(null=True, blank=True)
     events = models.ManyToManyField("Event")
     next_step = models.CharField(max_length=200)
+
+    def __str__(self):
+        return "%s, %s" % (self.title, self.company)
+
+    def get_absolute_url(self):
+        return reverse("jobber:opportunities_view_item", args=[self.id])
 
 
 class Stage(models.Model):
