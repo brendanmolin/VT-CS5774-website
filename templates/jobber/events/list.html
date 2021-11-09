@@ -1,0 +1,52 @@
+{% extends 'jobber/list_BASE.html' %}
+{% load humanize %}
+{% block primary-nav %}
+    {% include 'jobber/events/nav-bar.html' %}
+{% endblock %}
+{% block my-location %}
+    <p id="my-location"><a href="{% url "jobber:opportunities_index" %}">Home</a> > Events</p>
+{% endblock %}
+{% block header-2 %} Your Events {% endblock %}
+{% block sorter %}
+    <div class="list-sorter">
+        <label for="sort-opportunities">Sort By:</label>
+        <select name="sort-opportunities" id="sort-opportunities"
+                data-ajax-url="{% url "jobber:events_list_sort_ajax" %}">
+            <option value="date" selected="selected">Date</option>
+            <option value="type">Type</option>
+        </select>
+    </div>
+{% endblock %}
+
+{% block search-list %}
+    <form id="search-opportunities">
+        <label for="search-opportunities-box">Search: </label>
+        <input id="search-opportunities-box" type="text" name="search-list"
+               placeholder="Title...">
+    </form>
+{% endblock %}
+
+{% block add-item %}
+    <div class="header-buttons">
+        <p class="button"><a href={% url "jobber:events_add-item" %}>Add New Event</a></p>
+    </div>
+{% endblock %}
+
+{% block item-list %}
+    {% if events.count == 0 %}
+        <p class="sorry-message"><strong>Getting Started?</strong> Try adding an event!</p>
+    {% else %}
+        <div class="topic-box">
+            <ul class="detail-list">
+                {% for event in events %}
+                    <li class="opportunity-summary" data-sort-order="0" data-id="{{ event.id }}">
+                        <p>Events: <a
+                                href="{% url "jobber:events_view_item" event.id %}">{{ event.type }}: {{ event.title }}</a>
+                        </p>
+                        <p>Date: {{ event.date | naturalday }}</p>
+                    </li>
+                {% endfor %}
+            </ul> <!-- detail-list -->
+        </div> <!-- topic-box -->
+    {% endif %}
+{% endblock %}

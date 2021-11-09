@@ -68,6 +68,12 @@ class Event(models.Model):
     title = models.CharField(max_length=200)
     type = models.CharField(max_length=200)
 
+    def __str__(self):
+        return "%s, %s" % (self.type, self.title)
+
+    def get_absolute_url(self):
+        return reverse("jobber:events_view_item", args=[self.id])
+
 
 class Resume(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)

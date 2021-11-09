@@ -2,15 +2,15 @@
 {% load static %}
 {% block primary-nav %}
 <ul id="primary-nav">
-    <li><a href="{% url "jobber:opportunities_index" %}" class="selected">Home</a></li>
+    <li><a href="{% url "jobber:opportunities_index" %}">Home</a></li>
     <li><a href="{% url "users:profile" user.user.username %}">Profile</a></li>
     <li>
         <div class="dropdown">
-            <a class="dropper">Job Search</a>
+            <a class="dropper selected">Job Search</a>
             <div class="dropdown-content">
-                <a href="{% url "jobber:opportunities_list" %}">Opportunities</a>
+                <a href="{% url "jobber:opportunities_list" %}" class="selected">Opportunities</a>
                 <a href="{% url "jobber:contacts_list" %}">Contacts</a>
-                <a href="#">Calendar</a>
+                <a href="{% url "jobber:events_list" %}">Calendar</a>
             </div>
         </div> <!-- dropdown -->
     </li>
@@ -31,10 +31,10 @@
             <h2>Upcoming Events</h2>
             <ul id="upcoming-events" class="detail-list">
                 {% for ev in events|slice:":3" %}
-                    <li><p>{{ ev.type }}: <a href="#">{{ ev.title }}</a> {{ ev.date }}</p></li>
+                    <li><p>{{ ev.type }}: <a href="{% url "jobber:events_view_item" ev.id %}">{{ ev.title }}</a> {{ ev.date }}</p></li>
                 {% endfor %}
             </ul>
-            <p class="button"><a href="#">See Full Calendar</a></p>
+            <p class="button"><a href="{% url "jobber:events_list" %}">See Full Calendar</a></p>
         </div> <!-- #upcoming-events-box quickview-box -->
 
         <div id="suggestions-box" class="quickview-box">

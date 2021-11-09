@@ -23,7 +23,7 @@
             <input type="hidden" name="company" value="{{ contact.company }} ">
         </form>
     {% endif %}
-    {% if opportunity.id is not null %}
+    {% if contact.id is not null %}
         <p class="button-small"><a
                 href="{% url "jobber:contacts_view_item" contact.id %}">Close</a>
         </p>
