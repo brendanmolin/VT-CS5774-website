@@ -31,4 +31,18 @@ urlpatterns = [
     path('events/<int:id>/edit', views.events_edit_item, name="events_edit_item"),
     path('add-events', views.events_add_item, name="events_add-item"),
     path('events/delete', views.events_delete_item, name="events_delete_item"),
+    # CoverLetters
+    path('cover-letters', views.coverletters_list, name="coverletters_list"),
+    path('cover-letters/sort', views.coverletters_list_sort_ajax, name="coverletters_list_sort_ajax"),
+    path('cover-letters/<int:id>', views.coverletters_view_item, name="coverletters_view_item"),
+    path('cover-letters/<int:id>/edit', views.coverletters_edit_item, name="coverletters_edit_item"),
+    path('add-cover-letters', views.coverletters_add_item, name="coverletters_add-item"),
+    path('cover-letters/delete', views.coverletters_delete_item, name="coverletters_delete_item"),
+    # Resumes
+    path('resumes', views.resumes_list, name="resumes_list"),
+    path('resumes/sort', views.resumes_list_sort_ajax, name="resumes_list_sort_ajax"),
+    path('resumes/<int:id>', views.resumes_view_item, name="resumes_view_item"),
+    path('resumes/<int:id>/edit', views.resumes_edit_item, name="resumes_edit_item"),
+    path('add-resumes', views.resumes_add_item, name="resumes_add-item"),
+    path('resumes/delete', views.resumes_delete_item, name="resumes_delete_item"),
 ]

@@ -1,0 +1,52 @@
+{% extends 'jobber/list_BASE.html' %}
+{% load humanize %}
+{% block primary-nav %}
+    {% include 'jobber/coverletters/nav-bar.html' %}
+{% endblock %}
+{% block my-location %}
+    <p id="my-location"><a href="{% url "jobber:opportunities_index" %}">Home</a> > Cover Letters</p>
+{% endblock %}
+{% block header-2 %} Your Cover Letters {% endblock %}
+{% block sorter %}
+    <div class="list-sorter">
+        <label for="sort-opportunities">Sort By:</label>
+        <select name="sort-opportunities" id="sort-opportunities"
+                data-ajax-url="{% url "jobber:coverletters_list_sort_ajax" %}">
+            <option value="date" selected="selected">Modified Date</option>
+            <option value="name">Name</option>
+        </select>
+    </div>
+{% endblock %}
+
+{% block search-list %}
+    <form id="search-opportunities">
+        <label for="search-opportunities-box">Search: </label>
+        <input id="search-opportunities-box" type="text" name="search-list"
+               placeholder="Company...">
+    </form>
+{% endblock %}
+
+{% block add-item %}
+    <div class="header-buttons">
+        <p class="button"><a href={% url "jobber:coverletters_add-item" %}>Add New Cover Letter</a></p>
+    </div>
+{% endblock %}
+
+{% block item-list %}
+    {% if coverletters.count == 0 %}
+        <p class="sorry-message"><strong>Getting Started?</strong> Try adding a cover letter!</p>
+    {% else %}
+        <div class="topic-box">
+            <ul class="detail-list">
+                {% for coverletter in coverletters %}
+                    <li class="opportunity-summary" data-sort-order="0" data-id="{{ coverletter.id }}">
+                        <p>Cover Letter: <a
+                                href="{% url "jobber:coverletters_view_item" coverletter.id %}">{{ coverletter.name }}</a>
+                        </p>
+                        <p>Modified Date: {{ coverletter.modified_date | naturalday }}</p>
+                    </li>
+                {% endfor %}
+            </ul> <!-- detail-list -->
+        </div> <!-- topic-box -->
+    {% endif %}
+{% endblock %}
