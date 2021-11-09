@@ -589,7 +589,7 @@ def events_list(request):
                       "jobber/home-alt.html")
 
     events = get_events_by_user_and_role(request)
-    events = events.order_by('-date')
+    events = events.order_by('date')
     return render(request,
                   "jobber/events/list.html",
                   {"user": get_profile(request),
@@ -605,7 +605,7 @@ def events_list_sort_ajax(request):
         try:
             events = get_events_by_user_and_role(request)
             if sorter == "date":
-                events = events.order_by("-date")
+                events = events.order_by("date")
             elif sorter == "type":
                 events = events.order_by("type")
             event_order = {}

@@ -45,8 +45,6 @@ class Opportunity(models.Model):
     application_link = models.URLField(max_length=200)
     application = models.ForeignKey('Application', on_delete=models.CASCADE, null=True, blank=True)
     referral_contacts = models.ManyToManyField("Contact", related_name="referral_contacts")
-    interview_location = models.CharField(max_length=200)
-    interview_date = models.DateTimeField(null=True, blank=True)
     events = models.ManyToManyField("Event")
     next_step = models.CharField(max_length=200)
 
