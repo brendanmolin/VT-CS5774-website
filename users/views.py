@@ -26,6 +26,7 @@ def generate_profile(request, profile_id) -> Profile:
         is_public = True
     else:
         is_public = False
+    role = request.POST.get("input-role")
     my_profile = Profile.objects.get(pk=profile_id)
     my_user = my_profile.user
     my_user.first_name = first_name
@@ -34,6 +35,8 @@ def generate_profile(request, profile_id) -> Profile:
     if password != '':
         my_user.set_password(password)
     my_profile.is_public = is_public
+    if role is not None:
+        my_profile.role = role
     my_profile.save()
     my_user.save()
     return my_profile
