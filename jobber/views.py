@@ -44,9 +44,6 @@ def generate_opportunity(request, opportunity_id=None) -> Opportunity:
     for c in contacts:
         if str(c.id) in referral_contact:
             referral_contact_inputs.append(c)
-    interview_location = request.POST.get('interview-location')
-    interview_date = request.POST.get('interview-date')
-    interview_date = format_date(interview_date)
     if opportunity_id is None:
         my_opp = Opportunity(profile=get_profile(request),
                              create_date=utc.localize(datetime.now()), modified_date=utc.localize(datetime.now()),
@@ -55,7 +52,6 @@ def generate_opportunity(request, opportunity_id=None) -> Opportunity:
                              location=location,
                              application_link=application_link, recruiter_contact=input_recruiter_contact,
                              application=None,
-                             interview_location=interview_location, interview_date=interview_date,
                              next_step='')
     else:
         my_opp = Opportunity.objects.get(pk=opportunity_id)
@@ -68,8 +64,6 @@ def generate_opportunity(request, opportunity_id=None) -> Opportunity:
         my_opp.application_link = application_link
         my_opp.recruiter_contact = input_recruiter_contact
         my_opp.application = None
-        my_opp.interview_location = interview_location
-        my_opp.interview_date = interview_date
         my_opp.next_step = ''
     my_opp.save()
     my_opp.referral_contacts.clear()
@@ -79,11 +73,9 @@ def generate_opportunity(request, opportunity_id=None) -> Opportunity:
     return my_opp
 
 
-def generate_contact(request, contact_id=None) -> Opportunity:
+def generate_contact(request, contact_id=None) -> Contact:
     """ Creates a new or edits an existing Contact object given a request with contact form data"""
     utc = pytz.utc
-
-    print(request.POST)
     contact_type = request.POST.get("contact-type")
     name = request.POST.get("contact-name")
     title = request.POST.get("contact-title")
@@ -111,6 +103,36 @@ def generate_contact(request, contact_id=None) -> Opportunity:
         my_contact.contact_type = contact_type
     my_contact.save()
     return my_contact
+
+
+def generate_event(request, event_id=None) -> Event:
+    """ Creates a new or edits an existing Event object given a request with event form data"""
+    utc = pytz.utc
+    date = request.POST.get("input-date")
+    title = request.POST.get("input-title")
+    e_type = request.POST.get("input-type")
+    opp = request.POST.getlist("input-opp")
+    if event_id is None:
+        my_event = Event(
+            profile=get_profile(request),
+            date=format_date(date),
+            title=title,
+            type=e_type)
+    else:
+        my_event = Event.objects.get(pk=event_id)
+        my_event.profile = get_profile(request)
+        my_event.date = date
+        my_event.title = title
+        my_event.type = e_type
+    my_event.save()
+    for o in opp:
+        if o == "none":
+            continue
+        my_opp = Opportunity.objects.get(pk=o)
+        my_opp.events.clear()
+        my_opp.events.add(my_event.id)
+        my_opp.save()
+    return my_event
 
 
 def get_opportunities_by_user_and_role(request):
@@ -555,4 +577,146 @@ def contacts_delete_item(request):
     else:
         return render(request,
                       "jobber/contacts/add-item.html",
+                      {"user": get_profile(request)})
+
+
+# Events views
+
+def events_list(request):
+    """ List of events """
+    if not request.session.get("role", False):
+        return render(request,
+                      "jobber/home-alt.html")
+
+    events = get_events_by_user_and_role(request)
+    events = events.order_by('date')
+    return render(request,
+                  "jobber/events/list.html",
+                  {"user": get_profile(request),
+                   "events": events}
+                  )
+
+
+def events_list_sort_ajax(request):
+    """ Returns the sorted index of Event items sent from an AJAX GET request, given a sorter name"""
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+    if is_ajax and request.method == "GET":
+        sorter = request.GET.get("sorter")
+        try:
+            events = get_events_by_user_and_role(request)
+            if sorter == "date":
+                events = events.order_by("date")
+            elif sorter == "type":
+                events = events.order_by("type")
+            event_order = {}
+            for index, opp in enumerate(events):
+                event_order[str(index)] = opp.id
+            return JsonResponse(
+                {'success': 'success', 'opportunities': event_order},
+                status=200)
+        except:
+            return JsonResponse(
+                {'error': 'Event not found.'}, status=200)
+    else:
+        return JsonResponse({'error': 'Invalid request.'}, status=400)
+
+
+def events_view_item(request, id):
+    """ Detail page of a single event, given the event id """
+    if not request.session.get("role", False):
+        return render(request,
+                      "jobber/home-alt.html")
+    my_event = Event.objects.get(pk=id)
+    if request.session['role'] != "admin" and my_event.profile.user.username != request.session['username']:
+        # TODO: Add message denying access
+        return redirect("jobber:events_list")
+
+    return render(request,
+                  "jobber/events/view-item.html",
+                  {"user": get_profile(request),
+                   "event": my_event,
+                   "opportunities": my_event.opportunity_set.all()})
+
+
+def events_edit_item(request, id):
+    """ Renders an existing event's details to an editable form, saves inputs on POST request"""
+    if not request.session.get("role", False):
+        return render(request,
+                      "jobber/home-alt.html")
+    my_event = Event.objects.get(pk=id)
+    if request.session['role'] != "admin" and my_event.profile.user.username != request.session['username']:
+        # TODO: Add message denying access
+        return redirect("jobber:events_list")
+    if request.method == 'POST':
+        my_event = generate_event(request=request, event_id=id)
+        action = Action(
+            user=get_profile(request),
+            verb="updated event",
+            target=my_event
+        )
+        action.save()
+        messages.add_message(request, messages.INFO, "Saved Event: %s, %s" % (my_event.type, my_event.title))
+        return redirect("jobber:events_view_item", my_event.id)
+    return render(request,
+                  "jobber/events/add-item.html",
+                  {"user": get_profile(request),
+                   "event": my_event,
+                   "opportunities": get_opportunities_by_user_and_role(request)
+                   })
+
+
+def events_add_item(request):
+    """ Renders an empty events form page, saves a new Event on POST request"""
+    if not request.session.get("role", False):
+        return render(request,
+                      "jobber/home-alt.html")
+
+    if request.method == 'POST':
+        my_event = generate_event(request, event_id=None)
+        # Log Action
+        action = Action(
+            user=get_profile(request),
+            verb="created a new event",
+            target=my_event
+        )
+        action.save()
+        messages.add_message(request, messages.SUCCESS,
+                             "Submitted Event: %s, %s" % (my_event.type, my_event.title))
+        # Redirect
+        return redirect("jobber:events_view_item", my_event.id)
+    else:
+        return render(request,
+                      "jobber/events/add-item.html",
+                      {"user": get_profile(request),
+                       "opportunities": get_opportunities_by_user_and_role(request)})
+
+
+def events_delete_item(request):
+    """ Deletes a Event given a POST request with the event id to be deleted"""
+    if not request.session.get("role", False):
+        return render(request,
+                      "jobber/home-alt.html")
+
+    if request.method == 'POST':
+        event_id = request.POST.get("id")
+        my_event = Event.objects.get(pk=event_id)
+        if request.session['role'] != "admin" and my_event.profile.user.username != request.session['username']:
+            # TODO: Add message denying access
+            return redirect("jobber:events_list")
+        e_type = my_event.type
+        title = my_event.title
+        my_event.delete()
+        # Log Action
+        action = Action(
+            user=get_profile(request),
+            verb="Deleted the event %s, %s" % (e_type, title),
+            target=my_event
+        )
+        action.save()
+        messages.add_message(request, messages.WARNING, "Deleted event: %s, %s" % (e_type, title))
+        # Redirect
+        return redirect("jobber:events_list")
+    else:
+        return render(request,
+                      "jobber/events/add-item.html",
                       {"user": get_profile(request)})

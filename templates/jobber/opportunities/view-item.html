@@ -36,7 +36,7 @@
             Delete
         </button>
     {% endif %}
-    <p class="button"><a href="#">See Calendar</a></p>
+    <p class="button"><a href="{% url "jobber:events_list" %}">See Calendar</a></p>
 {% endblock %}
 
 {% block details-1 %}
@@ -80,14 +80,6 @@
             </ul>
         </div>
     </li>
-    {% if opportunity.interview_date is not None or opportunity.interview_location is not None %}
-        <li class="opportunity-summary">
-            <h3>Interview Details</h3>
-            <p>Location: {{ opportunity.interview_location }}</p>
-            <p>Date: {% if opportunity.interview_date is not None %}
-                {{ opportunity.interview_date | date:"F j, Y" }} {% endif %}</p>
-        </li>
-    {% endif %}
 {% endblock %}
 
 {% block content-other %}
