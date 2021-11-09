@@ -10,11 +10,11 @@ from django.urls import reverse
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=50, default="registered")
-    name = models.CharField(max_length=200)
     reputation = models.IntegerField(default=0)
+    is_public = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.name
+        return "%s %s" % (self.user.first_name, self.user.last_name)
 
     def get_absolute_url(self):
         return reverse("users:profile", args=[self.user.username])

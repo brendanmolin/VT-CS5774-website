@@ -1,0 +1,36 @@
+{% extends 'jobber/view-item_BASE.html' %}
+{% load humanize %}
+
+{% block primary-nav %}
+    {% include 'users/user/nav-bar.html' %}
+{% endblock %}
+{% block my-location %}
+    <p id="my-location"><a href="{% url "jobber:opportunities_index" %}">Home</a> > Profile
+    </p>
+{% endblock %}
+
+{% block header-buttons %}
+    {% if user.role == 'admin' or profile.user.id == user.id %}
+    <p class="button-small"><a
+            href="{% url "users:profiles_edit_item" profile.user.username %}">Edit</a></p>
+    {% endif %}
+{% endblock %}
+
+{% block details-1 %}
+    <li class="opportunity-summary">
+        <h3>Key Details</h3>
+        <p>Username: {{ profile.user.username }}</p>
+        <p>Name: {{ profile.user.first_name }} {{ profile.user.last_name }}</p>
+        <p>Role: {{ profile.role }}</p>
+        <p>Email: {{ profile.user.email }}</p>
+        <p>Reputation: {{ profile.reputation }}</p>
+        <p>Joined: {{ profile.user.date_joined | naturalday }}</p>
+    </li>
+    <li class="opportunity-summary">
+        <h3>Permissions</h3>
+        <p>Public Profile: {{ profile.is_public }}</p>
+    </li>
+    <li class="opportunity-summary">
+        {% include 'actions/action/feed.html' %}
+    </li>
+{% endblock %}
