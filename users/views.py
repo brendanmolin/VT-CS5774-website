@@ -20,8 +20,10 @@ def register(request):
         email = request.POST.get('register-email')
         password = request.POST.get('register-password')
         user = User.objects.create_user(username, email, password)
+        request.session['username'] = user.username
+        request.session['role'] = user.profile.role
         messages.add_message(request, messages.SUCCESS, "Welcome, %s" % user.username)
-        return redirect('jobber:opportunities_index')
+        return redirect("jobber:opportunities_index")
 
     return render(request,
                   "users/user/register.html")
