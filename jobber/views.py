@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.http import JsonResponse
 from datetime import datetime
-from .models import Opportunity, Event, Stage, Contact
+from .models import Opportunity, Event, Stage, Contact, CoverLetter, Resume, Application
 from users.models import Profile
 from actions.models import Action
 
@@ -25,11 +25,13 @@ def get_profile(request):
 
 def generate_opportunity(request, opportunity_id=None) -> Opportunity:
     """ Creates a new or edits an existing Opportunity object given a request with opportunity form data"""
+    print("launch gen")
     utc = pytz.utc
     contacts = Contact.objects.all()
     stage = request.POST.get('stage')
     input_stage = Stage.objects.get(value_name=stage)
     application_link = request.POST.get('application-link')
+    print(application_link)
     title = request.POST.get('title')
     company = request.POST.get('company')
     location = request.POST.get('location')
@@ -37,34 +39,53 @@ def generate_opportunity(request, opportunity_id=None) -> Opportunity:
     input_recruiter_contact = None
     if recruiter_contact != '' and recruiter_contact is not None and recruiter_contact != 'none':
         input_recruiter_contact = Contact.objects.get(pk=recruiter_contact)
-    filename_resume = request.POST.get('filename-resume')
-    filename_cover = request.POST.get('filename-cover')
+    resume_id = request.POST.get('resume')
+    if resume_id != 'none':
+        resume = Resume.objects.get(pk=resume_id)
+    else:
+        resume = None
+    coverletter_id = request.POST.get('coverletter')
+    if coverletter_id != 'none':
+        coverletter = CoverLetter.objects.get(pk=coverletter_id)
+    else:
+        coverletter = None
     referral_contact = request.POST.getlist('REF')
     referral_contact_inputs = []
     for c in contacts:
         if str(c.id) in referral_contact:
             referral_contact_inputs.append(c)
     if opportunity_id is None:
+        my_application = Application(profile=get_profile(request),
+                                     application_link=application_link,
+                                     resume=resume,
+                                     cover_letter=coverletter)
+        my_application.save()
+
         my_opp = Opportunity(profile=get_profile(request),
-                             create_date=utc.localize(datetime.now()), modified_date=utc.localize(datetime.now()),
-                             stage=input_stage, title=title,
+                             create_date=utc.localize(datetime.now()),
+                             modified_date=utc.localize(datetime.now()),
+                             stage=input_stage,
+                             title=title,
                              company=company,
                              location=location,
-                             application_link=application_link, recruiter_contact=input_recruiter_contact,
-                             application=None,
+                             recruiter_contact=input_recruiter_contact,
+                             application=my_application,
                              next_step='')
     else:
         my_opp = Opportunity.objects.get(pk=opportunity_id)
+        my_application = my_opp.application
         my_opp.profile = get_profile(request)
         my_opp.modified_date = utc.localize(datetime.now())
         my_opp.stage = input_stage
         my_opp.title = title
         my_opp.company = company
         my_opp.location = location
-        my_opp.application_link = application_link
+        my_application.application_link = application_link
+        my_application.resume = resume
+        my_application.cover_letter = coverletter
         my_opp.recruiter_contact = input_recruiter_contact
-        my_opp.application = None
         my_opp.next_step = ''
+        my_application.save()
     my_opp.save()
     my_opp.referral_contacts.clear()
     for c in referral_contact_inputs:
@@ -135,6 +156,47 @@ def generate_event(request, event_id=None) -> Event:
     return my_event
 
 
+def generate_coverletter(request, coverletter_id=None) -> CoverLetter:
+    """ Creates a new or edits an existing Resume object given a request with resume form data"""
+    name = request.POST.get("input-name")
+    text = request.POST.get("input-text")
+    if coverletter_id is None:
+        my_coverletter = CoverLetter(
+            profile=get_profile(request),
+            name=name,
+            text=text,
+            modified_date=datetime.now())
+    else:
+        my_coverletter = CoverLetter.objects.get(pk=coverletter_id)
+        my_coverletter.profile = get_profile(request)
+        my_coverletter.name = name
+        my_coverletter.text = text
+        my_coverletter.modified_date = datetime.now()
+    my_coverletter.save()
+    return my_coverletter
+
+
+def generate_resume(request, resume_id=None) -> Resume:
+    """ Creates a new or edits an existing Resume object given a request with resume form data"""
+    utc = pytz.utc
+    name = request.POST.get("input-name")
+    text = request.POST.get("input-text")
+    if resume_id is None:
+        my_resume = Resume(
+            profile=get_profile(request),
+            name=name,
+            text=text,
+            modified_date=datetime.now())
+    else:
+        my_resume = Resume.objects.get(pk=resume_id)
+        my_resume.profile = get_profile(request)
+        my_resume.name = name
+        my_resume.text = text
+        my_resume.modified_date = datetime.now()
+    my_resume.save()
+    return my_resume
+
+
 def get_opportunities_by_user_and_role(request):
     """ Gets permissioned Opportunities """
     if request.session['role'] == "admin":
@@ -163,6 +225,26 @@ def get_contacts_by_user_and_role(request):
         contacts = Contact.objects.filter(
             profile=get_profile(request).id)
     return contacts
+
+
+def get_coverletters_by_user_and_role(request):
+    """ Gets permissioned CoverLetters """
+    if request.session['role'] == "admin":
+        coverletters = CoverLetter.objects.all()
+    else:
+        coverletters = CoverLetter.objects.filter(
+            profile=get_profile(request).id)
+    return coverletters
+
+
+def get_resumes_by_user_and_role(request):
+    """ Gets permissioned Resumes """
+    if request.session['role'] == "admin":
+        resumes = Resume.objects.all()
+    else:
+        resumes = Resume.objects.filter(
+            profile=get_profile(request).id)
+    return resumes
 
 
 def get_actions_by_user_and_role(request):
@@ -265,6 +347,7 @@ def opportunities_view_item(request, id):
                       "jobber/home-alt.html")
     stages = Stage.objects.all()
     my_opp = Opportunity.objects.get(pk=id)
+    print("hey", my_opp.application.application_link)
     if request.session['role'] != "admin" and my_opp.profile.user.username != request.session['username']:
         # TODO: Add message denying access
         return redirect("jobber:opportunities_list")
@@ -278,16 +361,19 @@ def opportunities_view_item(request, id):
 
 def opportunities_edit_item(request, id):
     """ Renders an existing opportunity's details to an editable form, saves inputs on POST request"""
+    print("launch")
     if not request.session.get("role", False):
         return render(request,
                       "jobber/home-alt.html")
     stages = Stage.objects.all()
     my_opp = Opportunity.objects.get(pk=id)
+    print("oh", my_opp.application.application_link)
     if request.session['role'] != "admin" and my_opp.profile.user.username != request.session['username']:
         # TODO: Add message denying access
         return redirect("jobber:opportunities_list")
     if request.method == 'POST':
         my_opp = generate_opportunity(request=request, opportunity_id=id)
+        print("my", my_opp.application.application_link)
         # Log Action
         action = Action(
             user=get_profile(request),
@@ -299,13 +385,17 @@ def opportunities_edit_item(request, id):
         messages.add_message(request, messages.INFO, "Saved Opportunity: %s, %s" % (my_opp.title, my_opp.company))
         return redirect("jobber:opportunities_view_item", my_opp.id)
     contacts = get_contacts_by_user_and_role(request)
+    resumes = get_resumes_by_user_and_role(request)
+    coverletters = get_coverletters_by_user_and_role(request)
     return render(request,
                   "jobber/opportunities/add-item.html",
                   {"user": get_profile(request),
                    "opportunity": my_opp,
                    'stages': stages,
                    "recruiter_contacts": contacts.filter(contact_type='REC'),
-                   "referral_contacts": contacts.filter(contact_type='REF')
+                   "referral_contacts": contacts.filter(contact_type='REF'),
+                   "resumes": resumes,
+                   "coverletters": coverletters
                    })
 
 
@@ -333,12 +423,16 @@ def opportunities_add_item(request):
         return redirect("jobber:opportunities_view_item", my_opp.id)
     else:
         contacts = get_contacts_by_user_and_role(request)
+        resumes = get_resumes_by_user_and_role(request)
+        coverletters = get_coverletters_by_user_and_role(request)
         return render(request,
                       "jobber/opportunities/add-item.html",
                       {"user": get_profile(request),
                        "stages": stages,
                        "recruiter_contacts": contacts.filter(contact_type='REC'),
-                       "referral_contacts": contacts.filter(contact_type='REF')
+                       "referral_contacts": contacts.filter(contact_type='REF'),
+                       "resumes": resumes,
+                       "coverletters": coverletters
                        })
 
 
@@ -364,7 +458,7 @@ def opportunities_delete_item(request):
             target=my_opp
         )
         action.save()
-        messages.add_message(request, messages.WARNING, "Deleted Opportunity: %s, %s" % (title, company))
+        messages.add_message(request, messages.WARNING, "deleted Opportunity: %s, %s" % (title, company))
         # Redirect
         return redirect("jobber:opportunities_list")
     else:
@@ -571,7 +665,7 @@ def contacts_delete_item(request):
             target=my_contact
         )
         action.save()
-        messages.add_message(request, messages.WARNING, "Deleted contact: %s, %s" % (name, title))
+        messages.add_message(request, messages.WARNING, "deleted contact: %s, %s" % (name, title))
         # Redirect
         return redirect("jobber:contacts_list")
     else:
@@ -719,4 +813,286 @@ def events_delete_item(request):
     else:
         return render(request,
                       "jobber/events/add-item.html",
+                      {"user": get_profile(request)})
+
+
+# Cover Letter views
+
+def coverletters_list(request):
+    """ List of coverletters """
+    if not request.session.get("role", False):
+        return render(request,
+                      "jobber/home-alt.html")
+
+    coverletters = get_coverletters_by_user_and_role(request)
+    coverletters = coverletters.order_by('-modified_date')
+    return render(request,
+                  "jobber/coverletters/list.html",
+                  {"user": get_profile(request),
+                   "coverletters": coverletters}
+                  )
+
+
+def coverletters_list_sort_ajax(request):
+    """ Returns the sorted index of CoverLetter items sent from an AJAX GET request, given a sorter name"""
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+    if is_ajax and request.method == "GET":
+        sorter = request.GET.get("sorter")
+        try:
+            coverletters = get_coverletters_by_user_and_role(request)
+            if sorter == "date":
+                coverletters = coverletters.order_by("-modified-date")
+            elif sorter == "name":
+                coverletters = coverletters.order_by("name")
+            coverletter_order = {}
+            for index, opp in enumerate(coverletters):
+                coverletter_order[str(index)] = opp.id
+            return JsonResponse(
+                {'success': 'success', 'opportunities': coverletter_order},
+                status=200)
+        except:
+            return JsonResponse(
+                {'error': 'Cover Letter not found.'}, status=200)
+    else:
+        return JsonResponse({'error': 'Invalid request.'}, status=400)
+
+
+def coverletters_view_item(request, id):
+    """ Detail page of a single cover letter, given the coverletter id """
+    if not request.session.get("role", False):
+        return render(request,
+                      "jobber/home-alt.html")
+    my_coverletter = CoverLetter.objects.get(pk=id)
+    if request.session['role'] != "admin" and my_coverletter.profile.user.username != request.session['username']:
+        # TODO: Add message denying access
+        return redirect("jobber:coverletters_list")
+
+    return render(request,
+                  "jobber/coverletters/view-item.html",
+                  {"user": get_profile(request),
+                   "coverletter": my_coverletter,
+                   "opportunities": Opportunity.objects.filter(application__cover_letter=my_coverletter)})
+
+
+def coverletters_edit_item(request, id):
+    """ Renders an existing coverletter's details to an editable form, saves inputs on POST request"""
+    if not request.session.get("role", False):
+        return render(request,
+                      "jobber/home-alt.html")
+    my_coverletter = CoverLetter.objects.get(pk=id)
+    if request.session['role'] != "admin" and my_coverletter.profile.user.username != request.session['username']:
+        # TODO: Add message denying access
+        return redirect("jobber:coverletters_list")
+    if request.method == 'POST':
+        my_coverletter = generate_coverletter(request=request, coverletter_id=id)
+        action = Action(
+            user=get_profile(request),
+            verb="updated cover letter",
+            target=my_coverletter
+        )
+        action.save()
+        messages.add_message(request, messages.INFO, "Saved Cover Letter: %s" % (my_coverletter.name))
+        return redirect("jobber:coverletters_view_item", my_coverletter.id)
+    return render(request,
+                  "jobber/coverletters/add-item.html",
+                  {"user": get_profile(request),
+                   "coverletter": my_coverletter,
+                   "opportunities": get_opportunities_by_user_and_role(request)
+                   })
+
+
+def coverletters_add_item(request):
+    """ Renders an empty coverletter form page, saves a new CoverLetter on POST request"""
+    if not request.session.get("role", False):
+        return render(request,
+                      "jobber/home-alt.html")
+
+    if request.method == 'POST':
+        my_coverletter = generate_coverletter(request, coverletter_id=None)
+        # Log Action
+        action = Action(
+            user=get_profile(request),
+            verb="created a new cover letter",
+            target=my_coverletter
+        )
+        action.save()
+        messages.add_message(request, messages.SUCCESS,
+                             "Submitted Cover Letter: %s" % (my_coverletter.name))
+        # Redirect
+        return redirect("jobber:coverletters_view_item", my_coverletter.id)
+    else:
+        return render(request,
+                      "jobber/coverletters/add-item.html",
+                      {"user": get_profile(request),
+                       "opportunities": get_opportunities_by_user_and_role(request)})
+
+
+def coverletters_delete_item(request):
+    """ Deletes a CoverLetter given a POST request with the coverletter id to be deleted"""
+    if not request.session.get("role", False):
+        return render(request,
+                      "jobber/home-alt.html")
+
+    if request.method == 'POST':
+        coverletter_id = request.POST.get("id")
+        my_coverletter = CoverLetter.objects.get(pk=coverletter_id)
+        if request.session['role'] != "admin" and my_coverletter.profile.user.username != request.session['username']:
+            # TODO: Add message denying access
+            return redirect("jobber:coverletters_list")
+        name = my_coverletter.name
+        my_coverletter.delete()
+        # Log Action
+        action = Action(
+            user=get_profile(request),
+            verb="Deleted the cover letter %s" % (name),
+            target=my_coverletter
+        )
+        action.save()
+        messages.add_message(request, messages.WARNING, "Deleted cover letter: %s" % (name))
+        # Redirect
+        return redirect("jobber:coverletters_list")
+    else:
+        return render(request,
+                      "jobber/coverletters/add-item.html",
+                      {"user": get_profile(request)})
+
+
+# Resume views
+
+def resumes_list(request):
+    """ List of resumes """
+    if not request.session.get("role", False):
+        return render(request,
+                      "jobber/home-alt.html")
+
+    resumes = get_resumes_by_user_and_role(request)
+    resumes = resumes.order_by('-modified_date')
+    return render(request,
+                  "jobber/resumes/list.html",
+                  {"user": get_profile(request),
+                   "resumes": resumes}
+                  )
+
+
+def resumes_list_sort_ajax(request):
+    """ Returns the sorted index of Resume items sent from an AJAX GET request, given a sorter name"""
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+    if is_ajax and request.method == "GET":
+        sorter = request.GET.get("sorter")
+        try:
+            resumes = get_resumes_by_user_and_role(request)
+            if sorter == "date":
+                resumes = resumes.order_by("-modified_date")
+            elif sorter == "name":
+                resumes = resumes.order_by("name")
+            resume_order = {}
+            for index, opp in enumerate(resumes):
+                resume_order[str(index)] = opp.id
+            return JsonResponse(
+                {'success': 'success', 'opportunities': resume_order},
+                status=200)
+        except:
+            return JsonResponse(
+                {'error': 'Resume not found.'}, status=200)
+    else:
+        return JsonResponse({'error': 'Invalid request.'}, status=400)
+
+
+def resumes_view_item(request, id):
+    """ Detail page of a single resume, given the resume id """
+    if not request.session.get("role", False):
+        return render(request,
+                      "jobber/home-alt.html")
+    my_resume = Resume.objects.get(pk=id)
+    if request.session['role'] != "admin" and my_resume.profile.user.username != request.session['username']:
+        # TODO: Add message denying access
+        return redirect("jobber:resumes_list")
+
+    return render(request,
+                  "jobber/resumes/view-item.html",
+                  {"user": get_profile(request),
+                   "resume": my_resume,
+                   "opportunities": Opportunity.objects.filter(application__resume=my_resume)})
+
+
+def resumes_edit_item(request, id):
+    """ Renders an existing resume's details to an editable form, saves inputs on POST request"""
+    if not request.session.get("role", False):
+        return render(request,
+                      "jobber/home-alt.html")
+    my_resume = Resume.objects.get(pk=id)
+    if request.session['role'] != "admin" and my_resume.profile.user.username != request.session['username']:
+        # TODO: Add message denying access
+        return redirect("jobber:resumes_list")
+    if request.method == 'POST':
+        my_resume = generate_resume(request=request, resume_id=id)
+        action = Action(
+            user=get_profile(request),
+            verb="updated resume",
+            target=my_resume
+        )
+        action.save()
+        messages.add_message(request, messages.INFO, "Saved Resume: %s" % (my_resume.name))
+        return redirect("jobber:resumes_view_item", my_resume.id)
+    return render(request,
+                  "jobber/resumes/add-item.html",
+                  {"user": get_profile(request),
+                   "resume": my_resume,
+                   "opportunities": get_opportunities_by_user_and_role(request)
+                   })
+
+
+def resumes_add_item(request):
+    """ Renders an empty resumes form page, saves a new Resume on POST request"""
+    if not request.session.get("role", False):
+        return render(request,
+                      "jobber/home-alt.html")
+
+    if request.method == 'POST':
+        my_resume = generate_resume(request, resume_id=None)
+        # Log Action
+        action = Action(
+            user=get_profile(request),
+            verb="created a new resume",
+            target=my_resume
+        )
+        action.save()
+        messages.add_message(request, messages.SUCCESS,
+                             "Submitted Resume: %s" % (my_resume.name))
+        # Redirect
+        return redirect("jobber:resumes_view_item", my_resume.id)
+    else:
+        return render(request,
+                      "jobber/resumes/add-item.html",
+                      {"user": get_profile(request),
+                       "opportunities": get_opportunities_by_user_and_role(request)})
+
+
+def resumes_delete_item(request):
+    """ Deletes a Resume given a POST request with the resume id to be deleted"""
+    if not request.session.get("role", False):
+        return render(request,
+                      "jobber/home-alt.html")
+
+    if request.method == 'POST':
+        resume_id = request.POST.get("id")
+        my_resume = Resume.objects.get(pk=resume_id)
+        if request.session['role'] != "admin" and my_resume.profile.user.username != request.session['username']:
+            # TODO: Add message denying access
+            return redirect("jobber:events_list")
+        name = my_resume.name
+        my_resume.delete()
+        # Log Action
+        action = Action(
+            user=get_profile(request),
+            verb="Deleted the resume %s" % (name),
+            target=my_resume
+        )
+        action.save()
+        messages.add_message(request, messages.WARNING, "Deleted resume: %s" % (name))
+        # Redirect
+        return redirect("jobber:resumes_list")
+    else:
+        return render(request,
+                      "jobber/resumes/add-item.html",
                       {"user": get_profile(request)})

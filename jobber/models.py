@@ -42,7 +42,6 @@ class Opportunity(models.Model):
     location = models.CharField(max_length=200, )
     recruiter_contact = models.ForeignKey("Contact", related_name="recruiter_contact", on_delete=models.CASCADE,
                                           null=True)
-    application_link = models.URLField(max_length=200)
     application = models.ForeignKey('Application', on_delete=models.CASCADE, null=True, blank=True)
     referral_contacts = models.ManyToManyField("Contact", related_name="referral_contacts")
     events = models.ManyToManyField("Event")
@@ -75,19 +74,35 @@ class Event(models.Model):
 
 class Resume(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    contact = models.CharField(max_length=200)
-    experiences = models.TextField()
-    education = models.TextField()
-    skills = models.TextField()
+    name = models.CharField(max_length=100)
+    text = models.TextField(null=True)
+    create_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "%s" % (self.name)
+
+    def get_absolute_url(self):
+        return reverse("jobber:resumes_view_item", args=[self.id])
 
 
 class CoverLetter(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    text = models.CharField(max_length=200)
+    name = models.CharField(max_length=100)
+    text = models.TextField()
+    create_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "%s" % (self.name)
+
+    def get_absolute_url(self):
+        return reverse("jobber:coverletters_view_item", args=[self.id])
 
 
 class Application(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    application_link = models.URLField(max_length=200, null=True, blank=True)
     cover_letter = models.ForeignKey('CoverLetter', on_delete=models.CASCADE, null=True, blank=True)
     resume = models.ForeignKey('Resume', on_delete=models.CASCADE)
 

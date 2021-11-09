@@ -74,7 +74,7 @@
             <div class="form-box" id="form-fill">
                 <p>Link to Application Page Here</p>
                 <input type="url" name="application-link" id="form-key-details-application"
-                       value="{{ opportunity.application_link }}">
+                       value="{{ opportunity.application.application_link }}">
                 <button id="fill-in-details" type="button" name="auto-fill" value="empty">Fill in
                     Details
                 </button>
@@ -119,18 +119,28 @@
         </div>
         <div class="form-boxes">
             <div class="form-box">
-                <p><label for="myResume">Resume:</label>
-                    <input type="file" id="myResume" name="filename-resume"> or <a href="#"
-                                                                                   id="build-resume">
-                        {% if opportunity.application.resume is not None %}Edit {% else %}
-                            Build {% endif %}
-                        it from your Profile</a></p>
-                <p><label for="myCover">Cover Letter:</label>
-                    <input type="file" id="myCover" name="filename-cover"> or <a href="#"
-                                                                                 id="build-cover">
-                        {% if opportunity.application.cover_letter is not None %}Edit {% else %}
-                            Build {% endif %}
-                        it from your Templates</a></p>
+                <p>
+                    <label for="resume">Resume:</label>
+                    <select name="resume" id="resume" form="form-id-details">
+                        <option value="none" {% if not opportunity.application.resume %}selected="selected" {% endif %}>
+                            None
+                        </option>
+                        {% for resume in resumes %}
+                            <option value={{ resume.id }} {% if resume == opportunity.application.resume %} selected="selected" {% endif %}>{{ resume.name }}</option>
+                        {% endfor %}
+                    </select>
+                </p>
+                <p>
+                    <label for="coverletter">Cover Letter:</label>
+                    <select name="coverletter" id="coverletter" form="form-id-details">
+                        <option value="none" {% if not opportunity.application.cover_letter %}selected="selected" {% endif %}>
+                            None
+                        </option>
+                        {% for coverletter in coverletters %}
+                            <option value={{ coverletter.id }} {% if coverletter == opportunity.application.cover_letter %} selected="selected" {% endif %}>{{ coverletter.name }}</option>
+                        {% endfor %}
+                    </select>
+                </p>
                 <div class='contact-list' id="application-details-enter">
                     <label for="referral-contact">Referral Contact:</label>
                     <div class="contact-list-input">
@@ -167,25 +177,25 @@
               action="#" method="post">
     {% endif %}
 
-    {% csrf_token %}
-    <div class="form-box popup-form">
-        <h3>New Contact Information:</h3>
-        <input type="hidden" name="formname" id="formname">
-        <p><label for="contact-add-name">Name: </label>
-            <input type="text" name="contact-add-name" class="required" id="contact-add-name" required></p>
-        <p><label for="contact-add-title">Title: </label>
-            <input type="text" name="contact-add-title" class="required" id="contact-add-title" required></p>
-        <p><label for="contact-add-company">Company: </label>
-            <input type="text" name="contact-add-company" class="required" id="contact-add-company" required></p>
-        <p><label for="contact-add-phone">Phone Number: </label>
-            <input type="tel" name="contact-add-phone" maxlength=12 minlength=12 placeholder="123-456-7890"
-                   pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" class="required" id="contact-add-phone" required></p>
-        <p><label for="contact-add-email">Email: </label>
-            <input type="email" name="contact-add-email" class="required" id="contact-add-email" required></p>
-        <button type="submit" id="contact-submit" class="button-small contact-list-submit-button"
-                data-ajax-url="{% url "jobber:opportunities_add_contact_ajax" %}">Save
-        </button>
-        <button type="button" id="contact-cancel" class="button-small">Cancel</button>
-    </div><!-- contact-list-add -->
-    </form>;
+{% csrf_token %}
+<div class="form-box popup-form">
+    <h3>New Contact Information:</h3>
+    <input type="hidden" name="formname" id="formname">
+    <p><label for="contact-add-name">Name: </label>
+        <input type="text" name="contact-add-name" class="required" id="contact-add-name" required></p>
+    <p><label for="contact-add-title">Title: </label>
+        <input type="text" name="contact-add-title" class="required" id="contact-add-title" required></p>
+    <p><label for="contact-add-company">Company: </label>
+        <input type="text" name="contact-add-company" class="required" id="contact-add-company" required></p>
+    <p><label for="contact-add-phone">Phone Number: </label>
+        <input type="tel" name="contact-add-phone" maxlength=12 minlength=12 placeholder="123-456-7890"
+               pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" class="required" id="contact-add-phone" required></p>
+    <p><label for="contact-add-email">Email: </label>
+        <input type="email" name="contact-add-email" class="required" id="contact-add-email" required></p>
+    <button type="submit" id="contact-submit" class="button-small contact-list-submit-button"
+            data-ajax-url="{% url "jobber:opportunities_add_contact_ajax" %}">Save
+    </button>
+    <button type="button" id="contact-cancel" class="button-small">Cancel</button>
+</div><!-- contact-list-add -->
+</form>;
 {% endblock %}
