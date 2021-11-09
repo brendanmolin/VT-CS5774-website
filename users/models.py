@@ -9,7 +9,7 @@ from django.urls import reverse
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    role = models.CharField(max_length=50, default="regular")
+    role = models.CharField(max_length=50, default="registered")
     name = models.CharField(max_length=200)
     reputation = models.IntegerField(default=0)
 
