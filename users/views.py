@@ -17,7 +17,6 @@ def generate_profile(request, profile_id) -> Profile:
     last_name = request.POST.get("input-name2")
     email = request.POST.get("input-email")
     password = request.POST.get("input-password")
-    print(request.POST)
     is_public = request.POST.get("input-public")
     if is_public == "on":
         is_public = True
@@ -42,9 +41,14 @@ def register(request):
         return redirect("jobber:opportunities_index")
     if request.method == 'POST':
         username = request.POST.get('register-username')
+        first_name = request.POST.get('register-name1')
+        last_name = request.POST.get('register-name2')
         email = request.POST.get('register-email')
         password = request.POST.get('register-password')
         user = User.objects.create_user(username, email, password)
+        user.first_name = first_name
+        user.last_name = last_name
+        user.save()
         request.session['username'] = user.username
         request.session['role'] = user.profile.role
         messages.add_message(request, messages.SUCCESS, "Welcome, %s" % user.username)
