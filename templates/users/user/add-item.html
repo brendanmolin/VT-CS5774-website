@@ -1,0 +1,68 @@
+{% extends 'jobber/add-item_BASE.html' %}
+{% block primary-nav %}
+    {% include 'users/user/nav-bar.html' %}
+{% endblock %}
+{% block my-location %}
+    <p id="my-location"><a href="{% url "jobber:opportunities_index" %}">Home</a> >
+        <a href="{% url "users:profile" profile.user.username %}">Profile</a> > Edit
+    </p>
+{% endblock %}
+
+{% block header-2 %}Edit Profile {% endblock %}
+
+{% block header-buttons %}
+    <p class="button-small"><a href="{% url "users:profile" profile.id %}">Cancel</a></p>
+    <button id="save-opp" type="submit" class="button-small" form="form-id-details" formmethod="post">Save
+    </button>
+{% endblock %}
+
+{% block save-edit %}
+    <form name="form-key-details" id="form-id-details"
+          action="{% url "users:profiles_edit_item" profile.user.username %}" method="post">
+    {% csrf_token %}
+{% endblock %}
+
+{% block details-1 %}
+    <li class="opportunity-summary">
+        <div class="opportunity-summary-header">
+            <h3>Profile Details</h3>
+        </div>
+        <div class="form-boxes">
+            <div class="form-box" id="form-fill">
+                <p><label for="input-name1">First Name:</label>
+                    <input type="text" name="input-name1" id="input-name1" class="required" required
+                           value="{{ profile.user.first_name }}"></p>
+                <p><label for="input-name2">Last Name:</label>
+                    <input type="text" name="input-name2" id="input-name2" class="required" required
+                           value="{{ profile.user.last_name }}"></p>
+                <p><label for="input-email">Email:</label>
+                    <input type="email" name="input-email" id="input-email" class="required" required
+                           value="{{ profile.user.email }}"></p>
+                <p><label for="input-public">Public Profile</label>
+                    <input type="checkbox" name="input-public" id="input-public"
+                            {% if profile.is_public %} checked="True" {% else %} unchecked {% endif %}></p>
+                {% if user.role == 'admin' %}
+                    <p><label for="input-role">Role:</label>
+                        <input type="text" name="input-role" id="input-role"
+                               value="{{ profile.role }}"></p>
+                {% endif %}
+            </div>
+        </div> <!-- form-boxes -->
+    </li> <!-- form-fields -->
+    <li class="opportunity-summary">
+        <div class="opportunity-summary-header">
+            <h3>Change Password</h3>
+        </div>
+        <div class="form-boxes">
+            <div class="form-box" id="form-fill">
+                <p><label for="input-password">Password:</label>
+                    <input type="password" name="input-password" id="input-password"></p>
+            </div>
+        </div> <!-- form-boxes -->
+    </li> <!-- form-fields -->
+
+{% endblock %}
+
+{% block form-end %}
+    </form>;
+{% endblock %}
