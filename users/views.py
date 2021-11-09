@@ -16,6 +16,10 @@ def generate_profile(request, profile_id) -> Profile:
     first_name = request.POST.get("input-name1")
     last_name = request.POST.get("input-name2")
     email = request.POST.get("input-email")
+    if User.objects.exclude(pk=profile_id).filter(email=email).exists():
+        messages.add_message(request, messages.WARNING,
+                             "The email %s is already in use.  Please select another and try again" % email)
+        return None
     password = request.POST.get("input-password")
     is_public = request.POST.get("input-public")
     if is_public == "on":
@@ -45,6 +49,14 @@ def register(request):
         last_name = request.POST.get('register-name2')
         email = request.POST.get('register-email')
         password = request.POST.get('register-password')
+        if User.objects.filter(username=username).exists():
+            messages.add_message(request, messages.WARNING,
+                                 "The username %s is already in use.  Please select another and try again" % username)
+            return redirect("users:register")
+        if User.objects.filter(email=email).exists():
+            messages.add_message(request, messages.WARNING,
+                                 "The email %s is already in use.  Please select another and try again" % email)
+            return redirect("users:register")
         user = User.objects.create_user(username, email, password)
         user.first_name = first_name
         user.last_name = last_name
@@ -82,14 +94,18 @@ def profiles_edit_item(request, username):
         return redirect("jobber:profile", username=my_profile.user.username)
     if request.method == 'POST':
         my_profile = generate_profile(request=request, profile_id=my_profile.id)
-        action = Action(
-            user=get_profile(request),
-            verb="updated profile",
-            target=my_profile
-        )
-        action.save()
-        messages.add_message(request, messages.INFO, "Updated Profile")
-        return redirect("users:profile", my_profile.user.username)
+        if my_profile is not None:
+            action = Action(
+                user=get_profile(request),
+                verb="updated profile",
+                target=my_profile
+            )
+            action.save()
+            messages.add_message(request, messages.INFO, "Updated Profile")
+            return redirect("users:profile", my_profile.user.username)
+        else:
+            print("post", username)
+            return redirect("users:profiles_edit_item", username=username)
     return render(request,
                   "users/user/add-item.html",
                   {"user": get_profile(request),
