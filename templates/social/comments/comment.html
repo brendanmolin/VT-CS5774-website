@@ -1,0 +1,22 @@
+<div class="comment">
+    <p>comment.comment</p>
+    <p>Comment by <a
+            href="{% url "users:profile" comment.profile.user.username %}">{{ comment.profile.user.username }}</a>
+        on {{ comment.date_modified | naturaltime }}</p>
+</div> <!-- comment -->
+{% if comment.profile == profile %}
+    <div class="comment-buttons">
+        <!-- Delete comment -->
+        <form name="delete-comment" id="delete-comment" method="POST">
+            {% csrf_token %}
+            <input name="comment-id" type="hidden" value="{{ comment.id }}">
+            <button type="submit" class="button-small" data-ajax-url="{% url "social:comment_delete_item" %}">Delete</button>
+        </form>
+        <!-- Edit comment -->
+        <form name="edit-comment" id="edit-comment" method="POST">
+            {% csrf_token %}
+            <input name="comment-id" type="hidden" value="{{ comment.id }}">
+            <button type="submit" class="button-small" data-ajax-url="{% url "social:comment_edit_item" %}">Edit</button>
+        </form>
+    </div> <!-- comment-buttons -->
+{% endif %}

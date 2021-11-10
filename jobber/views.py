@@ -3,6 +3,8 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.http import JsonResponse
 from datetime import datetime
+
+from social.models import Feedback
 from .models import Opportunity, Event, Stage, Contact, CoverLetter, Resume, Application
 from users.models import Profile
 from actions.models import Action
@@ -25,13 +27,11 @@ def get_profile(request):
 
 def generate_opportunity(request, opportunity_id=None) -> Opportunity:
     """ Creates a new or edits an existing Opportunity object given a request with opportunity form data"""
-    print("launch gen")
     utc = pytz.utc
     contacts = Contact.objects.all()
     stage = request.POST.get('stage')
     input_stage = Stage.objects.get(value_name=stage)
     application_link = request.POST.get('application-link')
-    print(application_link)
     title = request.POST.get('title')
     company = request.POST.get('company')
     location = request.POST.get('location')
@@ -128,7 +128,6 @@ def generate_contact(request, contact_id=None) -> Contact:
 
 def generate_event(request, event_id=None) -> Event:
     """ Creates a new or edits an existing Event object given a request with event form data"""
-    utc = pytz.utc
     date = request.POST.get("input-date")
     title = request.POST.get("input-title")
     e_type = request.POST.get("input-type")
@@ -347,7 +346,8 @@ def opportunities_view_item(request, id):
                       "jobber/home-alt.html")
     stages = Stage.objects.all()
     my_opp = Opportunity.objects.get(pk=id)
-    print("hey", my_opp.application.application_link)
+    active_feedback = Feedback.objects.filter(status=Feedback.OPEN).\
+        filter(application__opportunity__profile=my_opp.profile)
     if request.session['role'] != "admin" and my_opp.profile.user.username != request.session['username']:
         # TODO: Add message denying access
         return redirect("jobber:opportunities_list")
@@ -356,24 +356,22 @@ def opportunities_view_item(request, id):
                   "jobber/opportunities/view-item.html",
                   {"user": get_profile(request),
                    "opportunity": my_opp,
-                   'stages': stages})
+                   "stages": stages,
+                   "feedback": active_feedback})
 
 
 def opportunities_edit_item(request, id):
     """ Renders an existing opportunity's details to an editable form, saves inputs on POST request"""
-    print("launch")
     if not request.session.get("role", False):
         return render(request,
                       "jobber/home-alt.html")
     stages = Stage.objects.all()
     my_opp = Opportunity.objects.get(pk=id)
-    print("oh", my_opp.application.application_link)
     if request.session['role'] != "admin" and my_opp.profile.user.username != request.session['username']:
         # TODO: Add message denying access
         return redirect("jobber:opportunities_list")
     if request.method == 'POST':
         my_opp = generate_opportunity(request=request, opportunity_id=id)
-        print("my", my_opp.application.application_link)
         # Log Action
         action = Action(
             user=get_profile(request),

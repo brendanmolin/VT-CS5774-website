@@ -1,0 +1,31 @@
+{% load humanize %}
+
+<h2>Feedback</h2>
+<div>
+    <p>feedback.status</p>
+    <p>feedback.message</p>
+    <p>
+        <a href="{% url "users:profile" feedback.application.profile.user.username %}">{{ feedback.application.profile.user.username }}</a>,
+        {{ feedback.date_created | naturaltime }}</p>
+</div>
+
+<form name="add-comment" id="add-comment" method="POST">
+    {% csrf_token %}
+    <p><label for="input-comment">Add a comment:</label>
+        <textarea name="input-text" id="input-text" class="required" required>{{ coverletter.text }}</textarea></p>
+    <button type="submit" class="button-small" data-ajax-url="{% url "social:comment_add_item" %}">Comment</button>
+</form> <!-- Add comment -->
+
+<ul id="recent-activity" class="detail-list">
+    {% if comments.length == 0 %}
+        <p>No comments yet!</p>
+    {% else %}
+        {% for comment in comments %}
+            <li>
+                {% include "social/comments/comment.html" %}
+            </li>
+        {% empty %}
+            <li>No activity yet.</li>
+        {% endfor %}
+    {% endif %}
+</ul>

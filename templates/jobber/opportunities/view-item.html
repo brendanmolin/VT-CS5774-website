@@ -58,18 +58,31 @@
     <li class="opportunity-summary">
         <h3>Application Details</h3>
         <div class="side-buttons">
-            <p class="button"><a href="#">Download Application</a></p>
-            <p class="button"><a href="#">Get Feedback</a></p>
+            <form id="feedback" name="feedback" method="POST">
+                {% csrf_token %}
+                <input type="hidden" id="opp-id" name="opp-id" value="{{ opportunity.id }}">
+                <p class="button"><a href="#">Download Application</a></p>
+                {% if not feedback %}
+                    <button type="submit" class="button" formaction="{% url "social:feedback_open" %}">Get Feedback
+                    </button>
+                {% else %}
+                    <button type="submit" class="button" formmethod="{% url "social:feedback_close" feedback.id %}">
+                        Close Feedback
+                    </button>
+                {% endif %}
+            </form>
         </div>
         <div class="opportunity-summary-details-wide">
-            <p>Applicant: {{ opportunity.profile.firstname }} {{ opportunity.profile.lastname }}</p>
+            <p>Applicant: {{ opportunity.profile.user.first_name }} {{ opportunity.profile.user.last_name }}</p>
             <p>Application Page: <a href="{{ opportunity.application.application_link }}"
                                     class="explicit-link">{{ opportunity.application.application_link }}</a>
             </p>
             <p>Resume: {% if opportunity.application.resume is not None %}Complete
-                <a href="{% url "jobber:resumes_view_item" opportunity.application.resume.id %}">(see)</a> {% endif %}</p>
+                <a href="{% url "jobber:resumes_view_item" opportunity.application.resume.id %}">(see)</a> {% endif %}
+            </p>
             <p>Cover Letter: {% if opportunity.application.cover_letter is not None %}Complete
-                <a href="{% url "jobber:coverletters_view_item" opportunity.application.cover_letter.id %}">(see)</a> {% endif %} </p>
+                <a href="{% url "jobber:coverletters_view_item" opportunity.application.cover_letter.id %}">(see)</a> {% endif %}
+            </p>
             <p>Referrals:</p>
             <ul class="contact-list">
                 {% for contact in opportunity.referral_contacts.all %}
@@ -91,4 +104,7 @@
         <p>Phone: <span></span></p>
         <p>Email: <span></span></p>
     </div><!-- contact-list-add -->
+    {% if feedback %}
+        {% include "social/feedback/feedback.html" %}
+    {% endif %}
 {% endblock %}
