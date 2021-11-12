@@ -20,7 +20,6 @@ def format_date(date):
         date = None
     return date
 
-
 def get_profile(request):
     return Profile.objects.get(user__username=request.session['username'])
 
@@ -347,7 +346,7 @@ def opportunities_view_item(request, id):
     stages = Stage.objects.all()
     my_opp = Opportunity.objects.get(pk=id)
     active_feedback = Feedback.objects.filter(status=Feedback.OPEN).\
-        filter(application__opportunity__profile=my_opp.profile)
+        filter(application__opportunity=my_opp).last()
     if request.session['role'] != "admin" and my_opp.profile.user.username != request.session['username']:
         # TODO: Add message denying access
         return redirect("jobber:opportunities_list")
@@ -503,9 +502,9 @@ def opportunities_add_contact_ajax(request):
                 status=200)
         except:
             return JsonResponse(
-                {'error': 'Data types entered are invalid.'}, status=200)
-        else:
-            return JsonResponse({'error': 'Invalid request.'}, status=400)
+            {'error': 'Data types entered are invalid.'}, status=200)
+    else:
+        return JsonResponse({'error': 'Invalid request.'}, status=400)
 
 
 def opportunities_view_contact_ajax(request):
@@ -521,7 +520,9 @@ def opportunities_view_contact_ajax(request):
             contact_phone = my_contact.phone_number
             contact_email = my_contact.email
             return JsonResponse(
-                {'success': 'success', 'contact_name': contact_name, 'contact_title': contact_title,
+                {'success': 'success',
+                 'contact_name': contact_name,
+                 'contact_title': contact_title,
                  'contact_company': contact_company,
                  'contact_phone': contact_phone,
                  'contact_email': contact_email},

@@ -1,7 +1,9 @@
 {% extends 'jobber/view-item_BASE.html' %}
+
 {% block primary-nav %}
     {% include 'jobber/opportunities/nav-bar.html' %}
 {% endblock %}
+
 {% block my-location %}
     <p id="my-location"><a href="{% url "jobber:opportunities_index" %}">Home</a> > <a
             href="{% url "jobber:opportunities_list" %}">Opportunities</a> > View Opportunity Details
@@ -50,7 +52,9 @@
             {% if opportunity.recruiter_contact is not None %}
                 <li data-ajax-url="{% url "jobber:opportunities_view_contact_ajax" %}"
                     data-contact="{{ opportunity.recruiter_contact.id }}">{{ opportunity.recruiter_contact.name }}
-                    <a href="#">(see details)</a></li>
+                    <a href="#">(see details)</a>
+                    <div class="hover-frame permanent-hide"></div>
+                </li>
             {% endif %}
         </ul>
         <p>Created Date: {{ opportunity.create_date | date:"F j, Y" }}</p>
@@ -66,7 +70,7 @@
                     <button type="submit" class="button" formaction="{% url "social:feedback_open" %}">Get Feedback
                     </button>
                 {% else %}
-                    <button type="submit" class="button" formmethod="{% url "social:feedback_close" feedback.id %}">
+                    <button type="submit" class="button" formaction="{% url "social:feedback_close" feedback.id %}">
                         Close Feedback
                     </button>
                 {% endif %}
@@ -88,11 +92,17 @@
                 {% for contact in opportunity.referral_contacts.all %}
                     <li data-ajax-url="{% url "jobber:opportunities_view_contact_ajax" %}"
                         data-contact="{{ contact.id }}">{{ contact.name }} <a href="#">(see details)</a>
+                        <div class="hover-frame permanent-hide"></div>
                     </li>
                 {% endfor %}
             </ul>
         </div>
     </li>
+    {% if feedback %}
+        <li class="opportunity-summary">
+            {% include "social/feedback/feedback.html" %}
+        </li>
+    {% endif %}
 {% endblock %}
 
 {% block content-other %}
@@ -104,7 +114,4 @@
         <p>Phone: <span></span></p>
         <p>Email: <span></span></p>
     </div><!-- contact-list-add -->
-    {% if feedback %}
-        {% include "social/feedback/feedback.html" %}
-    {% endif %}
 {% endblock %}
