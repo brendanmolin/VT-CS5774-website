@@ -8,7 +8,9 @@ from actions.models import Action
 
 # Helper functions
 def get_profile(request):
-    return Profile.objects.get(user__username=request.session['username'])
+    if 'username' in request.session.keys():
+        return Profile.objects.get(user__username=request.session['username'])
+    return None
 
 
 def generate_profile(request, profile_id) -> Profile:
@@ -16,7 +18,7 @@ def generate_profile(request, profile_id) -> Profile:
     first_name = request.POST.get("input-name1")
     last_name = request.POST.get("input-name2")
     email = request.POST.get("input-email")
-    if User.objects.exclude(pk=profile_id).filter(email=email).exists():
+    if User.objects.exclude(pk=Profile.objects.get(pk=profile_id).user.id).filter(email=email).exists():
         messages.add_message(request, messages.WARNING,
                              "The email %s is already in use.  Please select another and try again" % email)
         return None

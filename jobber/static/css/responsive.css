@@ -37,7 +37,7 @@ div#account-box {
 
 div#search-articles-box {
     clear: left;
-    margin: 1em 1em 1em 3em;
+    margin: 1em 1em 1em 5em;
 }
 
 div#account-box ul {
@@ -120,11 +120,6 @@ ul#primary-nav li div.dropdown div.dropdown-content {
     min-width: 160px;
 }
 
-/* Primary navigation bar dropdown content, show on hover */
-ul#primary-nav li div.dropdown:hover div.dropdown-content {
-    display: block;
-}
-
 h2 {
     clear: left;
     margin-left: 0.5em;
@@ -191,6 +186,11 @@ ul.messages li.warning {
     margin: 0.25em;
 }
 
+/* Primary navigation bar dropdown content, show on hover */
+ul#primary-nav li div.dropdown:hover div.dropdown-content {
+    display: block;
+}
+
 div.quickview-box {
     border-style: solid;
     border-width: 0.1em;
@@ -218,6 +218,12 @@ ul.detail-list > li {
     border-width: 0.1em;
     margin: 0.2em 0.2em;
     background-color: lightgrey
+}
+
+/* Comment box */
+ul#comment-activity li {
+    display: block;
+    background-color: azure;
 }
 
 p.button {
@@ -398,12 +404,8 @@ div#footer div#language-select {
     ul.detail-list > li {
         float: left;
         clear: left;
-        border-style: solid;
-        border-width: 0.1em;
-        margin-top: 0.2em;
         width: 95%;
         padding-left: 0.2em;
-        background-color: lightgrey
     }
 
     div#content ul#suggestions {

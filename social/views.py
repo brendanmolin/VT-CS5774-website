@@ -88,7 +88,7 @@ def comment_add_item_ajax(request):
             action = Action(
                 user=get_profile(request),
                 verb="Added a comment on opportunity %s, %s" % (title, company),
-                target=my_comment
+                target=my_comment.feedback.application.opportunity
             )
             action.save()
             return JsonResponse(
@@ -120,7 +120,7 @@ def comment_edit_item_ajax(request):
             action = Action(
                 user=get_profile(request),
                 verb="Edited the comment on opportunity %s, %s" % (title, company),
-                target=my_comment
+                target=my_comment.feedback.application.opportunity
             )
             action.save()
             return JsonResponse(
@@ -148,7 +148,7 @@ def comment_delete_item_ajax(request):
             action = Action(
                 user=get_profile(request),
                 verb="Deleted the comment on opportunity %s, %s" % (title, company),
-                target=my_comment
+                target=my_comment.feedback.application.opportunity
             )
             action.save()
             return JsonResponse(

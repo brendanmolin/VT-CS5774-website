@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block header-buttons %}
-    {% if user.role == 'admin' or profile.user.id == user.id %}
+    {% if user.role == 'admin' or profile.id == user.id %}
     <p class="button-small"><a
             href="{% url "users:profiles_edit_item" profile.user.username %}">Edit</a></p>
     {% endif %}

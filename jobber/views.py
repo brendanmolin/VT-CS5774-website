@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.http import JsonResponse
 from datetime import datetime
-
+from django.db.models import Q
 from social.models import Feedback
 from .models import Opportunity, Event, Stage, Contact, CoverLetter, Resume, Application
 from users.models import Profile
@@ -19,6 +19,7 @@ def format_date(date):
     else:
         date = None
     return date
+
 
 def get_profile(request):
     return Profile.objects.get(user__username=request.session['username'])
@@ -246,12 +247,26 @@ def get_resumes_by_user_and_role(request):
 
 
 def get_actions_by_user_and_role(request):
-    """ Gets permissioned Events """
+    """ Gets actions for the logged in user """
     if request.session['role'] == "admin":
         actions = Action.objects.all()
     else:
         actions = Action.objects.filter(
             user=get_profile(request).id)
+    return actions
+
+
+def get_extended_actions_by_user_and_role(request):
+    """ Gets permissioned Events """
+    if request.session['role'] == "admin":
+        actions = Action.objects.all()
+    else:
+        actions = Action.objects.filter(
+            Q(user=get_profile(request).id) |
+            Q(verb__contains='Requested feedback') | Q(verb__contains='Closed Feedback') |
+            (Q(target_ct__model='opportunity') & Q(
+                target_id__in=[x.id for x in get_opportunities_by_user_and_role(request=request)]))
+        )
     return actions
 
 
@@ -263,7 +278,7 @@ def opportunities_index(request):
     if not request.session.get("role", False):
         return render(request,
                       "jobber/home-alt.html")
-    actions = get_actions_by_user_and_role(request).order_by("-created")[:3]
+    actions = get_extended_actions_by_user_and_role(request).order_by("-created")[:5]
     events = get_events_by_user_and_role(request)
     return render(request,
                   "jobber/index.html",
@@ -345,10 +360,10 @@ def opportunities_view_item(request, id):
                       "jobber/home-alt.html")
     stages = Stage.objects.all()
     my_opp = Opportunity.objects.get(pk=id)
-    active_feedback = Feedback.objects.filter(status=Feedback.OPEN).\
+    active_feedback = Feedback.objects.filter(status=Feedback.OPEN). \
         filter(application__opportunity=my_opp).last()
-    if request.session['role'] != "admin" and my_opp.profile.user.username != request.session['username']:
-        # TODO: Add message denying access
+    if request.session['role'] != "admin" and (my_opp.profile.user.username != request.session['username']
+                                               and active_feedback is None):
         return redirect("jobber:opportunities_list")
 
     return render(request,
@@ -367,7 +382,6 @@ def opportunities_edit_item(request, id):
     stages = Stage.objects.all()
     my_opp = Opportunity.objects.get(pk=id)
     if request.session['role'] != "admin" and my_opp.profile.user.username != request.session['username']:
-        # TODO: Add message denying access
         return redirect("jobber:opportunities_list")
     if request.method == 'POST':
         my_opp = generate_opportunity(request=request, opportunity_id=id)
@@ -502,7 +516,7 @@ def opportunities_add_contact_ajax(request):
                 status=200)
         except:
             return JsonResponse(
-            {'error': 'Data types entered are invalid.'}, status=200)
+                {'error': 'Data types entered are invalid.'}, status=200)
     else:
         return JsonResponse({'error': 'Invalid request.'}, status=400)
 
@@ -862,7 +876,10 @@ def coverletters_view_item(request, id):
         return render(request,
                       "jobber/home-alt.html")
     my_coverletter = CoverLetter.objects.get(pk=id)
-    if request.session['role'] != "admin" and my_coverletter.profile.user.username != request.session['username']:
+    active_feedback = Feedback.objects.filter(status=Feedback.OPEN). \
+        filter(application__in=my_coverletter.application_set.all())
+    if request.session['role'] != "admin" and (my_coverletter.profile.user.username != request.session['username']
+                                               and active_feedback is None):
         # TODO: Add message denying access
         return redirect("jobber:coverletters_list")
 
@@ -1003,7 +1020,10 @@ def resumes_view_item(request, id):
         return render(request,
                       "jobber/home-alt.html")
     my_resume = Resume.objects.get(pk=id)
-    if request.session['role'] != "admin" and my_resume.profile.user.username != request.session['username']:
+    active_feedback = Feedback.objects.filter(status=Feedback.OPEN). \
+        filter(application__in=my_resume.application_set.all())
+    if request.session['role'] != "admin" and (my_resume.profile.user.username != request.session['username']
+                                               and active_feedback is None):
         # TODO: Add message denying access
         return redirect("jobber:resumes_list")
 

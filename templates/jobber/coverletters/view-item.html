@@ -8,21 +8,23 @@
     </p> {% endblock %}
 
 {% block header-buttons %}
-    {% if request.session.role == "admin" or coverletter.profile.id == user.id %}
-        <form name="delete" id="delete-form" method="POST"
-              action="{% url "jobber:coverletters_delete_item" %}">
-            {% csrf_token %}
-            <input type="hidden" name="id" value="{{ coverletter.id }}">
-            <input type="hidden" name="name" value="{{ coverletter.name }}">
-        </form>
-    {% endif %}
-    <p class="button-small"><a
-            href="{% url "jobber:coverletters_edit_item" coverletter.id %}">Edit</a></p>
-    {% if request.session.role == "admin" or coverletter.profile.id == user.id %}
-        <button id="delete-opp" type="submit" class="button-small delete" form="delete-form"
-                formmethod="post">
-            Delete
-        </button>
+    {% if coverletter.profile.user.username == user.user.username %}
+        {% if request.session.role == "admin" or coverletter.profile.id == user.id %}
+            <form name="delete" id="delete-form" method="POST"
+                  action="{% url "jobber:coverletters_delete_item" %}">
+                {% csrf_token %}
+                <input type="hidden" name="id" value="{{ coverletter.id }}">
+                <input type="hidden" name="name" value="{{ coverletter.name }}">
+            </form>
+        {% endif %}
+        <p class="button-small"><a
+                href="{% url "jobber:coverletters_edit_item" coverletter.id %}">Edit</a></p>
+        {% if request.session.role == "admin" or coverletter.profile.id == user.id %}
+            <button id="delete-opp" type="submit" class="button-small delete" form="delete-form"
+                    formmethod="post">
+                Delete
+            </button>
+        {% endif %}
     {% endif %}
 {% endblock %}
 
@@ -40,7 +42,9 @@
             <p>This cover letter has not been used.</p>
         {% else %}
             {% for opportunity in opportunities %}
-                <p><a href="{% url "jobber:opportunities_view_item" opportunity.id %}">{{ opportunity.title }}, {{ opportunity.company }}</a></p>
+                <p>
+                    <a href="{% url "jobber:opportunities_view_item" opportunity.id %}">{{ opportunity.title }}, {{ opportunity.company }}</a>
+                </p>
             {% endfor %}
         {% endif %}
     </li>

@@ -7,7 +7,7 @@
         on {{ comment.date_modified | naturaltime }}
         {% if comment.date_modified != comment.date_created %} <span><em> (edited)</em></span> {% endif %}</p>
 </div> <!-- comment -->
-{% if comment.profile == user %}
+{% if comment.profile == user or user.role == 'admin' %}
     <div class="comment-buttons">
         <!-- Delete comment -->
         <form name="delete-comment" id="delete-comment" method="POST">

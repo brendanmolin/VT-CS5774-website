@@ -1,5 +1,6 @@
 <ul id="primary-nav">
     <li><a href="{% url "jobber:opportunities_index" %}">Home</a></li>
+    {% if user %}
     <li><a href="{% url "users:profile" user.user.username %}">Profile</a></li>
     <li>
         <div class="dropdown">
@@ -13,6 +14,7 @@
             </div>
         </div> <!-- dropdown -->
     </li>
+    {% endif %}
     <li><a href="#">Advice</a></li>
     <li><a href="#">About</a></li>
 </ul>
