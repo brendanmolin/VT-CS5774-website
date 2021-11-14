@@ -42,7 +42,7 @@ class Opportunity(models.Model):
     location = models.CharField(max_length=200, )
     recruiter_contact = models.ForeignKey("Contact", related_name="recruiter_contact", on_delete=models.CASCADE,
                                           null=True)
-    application = models.ForeignKey('Application', on_delete=models.CASCADE, null=True, blank=True)
+    application = models.OneToOneField('Application', on_delete=models.CASCADE, null=True, blank=True)
     referral_contacts = models.ManyToManyField("Contact", related_name="referral_contacts")
     events = models.ManyToManyField("Event")
     next_step = models.CharField(max_length=200)
@@ -103,13 +103,8 @@ class CoverLetter(models.Model):
 class Application(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     application_link = models.URLField(max_length=200, null=True, blank=True)
-    cover_letter = models.ForeignKey('CoverLetter', on_delete=models.CASCADE, null=True, blank=True)
-    resume = models.ForeignKey('Resume', on_delete=models.CASCADE)
-
-
-class Feedback(models.Model):
-    application = models.ForeignKey('Application', on_delete=models.CASCADE)
-    date = models.DateTimeField(auto_now_add=True)
+    cover_letter = models.ForeignKey('CoverLetter', on_delete=models.CASCADE, null=True)
+    resume = models.ForeignKey('Resume', on_delete=models.CASCADE, null=True)
 
 
 class Author(models.Model):

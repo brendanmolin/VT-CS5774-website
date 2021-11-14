@@ -1,7 +1,9 @@
 {% extends 'jobber/view-item_BASE.html' %}
+
 {% block primary-nav %}
     {% include 'jobber/opportunities/nav-bar.html' %}
 {% endblock %}
+
 {% block my-location %}
     <p id="my-location"><a href="{% url "jobber:opportunities_index" %}">Home</a> > <a
             href="{% url "jobber:opportunities_list" %}">Opportunities</a> > View Opportunity Details
@@ -50,7 +52,9 @@
             {% if opportunity.recruiter_contact is not None %}
                 <li data-ajax-url="{% url "jobber:opportunities_view_contact_ajax" %}"
                     data-contact="{{ opportunity.recruiter_contact.id }}">{{ opportunity.recruiter_contact.name }}
-                    <a href="#">(see details)</a></li>
+                    <a href="#">(see details)</a>
+                    <div class="hover-frame permanent-hide"></div>
+                </li>
             {% endif %}
         </ul>
         <p>Created Date: {{ opportunity.create_date | date:"F j, Y" }}</p>
@@ -58,28 +62,47 @@
     <li class="opportunity-summary">
         <h3>Application Details</h3>
         <div class="side-buttons">
-            <p class="button"><a href="#">Download Application</a></p>
-            <p class="button"><a href="#">Get Feedback</a></p>
+            <form id="feedback" name="feedback" method="POST">
+                {% csrf_token %}
+                <input type="hidden" id="opp-id" name="opp-id" value="{{ opportunity.id }}">
+                <p class="button"><a href="#">Download Application</a></p>
+                {% if not feedback %}
+                    <button type="submit" class="button" formaction="{% url "social:feedback_open" %}">Get Feedback
+                    </button>
+                {% else %}
+                    <button type="submit" class="button" formaction="{% url "social:feedback_close" feedback.id %}">
+                        Close Feedback
+                    </button>
+                {% endif %}
+            </form>
         </div>
         <div class="opportunity-summary-details-wide">
-            <p>Applicant: {{ opportunity.profile.firstname }} {{ opportunity.profile.lastname }}</p>
+            <p>Applicant: {{ opportunity.profile.user.first_name }} {{ opportunity.profile.user.last_name }}</p>
             <p>Application Page: <a href="{{ opportunity.application.application_link }}"
                                     class="explicit-link">{{ opportunity.application.application_link }}</a>
             </p>
             <p>Resume: {% if opportunity.application.resume is not None %}Complete
-                <a href="{% url "jobber:resumes_view_item" opportunity.application.resume.id %}">(see)</a> {% endif %}</p>
+                <a href="{% url "jobber:resumes_view_item" opportunity.application.resume.id %}">(see)</a> {% endif %}
+            </p>
             <p>Cover Letter: {% if opportunity.application.cover_letter is not None %}Complete
-                <a href="{% url "jobber:coverletters_view_item" opportunity.application.cover_letter.id %}">(see)</a> {% endif %} </p>
+                <a href="{% url "jobber:coverletters_view_item" opportunity.application.cover_letter.id %}">(see)</a> {% endif %}
+            </p>
             <p>Referrals:</p>
             <ul class="contact-list">
                 {% for contact in opportunity.referral_contacts.all %}
                     <li data-ajax-url="{% url "jobber:opportunities_view_contact_ajax" %}"
                         data-contact="{{ contact.id }}">{{ contact.name }} <a href="#">(see details)</a>
+                        <div class="hover-frame permanent-hide"></div>
                     </li>
                 {% endfor %}
             </ul>
         </div>
     </li>
+    {% if feedback %}
+        <li class="opportunity-summary">
+            {% include "social/feedback/feedback.html" %}
+        </li>
+    {% endif %}
 {% endblock %}
 
 {% block content-other %}

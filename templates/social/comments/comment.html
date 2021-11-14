@@ -1,0 +1,27 @@
+{% load humanize %}
+
+<div class="comment">
+    <p class="comment">{{ comment.comment }}</p>
+    <p class="byline">Comment by <a
+            href="{% url "users:profile" comment.profile.user.username %}">{{ comment.profile.user.username }}</a>
+        on {{ comment.date_modified | naturaltime }}
+        {% if comment.date_modified != comment.date_created %} <span><em> (edited)</em></span> {% endif %}</p>
+</div> <!-- comment -->
+{% if comment.profile == user %}
+    <div class="comment-buttons">
+        <!-- Delete comment -->
+        <form name="delete-comment" id="delete-comment" method="POST">
+            <input name="comment-id" type="hidden" value="{{ comment.id }}">
+            <button id="comment-delete" type="submit" class="button-small" data-is-active="false"
+                    data-ajax-url="{% url "social:comment-delete-item-ajax" %}">Delete
+            </button>
+        </form>
+        <!-- Edit comment -->
+        <form name="edit-comment" id="edit-comment" method="POST">
+            <input name="comment-id" type="hidden" value="{{ comment.id }}">
+            <button id="comment-edit" type="submit" class="button-small" data-is-active="false"
+                    data-ajax-url="{% url "social:comment-edit-item-ajax" %}">Edit
+            </button>
+        </form>
+    </div> <!-- comment-buttons -->
+{% endif %}
