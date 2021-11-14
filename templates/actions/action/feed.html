@@ -1,0 +1,15 @@
+{% load humanize %}
+
+<h2>Recent Activity</h2>
+<ul id="recent-activity" class="detail-list">
+    {% for action in actions %}
+        <li>
+            <a href="{{ action.user.get_absolute_url }}">{{ action.user.user.username }}</a> {{ action.verb }}
+            {% if action.target is not None %}: <a
+                    href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>{% endif %}
+            ({{ action.created | naturaltime }})
+        </li>
+    {% empty %}
+        <li>No activity yet.</li>
+    {% endfor %}
+</ul>

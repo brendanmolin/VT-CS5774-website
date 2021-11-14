@@ -1,0 +1,51 @@
+{% extends 'jobber/view-item_BASE.html' %}
+{% block primary-nav %}
+    {% include 'jobber/coverletters/nav-bar.html' %}
+{% endblock %}
+{% block my-location %}
+    <p id="my-location"><a href="{% url "jobber:opportunities_index" %}">Home</a> > <a
+            href="{% url "jobber:coverletters_list" %}">Cover Letters</a> > View Cover Letter Details
+    </p> {% endblock %}
+
+{% block header-buttons %}
+    {% if coverletter.profile.user.username == user.user.username %}
+        {% if request.session.role == "admin" or coverletter.profile.id == user.id %}
+            <form name="delete" id="delete-form" method="POST"
+                  action="{% url "jobber:coverletters_delete_item" %}">
+                {% csrf_token %}
+                <input type="hidden" name="id" value="{{ coverletter.id }}">
+                <input type="hidden" name="name" value="{{ coverletter.name }}">
+            </form>
+        {% endif %}
+        <p class="button-small"><a
+                href="{% url "jobber:coverletters_edit_item" coverletter.id %}">Edit</a></p>
+        {% if request.session.role == "admin" or coverletter.profile.id == user.id %}
+            <button id="delete-opp" type="submit" class="button-small delete" form="delete-form"
+                    formmethod="post">
+                Delete
+            </button>
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block details-1 %}
+    <li class="opportunity-summary">
+        <h3>Key Details</h3>
+        <p>Name: {{ coverletter.name }}</p>
+        <p>Modified Date: {{ coverletter.modified_date }}</p>
+        <p>Create Date: {{ coverletter.create_date }}</p>
+        <p>Cover Letter Text:<br> {{ coverletter.text }}</p>
+    </li>
+    <li class="opportunity-summary">
+        <h3>Used In</h3>
+        {% if opportunities.length == 0 %}
+            <p>This cover letter has not been used.</p>
+        {% else %}
+            {% for opportunity in opportunities %}
+                <p>
+                    <a href="{% url "jobber:opportunities_view_item" opportunity.id %}">{{ opportunity.title }}, {{ opportunity.company }}</a>
+                </p>
+            {% endfor %}
+        {% endif %}
+    </li>
+{% endblock %}

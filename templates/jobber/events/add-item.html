@@ -1,0 +1,84 @@
+{% extends 'jobber/add-item_BASE.html' %}
+{% block primary-nav %}
+    {% include 'jobber/events/nav-bar.html' %}
+{% endblock %}
+{% block my-location %}
+    <p id="my-location"><a href="{% url "jobber:opportunities_index" %}">Home</a> > <a
+            href="{% url "jobber:events_list" %}">Events</a> > {% if event.id is not None %}
+        <a href="{% url "jobber:events_view_item" event.id %}">Event</a> > {% endif %}
+        {% if event.id %}
+            Edit {% else %}Create New {% endif %} Event
+    </p>
+{% endblock %}
+
+{% block header-2 %}{% if event.id %}Edit {% else %}Create New{% endif %} Event {% endblock %}
+
+{% block header-buttons %}
+    {% if request.session.role == "admin" and event.id is not None %}
+        <form name="delete" id="delete-form" method="POST"
+              action="{% url "jobber:events_delete_item" %}">
+            {% csrf_token %}
+            <input type="hidden" name="id" value="{{ event.id }}">
+            <input type="hidden" name="title" value="{{ event.title }}">
+        </form>
+    {% endif %}
+    {% if event.id is not null %}
+        <p class="button-small"><a
+                href="{% url "jobber:events_view_item" event.id %}">Close</a>
+        </p>
+    {% else %}
+        <p class="button-small"><a href="{% url "jobber:events_list" %}">Cancel</a></p>
+    {% endif %}
+    {% if request.session.role == "admin" and event.id is not None %}
+        <button id="delete-opp" type="submit" class="button-small delete" form="delete-form" formmethod="post">
+            Delete
+        </button>
+    {% endif %}
+    <button id="save-opp" type="submit" class="button-small" form="form-id-details" formmethod="post">Save
+    </button>
+{% endblock %}
+
+{% block save-edit %}
+    {% if not event.id %}
+        <form name="form-key-details" id="form-id-details"
+              action="{% url "jobber:events_add-item" %}" method="post">
+    {% else %}
+        <form name="form-key-details" id="form-id-details"
+              action="{% url "jobber:events_edit_item" event.id %}" method="post">
+    {% endif %}
+    {% csrf_token %}
+{% endblock %}
+
+{% block details-1 %}
+    <li class="opportunity-summary">
+        <div class="opportunity-summary-header">
+            <h3>Event Details</h3>
+        </div>
+        <div class="form-boxes">
+            <div class="form-box" id="form-fill">
+                <p><label for="input-title">Title:</label>
+                    <input type="text" name="input-title" id="input-title" class="required" required
+                           value="{{ event.title }}"></p>
+                <p><label for="input-date">Date:</label>
+                    <input type="date" name="input-date" id="input-date" required
+                           value={% if event.date is not None %} "{{ event.date | date:"Y-m-d" }}" {% endif %}>
+                <p><label for="input-type">Type:</label>
+                    <input type="text" name="input-type" id="input-type" class="required" required
+                           value="{{ event.type }}"></p>
+                <p><label for="input-opp">Opportunity:</label>
+                    <select name="input-opp" id="input-opp" multiple="multiple">
+                        <option value="none">None</option>
+                        {% for opp in opportunities %}
+                            <option value="{{ opp.id }}" {% if event in opp.events.all %}
+                                    selected="selected" {% endif %}>{{ opp.title }}, {{ opp.company }}</option>
+                        {% endfor %}
+                    </select>
+                </p>
+            </div>
+        </div> <!-- form-boxes -->
+    </li> <!-- form-fields -->
+{% endblock %}
+
+{% block form-end %}
+    </form>;
+{% endblock %}

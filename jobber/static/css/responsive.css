@@ -37,7 +37,7 @@ div#account-box {
 
 div#search-articles-box {
     clear: left;
-    margin: 1em 1em 1em 3em;
+    margin: 1em 1em 1em 5em;
 }
 
 div#account-box ul {
@@ -70,6 +70,7 @@ div#content {
     width: 95%
 }
 
+/* Primary navigation bar */
 ul#primary-nav {
     clear: left;
     float: left;
@@ -78,17 +79,45 @@ ul#primary-nav {
     padding-left: 0;
     border-style: solid;
     list-style-type: none;
+    background-color: darkslategrey;
 }
 
+/* Primary navigation bar items */
 ul#primary-nav li {
     float: left
 }
 
+/* Primary navigation bar item text */
 ul#primary-nav li a {
     display: block;
     padding: 10px 7px;
     background-color: darkslategrey;
     color: white
+}
+
+/* Primary navigation bar item text on hover */
+ul#primary-nav li a:hover {
+    background-color: greenyellow;
+    color: darkslategrey;
+}
+
+/* Primary navigation bar item when selected */
+ul#primary-nav li a.selected {
+    background-color: lightgrey;
+    color: darkslategrey;
+}
+
+/* Primary navigation bar dropdown header and list container  */
+ul#primary-nav li div.dropdown {
+    float: left;
+    overflow: hidden;
+}
+
+/* Primary navigation bar dropdown content, hidden  */
+ul#primary-nav li div.dropdown div.dropdown-content {
+    display: none;
+    position: absolute;
+    min-width: 160px;
 }
 
 h2 {
@@ -157,6 +186,11 @@ ul.messages li.warning {
     margin: 0.25em;
 }
 
+/* Primary navigation bar dropdown content, show on hover */
+ul#primary-nav li div.dropdown:hover div.dropdown-content {
+    display: block;
+}
+
 div.quickview-box {
     border-style: solid;
     border-width: 0.1em;
@@ -184,6 +218,12 @@ ul.detail-list > li {
     border-width: 0.1em;
     margin: 0.2em 0.2em;
     background-color: lightgrey
+}
+
+/* Comment box */
+ul#comment-activity li {
+    display: block;
+    background-color: azure;
 }
 
 p.button {
@@ -332,16 +372,6 @@ div#footer div#language-select {
         width: 95%
     }
 
-    ul#primary-nav li a:hover {
-        background-color: greenyellow;
-        color: darkslategrey;
-    }
-
-    ul#primary-nav li a.selected {
-        background-color: lightgrey;
-        color: darkslategrey;
-    }
-
     h2 {
         float: left;
     }
@@ -374,12 +404,8 @@ div#footer div#language-select {
     ul.detail-list > li {
         float: left;
         clear: left;
-        border-style: solid;
-        border-width: 0.1em;
-        margin-top: 0.2em;
         width: 95%;
         padding-left: 0.2em;
-        background-color: lightgrey
     }
 
     div#content ul#suggestions {

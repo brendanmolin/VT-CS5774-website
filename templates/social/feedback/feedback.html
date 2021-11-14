@@ -1,0 +1,32 @@
+{% load humanize %}
+
+<h3>Feedback</h3>
+<div class="side-buttons">
+</div>
+
+<div class="opportunity-summary-details-wide">
+    <form name="add-comment" id="add-comment" method="POST">
+        <input name="add-profile-id" id="add-profile-id" type="hidden" value="{{ user.id }}">
+        <input name="add-feedback-id" id="add-feedback-id" type="hidden" value="{{ feedback.id }}">
+        <input name="add-profile-username" id="add-profile-username" type="hidden" value="{{ user.user.username }}">
+        <input name="url-profile" id="url-profile" type="hidden" value="{% url "users:profile" user.user.username %}">
+        <input name="url-edit" id="url-edit" type="hidden" value="{% url "social:comment-edit-item-ajax" %}">
+        <input name="url-delete" id="url-delete" type="hidden" value="{% url "social:comment-delete-item-ajax" %}">
+        <p><label for="input-comment">Add a comment:</label><br>
+            <textarea name="input-comment" id="input-comment"></textarea></p>
+        <button id="add-comment" type="submit" class="button"
+                data-ajax-url="{% url "social:comment-add-item-ajax" %}">Comment
+        </button>
+    </form> <!-- Add comment -->
+
+    <ul id="comment-activity" class="detail-list">
+        <p>{{ feedback.comment_set.all.length }}</p>
+        {% for comment in feedback.comment_set.all %}
+            <li>
+                {% include "social/comments/comment.html" %}
+            </li>
+        {% empty %}
+            <li id="no-comment">No comments yet.</li>
+        {% endfor %}
+    </ul>
+</div>

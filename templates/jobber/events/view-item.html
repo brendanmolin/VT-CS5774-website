@@ -1,0 +1,46 @@
+{% extends 'jobber/view-item_BASE.html' %}
+{% load humanize %}
+{% block primary-nav %}
+    {% include 'jobber/events/nav-bar.html' %}
+{% endblock %}
+{% block my-location %}
+    <p id="my-location"><a href="{% url "jobber:opportunities_index" %}">Home</a> > <a
+            href="{% url "jobber:events_list" %}">Events</a> > View Event Details
+    </p> {% endblock %}
+
+{% block header-buttons %}
+    {% if request.session.role == "admin" or event.profile.id == user.id %}
+        <form name="delete" id="delete-form" method="POST"
+              action="{% url "jobber:events_delete_item" %}">
+            {% csrf_token %}
+            <input type="hidden" name="id" value="{{ event.id }}">
+            <input type="hidden" name="name" value="{{ event.name }}">
+            <input type="hidden" name="title" value="{{ event.title }} ">
+        </form>
+    {% endif %}
+    <p class="button-small"><a
+            href="{% url "jobber:events_edit_item" event.id %}">Edit</a></p>
+    {% if request.session.role == "admin" or event.profile.id == user.id %}
+        <button id="delete-opp" type="submit" class="button-small delete" form="delete-form"
+                formmethod="post">
+            Delete
+        </button>
+    {% endif %}
+{% endblock %}
+
+{% block details-1 %}
+    <li class="opportunity-summary">
+        <h3>Key Details</h3>
+        <p>Title: {{ event.title }}</p>
+        <p>Date: {{ event.date | naturalday }}</p>
+        <p>Type: {{ event.type }}</p>
+        {% if opportunities %}
+            <p>Opportunities:</p>
+            <ul>
+                {% for opp in opportunities %}
+                    <li><a href="{% url "jobber:opportunities_view_item" opp.id %}">{{ opp.title }} , {{ opp.company }}</a></li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </li>
+{% endblock %}

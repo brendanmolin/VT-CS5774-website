@@ -1,0 +1,49 @@
+{% extends 'jobber/view-item_BASE.html' %}
+{% block primary-nav %}
+    {% include 'jobber/resumes/nav-bar.html' %}
+{% endblock %}
+{% block my-location %}
+    <p id="my-location"><a href="{% url "jobber:opportunities_index" %}">Home</a> > <a
+            href="{% url "jobber:resumes_list" %}">Resumes</a> > View Resume Details
+    </p> {% endblock %}
+
+{% block header-buttons %}
+    {% if resume.profile.user.username == user.user.username %}
+    {% if request.session.role == "admin" or resume.profile.id == user.id %}
+        <form name="delete" id="delete-form" method="POST"
+              action="{% url "jobber:resumes_delete_item" %}">
+            {% csrf_token %}
+            <input type="hidden" name="id" value="{{ resume.id }}">
+            <input type="hidden" name="name" value="{{ resume.name }}">
+        </form>
+    {% endif %}
+    <p class="button-small"><a
+            href="{% url "jobber:resumes_edit_item" resume.id %}">Edit</a></p>
+    {% if request.session.role == "admin" or resume.profile.id == user.id %}
+        <button id="delete-opp" type="submit" class="button-small delete" form="delete-form"
+                formmethod="post">
+            Delete
+        </button>
+    {% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block details-1 %}
+    <li class="opportunity-summary">
+        <h3>Key Details</h3>
+        <p>Name: {{ resume.name }}</p>
+        <p>Resume Text:<br> {{ resume.text }}</p>
+        <p>Modified Date: {{ resume.modified_date }}</p>
+        <p>Create Date: {{ resume.create_date }}</p>
+    </li>
+    <li class="opportunity-summary">
+        <h3>Used In</h3>
+        {% if opportunities.length == 0 %}
+            <p>This cover letter has not been used.</p>
+        {% else %}
+            {% for opportunity in opportunities %}
+                <p><a href="{% url "jobber:opportunities_view_item" opportunity.id %}">{{ opportunity.title }}, {{ opportunity.company }}</a></p>
+            {% endfor %}
+        {% endif %}
+    </li>
+{% endblock %}

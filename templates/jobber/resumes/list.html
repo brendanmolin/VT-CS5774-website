@@ -1,0 +1,52 @@
+{% extends 'jobber/list_BASE.html' %}
+{% load humanize %}
+{% block primary-nav %}
+    {% include 'jobber/resumes/nav-bar.html' %}
+{% endblock %}
+{% block my-location %}
+    <p id="my-location"><a href="{% url "jobber:opportunities_index" %}">Home</a> > Resumes</p>
+{% endblock %}
+{% block header-2 %} Your Resumes {% endblock %}
+{% block sorter %}
+    <div class="list-sorter">
+        <label for="sort-opportunities">Sort By:</label>
+        <select name="sort-opportunities" id="sort-opportunities"
+                data-ajax-url="{% url "jobber:resumes_list_sort_ajax" %}">
+            <option value="date" selected="selected">Date Modified</option>
+            <option value="name">Name</option>
+        </select>
+    </div>
+{% endblock %}
+
+{% block search-list %}
+    <form id="search-opportunities">
+        <label for="search-opportunities-box">Search: </label>
+        <input id="search-opportunities-box" type="text" name="search-list"
+               placeholder="Skill...">
+    </form>
+{% endblock %}
+
+{% block add-item %}
+    <div class="header-buttons">
+        <p class="button"><a href={% url "jobber:resumes_add-item" %}>Add New Resume</a></p>
+    </div>
+{% endblock %}
+
+{% block item-list %}
+    {% if resumes.count == 0 %}
+        <p class="sorry-message"><strong>Getting Started?</strong> Try adding a resume!</p>
+    {% else %}
+        <div class="topic-box">
+            <ul class="detail-list">
+                {% for resume in resumes %}
+                    <li class="opportunity-summary" data-sort-order="0" data-id="{{ resume.id }}">
+                        <p>Resume: <a
+                                href="{% url "jobber:resumes_view_item" resume.id %}">{{ resume.name }}</a>
+                        </p>
+                        <p>Modified Date: {{ resume.modified_date | naturalday }}</p>
+                    </li>
+                {% endfor %}
+            </ul> <!-- detail-list -->
+        </div> <!-- topic-box -->
+    {% endif %}
+{% endblock %}
