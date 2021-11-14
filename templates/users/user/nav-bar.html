@@ -1,6 +1,6 @@
 <ul id="primary-nav">
     <li><a href="{% url "jobber:opportunities_index" %}">Home</a></li>
-    {% if request.username %}
+    {% if user %}
     <li><a href="{% url "users:profile" user.user.username %}" class="selected">Profile</a></li>
     <li>
         <div class="dropdown">

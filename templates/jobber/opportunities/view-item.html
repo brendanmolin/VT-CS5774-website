@@ -10,72 +10,80 @@
     </p> {% endblock %}
 
 {% block header-items %}
-    <div id="stage-select">
-        <label for="stage">Current Stage:</label>
-        <select name="stage" id="stage">
-            {% for s in stages %}
-                <option value={{ s.value_name }} {% if s.value_name == opportunity.stage.value_name %} selected="selected" {% endif %}>{{ s.name }}</option>
-            {% endfor %}
-        </select>
-    </div> <!-- stage-select -->
+    {% if opportunity.profile.user.username == user.user.username %}
+        <div id="stage-select">
+            <label for="stage">Current Stage:</label>
+            <select name="stage" id="stage">
+                {% for s in stages %}
+                    <option value={{ s.value_name }} {% if s.value_name == opportunity.stage.value_name %} selected="selected" {% endif %}>{{ s.name }}</option>
+                {% endfor %}
+            </select>
+        </div> <!-- stage-select -->
+    {% endif %}
 {% endblock %}
 
 {% block header-buttons %}
-    {% if request.session.role == "admin" or opportunity.profile.id == user.id %}
-        <form name="delete" id="delete-form" method="POST"
-              action="{% url "jobber:opportunities_delete_item" %}">
-            {% csrf_token %}
-            <input type="hidden" name="id" value="{{ opportunity.id }}">
-            <input type="hidden" name="title" value="{{ opportunity.title }}">
-            <input type="hidden" name="company" value="{{ opportunity.company }} ">
-        </form>
+    {% if opportunity.profile.user.username == user.user.username %}
+        {% if request.session.role == "admin" or opportunity.profile.id == user.id %}
+            <form name="delete" id="delete-form" method="POST"
+                  action="{% url "jobber:opportunities_delete_item" %}">
+                {% csrf_token %}
+                <input type="hidden" name="id" value="{{ opportunity.id }}">
+                <input type="hidden" name="title" value="{{ opportunity.title }}">
+                <input type="hidden" name="company" value="{{ opportunity.company }} ">
+            </form>
+        {% endif %}
+        <p class="button-small"><a
+                href="{% url "jobber:opportunities_edit_item" opportunity.id %}">Edit</a></p>
+        {% if request.session.role == "admin" or opportunity.profile.id == user.id %}
+            <button id="delete-opp" type="submit" class="button-small delete" form="delete-form"
+                    formmethod="post">
+                Delete
+            </button>
+        {% endif %}
+        <p class="button"><a href="{% url "jobber:events_list" %}">See Calendar</a></p>
     {% endif %}
-    <p class="button-small"><a
-            href="{% url "jobber:opportunities_edit_item" opportunity.id %}">Edit</a></p>
-    {% if request.session.role == "admin" or opportunity.profile.id == user.id %}
-        <button id="delete-opp" type="submit" class="button-small delete" form="delete-form"
-                formmethod="post">
-            Delete
-        </button>
-    {% endif %}
-    <p class="button"><a href="{% url "jobber:events_list" %}">See Calendar</a></p>
 {% endblock %}
 
 {% block details-1 %}
-    <li class="opportunity-summary">
-        <h3>Key Details</h3>
-        <p>Title: {{ opportunity.title }}</p>
-        <p>Company: {{ opportunity.company }}</p>
-        <p>Location: {{ opportunity.location }}</p>
-        <p>Recruiter Contact:</p>
-        <ul class="contact-list">
-            {% if opportunity.recruiter_contact is not None %}
-                <li data-ajax-url="{% url "jobber:opportunities_view_contact_ajax" %}"
-                    data-contact="{{ opportunity.recruiter_contact.id }}">{{ opportunity.recruiter_contact.name }}
-                    <a href="#">(see details)</a>
-                    <div class="hover-frame permanent-hide"></div>
-                </li>
-            {% endif %}
-        </ul>
-        <p>Created Date: {{ opportunity.create_date | date:"F j, Y" }}</p>
-    </li>
+    {% if opportunity.profile.user.username == user.user.username %}
+        <li class="opportunity-summary">
+            <h3>Key Details</h3>
+            <p>Title: {{ opportunity.title }}</p>
+            <p>Company: {{ opportunity.company }}</p>
+            <p>Location: {{ opportunity.location }}</p>
+            <p>Recruiter Contact:</p>
+            <ul class="contact-list">
+                {% if opportunity.recruiter_contact is not None %}
+                    <li data-ajax-url="{% url "jobber:opportunities_view_contact_ajax" %}"
+                        data-contact="{{ opportunity.recruiter_contact.id }}">{{ opportunity.recruiter_contact.name }}
+                        <a href="#">(see details)</a>
+                        <div class="hover-frame permanent-hide"></div>
+                    </li>
+                {% endif %}
+            </ul>
+            <p>Created Date: {{ opportunity.create_date | date:"F j, Y" }}</p>
+        </li>
+    {% endif %}
     <li class="opportunity-summary">
         <h3>Application Details</h3>
-        <div class="side-buttons">
-            <form id="feedback" name="feedback" method="POST">
-                {% csrf_token %}
-                <input type="hidden" id="opp-id" name="opp-id" value="{{ opportunity.id }}">
-                <p class="button"><a href="#">Download Application</a></p>
-                {% if not feedback %}
-                    <button type="submit" class="button" formaction="{% url "social:feedback_open" %}">Get Feedback
-                    </button>
-                {% else %}
-                    <button type="submit" class="button" formaction="{% url "social:feedback_close" feedback.id %}">
-                        Close Feedback
-                    </button>
-                {% endif %}
-            </form>
-        </div>
+        {% if opportunity.profile.user.username == user.user.username %}
+            <div class="side-buttons">
+                <form id="feedback" name="feedback" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" id="opp-id" name="opp-id" value="{{ opportunity.id }}">
+                    <p class="button"><a href="#">Download Application</a></p>
+                    {% if not feedback %}
+                        <button type="submit" class="button" formaction="{% url "social:feedback_open" %}">Get Feedback
+                        </button>
+                    {% else %}
+                        <button type="submit" class="button" formaction="{% url "social:feedback_close" feedback.id %}">
+                            Close Feedback
+                        </button>
+                    {% endif %}
+                </form>
+            </div>
+        {% endif %}
         <div class="opportunity-summary-details-wide">
             <p>Applicant: {{ opportunity.profile.user.first_name }} {{ opportunity.profile.user.last_name }}</p>
             <p>Application Page: <a href="{{ opportunity.application.application_link }}"

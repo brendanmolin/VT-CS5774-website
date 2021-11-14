@@ -8,6 +8,7 @@
     </p> {% endblock %}
 
 {% block header-buttons %}
+    {% if resume.profile.user.username == user.user.username %}
     {% if request.session.role == "admin" or resume.profile.id == user.id %}
         <form name="delete" id="delete-form" method="POST"
               action="{% url "jobber:resumes_delete_item" %}">
@@ -23,6 +24,7 @@
                 formmethod="post">
             Delete
         </button>
+    {% endif %}
     {% endif %}
 {% endblock %}
 
