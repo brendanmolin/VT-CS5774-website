@@ -14,19 +14,7 @@ from pathlib import Path
 import json
 import os
 from django.core.exceptions import ImproperlyConfigured
-
-BASE_DIR = ''
-with open(os.path.join(BASE_DIR, 'secrets.json')) as secrets_file:
-    secrets = json.load(secrets_file)
-
-
-def get_secret(setting, secrets=secrets):
-    """Get secret setting or fail with ImproperlyConfigured"""
-    try:
-        return secrets[setting]
-    except KeyError:
-        raise ImproperlyConfigured("Set the {} setting".format(setting))
-
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,7 +28,10 @@ SECRET_KEY = 'django-insecure-uno0#b!+&5ehlc4gyul#)zggr&+_%&s^uterie$&jayzw5u=f1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'cs5774proj6-brendanmolin.herokuapp.com',
+    '127.0.0.1'
+]
 
 # Application definition
 
@@ -60,6 +51,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -92,17 +84,21 @@ WSGI_APPLICATION = 'djangoProject.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'cs5774db',
-        'USER': 'postgres',
-        'PASSWORD': get_secret('DB_PASSWORD'),
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+if 'DATABASE_URL' in os.environ:
+    # heroku
+    DATABASES = {'default': dj_database_url.config()}
+else:
+    # local
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'cs5774db',
+            'USER': 'postgres',
+            'PASSWORD': "Legend01VT",
+            'HOST': '127.0.0.1',
+            'PORT': '5432',
+        }
     }
-}
 
 # DATABASES = {
 #     'default': {
@@ -146,6 +142,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATIC_URL = '/static/'
 
 # Default primary key field type
