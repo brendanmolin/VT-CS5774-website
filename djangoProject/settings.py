@@ -15,19 +15,6 @@ import json
 import os
 from django.core.exceptions import ImproperlyConfigured
 
-BASE_DIR = ''
-with open(os.path.join(BASE_DIR, 'secrets.json')) as secrets_file:
-    secrets = json.load(secrets_file)
-
-
-def get_secret(setting, secrets=secrets):
-    """Get secret setting or fail with ImproperlyConfigured"""
-    try:
-        return secrets[setting]
-    except KeyError:
-        raise ImproperlyConfigured("Set the {} setting".format(setting))
-
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -101,7 +88,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'cs5774db',
         'USER': 'postgres',
-        'PASSWORD': get_secret('DB_PASSWORD'),
+        'PASSWORD': "Legend01VT",
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
