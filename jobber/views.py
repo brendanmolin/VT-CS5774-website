@@ -304,7 +304,8 @@ def opportunities_home_alt(request):
 def opportunities_search_results(request):
     """ Renders the search page """
     return render(request,
-                  "jobber/search-results.html")
+                  "jobber/search-results.html",
+                  {"user": get_profile(request)})
 
 
 # Opportunities Views
